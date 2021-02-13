@@ -60,6 +60,7 @@ class CommonProcess:
         self.__lifetime_event.wait()
 
 
+# noinspection DuplicatedCode
 def common_process(args, preexec_fn=None, real_time_limit=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     _full_lifetime_complete = Event()
@@ -69,6 +70,7 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
     _start_time = Value('d', 0.0)
     _start_time_ok = Event()
 
+    # noinspection DuplicatedCode
     def _execute_parent() -> CommonProcess:
         os.close(stdin_read)
         os.close(stdout_write)
@@ -140,6 +142,7 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
         _communicate_thread = Thread(target=_communicate_func)
         _communicate_thread.start()
 
+        # wait for all the thread initialized
         _measure_initialized.wait()
         _killer_initialized.wait()
         _communicate_initialized.wait()
