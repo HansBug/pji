@@ -5,7 +5,7 @@ from multiprocessing.synchronize import Event as EventClass
 from queue import Queue, Empty
 from threading import Thread
 
-from .base import wait_and_measure_thread, process_kill_thread, preexec_fn_merge
+from .base import measure_thread, killer_thread, preexec_fn_merge
 from ..model import ProcessResult
 from ...utils import args_split
 
@@ -89,12 +89,12 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None) -> Interact
 
     # thread for process control and resource measure
     resource_measure_thread, _process_complete, _process_result = \
-        wait_and_measure_thread(_start_time_ok, _start_time, process)
+        measure_thread(_start_time_ok, _start_time, process)
     resource_measure_thread.start()
 
     # thread for killing the process when real time exceed
-    killer_thread = process_kill_thread(_start_time_ok, _start_time, process, real_time_limit, _process_complete)
-    killer_thread.start()
+    killer_threadx = killer_thread(_start_time_ok, _start_time, process, real_time_limit, _process_complete)
+    killer_threadx.start()
 
     # output control thread
     _all_output_queue = Queue()
@@ -111,7 +111,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None) -> Interact
         stdout_thread.join()
         stderr_thread.join()
         resource_measure_thread.join()
-        killer_thread.join()
+        killer_threadx.join()
         _all_output_complete.set()
 
     que_thread = Thread(target=_output_queue)

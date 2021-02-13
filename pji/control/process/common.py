@@ -1,21 +1,21 @@
-import subprocess
-from multiprocessing import Event
+import os
+import sys
+import time
+from multiprocessing import Event, Value
 from multiprocessing.synchronize import Event as EventClass
-from subprocess import Popen
 from threading import Thread
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Mapping
 
-from .base import process_kill_thread, wait_and_measure_thread, preexec_fn_merge
+from .base import measure_thread, killer_thread, read_all_from_stream
 from ..model import ProcessResult
-from ...utils import args_split, ValueProxy
+from ...utils import ValueProxy, args_split
 
 
 class CommonProcess:
-    def __init__(self, process: Popen, start_time: float,
+    def __init__(self, start_time: float,
                  communicate_event: EventClass, communicate_complete: EventClass,
                  communicate_stdin: ValueProxy, communicate_stdout: ValueProxy, communicate_stderr: ValueProxy,
                  result_func, lifetime_event: EventClass):
-        self.__process = process
         self.__start_time = start_time
 
         self.__communicate_event = communicate_event
@@ -61,57 +61,129 @@ class CommonProcess:
         self.__lifetime_event.wait()
 
 
-def common_process(args, preexec_fn=None, real_time_limit=None) -> CommonProcess:
+def common_process(args, preexec_fn=None, real_time_limit=None,
+                   environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     _full_lifetime_complete = Event()
-    _start_time_ok, _start_time, _before_exec = preexec_fn_merge(preexec_fn)
+    args = args_split(args)
+    environ = dict(environ or {})
 
-    process = subprocess.Popen(
-        args=args_split(args),
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        preexec_fn=_before_exec,
-    )
+    _parent_initialized = Event()
+    _start_time = Value('d', 0.0)
+    _start_time_ok = Event()
 
-    # thread for process control and resource measure
-    resource_measure_thread, _process_complete, _process_result = \
-        wait_and_measure_thread(_start_time_ok, _start_time, process)
-    resource_measure_thread.start()
+    def _execute_child():
+        os.close(stdin_write)
+        os.dup2(stdin_read, sys.stdin.fileno())
 
-    # thread for killing the process when real time exceed
-    killer_thread = process_kill_thread(_start_time_ok, _start_time, process, real_time_limit, _process_complete)
-    killer_thread.start()
+        os.close(stdout_read)
+        os.dup2(stdout_write, sys.stdout.fileno())
 
-    # communication function control
-    _communicate_stdin, _communicate_stdout, _communicate_stderr = ValueProxy(), ValueProxy(), ValueProxy()
-    _communicate_event, _communicate_complete = Event(), Event()
+        os.close(stderr_read)
+        os.dup2(stderr_write, sys.stderr.fileno())
 
-    def _communicate_func():
+        if preexec_fn is not None:
+            preexec_fn()
+
+        _parent_initialized.wait()
+        _start_time.value = time.time()
+        _start_time_ok.set()
+
+        os.execvpe(args[0], args, environ)
+
+    def _execute_parent() -> CommonProcess:
+        os.close(stdin_read)
+        os.close(stdout_write)
+        os.close(stderr_write)
+
+        # measure thread
+        _measure_thread, _measure_initialized, _process_complete, _measure_complete, _result_proxy = measure_thread(
+            start_time_ok=_start_time_ok,
+            start_time=_start_time,
+            child_pid=child_pid,
+        )
+        _measure_thread.start()
+
+        # killer thread
+        _killer_thread, _killer_initialized = killer_thread(
+            start_time_ok=_start_time_ok,
+            start_time=_start_time,
+            child_pid=child_pid,
+            real_time_limit=real_time_limit,
+            process_complete=_process_complete,
+        )
+        _killer_thread.start()
+
+        # communication thread
+        _communicate_initialized, _communicate_event, _communicate_complete = Event(), Event(), Event()
+        _communicate_stdin, _communicate_stdout, _communicate_stderr = ValueProxy(), ValueProxy(), ValueProxy()
+
+        def _communicate_func():
+            with os.fdopen(stdin_write, 'wb', 0) as fstdin, \
+                    os.fdopen(stdout_read, 'rb', 0) as fstdout, \
+                    os.fdopen(stderr_read, 'rb', 0) as fstderr:
+                _communicate_initialized.set()
+                _communicate_event.wait()
+
+                _stdout, _stderr = None, None
+
+                def _read_stdout():
+                    nonlocal _stdout
+                    _stdout = read_all_from_stream(fstdout)
+
+                def _read_stderr():
+                    nonlocal _stderr
+                    _stderr = read_all_from_stream(fstderr)
+
+                _stdout_thread = Thread(target=_read_stdout)
+                _stderr_thread = Thread(target=_read_stderr)
+
+                # write stdin into stream
+                fstdin.write(_communicate_stdin.value)
+                fstdin.flush()
+                _stdout_thread.start()
+                _stderr_thread.start()
+
+                # waiting for receiving of stdout and stderr
+                fstdin.close()
+                _stdout_thread.join()
+                _stderr_thread.join()
+
+                # set stderr
+                _communicate_stdout.value = _stdout
+                _communicate_stderr.value = _stderr
+                _communicate_complete.set()
+
+                # ending of all the process
+                _process_complete.wait()
+                _measure_complete.wait()
+                _full_lifetime_complete.set()
+
+        _communicate_thread = Thread(target=_communicate_func)
+        _communicate_thread.start()
+
+        _measure_initialized.wait()
+        _killer_initialized.wait()
+        _communicate_initialized.wait()
+        _parent_initialized.set()
+
         _start_time_ok.wait()
-        _communicate_event.wait()
-        _stdout, _stderr = process.communicate(_communicate_stdin.value)
-        _communicate_stdout.value = _stdout
-        _communicate_stderr.value = _stderr
-        _communicate_complete.set()
+        return CommonProcess(
+            start_time=_start_time.value,
+            communicate_event=_communicate_event,
+            communicate_complete=_communicate_complete,
+            communicate_stdin=_communicate_stdin,
+            communicate_stdout=_communicate_stdout,
+            communicate_stderr=_communicate_stderr,
+            result_func=lambda: _result_proxy.value,
+            lifetime_event=_full_lifetime_complete,
+        )
 
-        resource_measure_thread.join()
-        killer_thread.join()
-        _full_lifetime_complete.set()
+    stdin_read, stdin_write = os.pipe()
+    stdout_read, stdout_write = os.pipe()
+    stderr_read, stderr_write = os.pipe()
+    child_pid = os.fork()
 
-    communicate_thread = Thread(target=_communicate_func)
-
-    # wait for real start
-    _start_time_ok.wait()
-    communicate_thread.start()
-
-    return CommonProcess(
-        process=process,
-        start_time=_start_time.value,
-        communicate_event=_communicate_event,
-        communicate_complete=_communicate_complete,
-        communicate_stdin=_communicate_stdin,
-        communicate_stdout=_communicate_stdout,
-        communicate_stderr=_communicate_stderr,
-        result_func=lambda: _process_result.value,
-        lifetime_event=_full_lifetime_complete,
-    )
+    if not child_pid:
+        _execute_child()
+    else:
+        return _execute_parent()
