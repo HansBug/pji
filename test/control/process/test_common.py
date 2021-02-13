@@ -10,10 +10,13 @@ from pji.control.process import common_process, CommonProcess
 @pytest.mark.unittest
 class TestControlProcessCommon:
     def test_common_process_simple(self):
+        _before_start = time.time()
         cp = common_process(
             args='echo 233',
         )
+        _after_start = time.time()
         assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
 
         _cresult = cp.communicate()
         assert cp.stdin == b''
@@ -32,10 +35,13 @@ class TestControlProcessCommon:
         assert _result.cpu_time < 0.5
 
     def test_common_process_with_input(self):
+        _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]))\""
         )
+        _after_start = time.time()
         assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
 
         _cresult = cp.communicate(b'2 3 4 5 6')
         assert cp.stdin == b'2 3 4 5 6'
@@ -54,11 +60,13 @@ class TestControlProcessCommon:
         assert _result.cpu_time < 0.5
 
     def test_common_process_without_wait(self):
-        _start = time.time()
+        _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]))\""
         )
+        _after_start = time.time()
         assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
 
         _cresult = cp.communicate(b'2 3 4 5 6', wait=False)
         cp.join()
@@ -75,11 +83,14 @@ class TestControlProcessCommon:
         assert _result.cpu_time < 0.5
 
     def test_common_process_rtle(self):
+        _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]));import time;time.sleep(4.0);\"",
             real_time_limit=2.0
         )
+        _after_start = time.time()
         assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
 
         cp.communicate(b'2 3 4 5 6')
         cp.join()
@@ -91,11 +102,14 @@ class TestControlProcessCommon:
 
     @pytest.mark.timeout(10.0)
     def test_common_process_rtle_pass(self):
+        _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]));import time;time.sleep(4.0);\"",
             real_time_limit=20.0
         )
+        _after_start = time.time()
         assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
 
         _cresult = cp.communicate(b'2 3 4 5 6', wait=False)
         cp.join()
@@ -110,6 +124,10 @@ class TestControlProcessCommon:
         assert _result is not None
         assert _result.ok
         assert _result.cpu_time < 0.5
+
+    def test_common_process_wtf(self):
+        with pytest.raises(EnvironmentError):
+            common_process(args="what_the_fuck -a 1 -b 2")
 
 
 if __name__ == "__main__":
