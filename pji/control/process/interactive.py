@@ -15,9 +15,12 @@ class InteractiveProcess:
                  output_iter, result_func, lifetime_event: EventClass):
         self.__stdin_stream = stdin_stream
         self.__start_time = start_time
+
         self.__output_iter = output_iter
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
+
+        self.__closed = False
 
     @property
     def result(self) -> ProcessResult:
@@ -38,12 +41,21 @@ class InteractiveProcess:
 
     def close_stdin(self):
         self.__stdin_stream.close()
+        self.__closed = True
 
     def join(self):
         return self.__lifetime_event.wait()
 
+    def __enter__(self):
+        return self
 
-def _read_stream(pipe_entry, start_time_ok: EventClass, start_time: Value, tag: str, queue: Queue):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self.__closed:
+            self.close_stdin()
+        self.join()
+
+
+def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value, tag: str, queue: Queue):
     def _transform_func(item):
         _time, _line = item
         return _time - start_time.value, tag, _line.rstrip(b'\r\n')
@@ -90,11 +102,10 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
         # lines output
         _output_queue = Queue()
         _output_start, _output_complete = Event(), Event()
-        _start_time_ok.wait()
         _stdout_thread = Thread(
-            target=lambda: _read_stream(stdout_read, _start_time_ok, _start_time, 'stdout', _output_queue))
+            target=lambda: _read_pipe(stdout_read, _start_time_ok, _start_time, 'stdout', _output_queue))
         _stderr_thread = Thread(
-            target=lambda: _read_stream(stderr_read, _start_time_ok, _start_time, 'stderr', _output_queue))
+            target=lambda: _read_pipe(stderr_read, _start_time_ok, _start_time, 'stderr', _output_queue))
 
         def _output_queue_func():
             _stdout_thread.start()

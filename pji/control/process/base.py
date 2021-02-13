@@ -29,7 +29,7 @@ def load_lines_from_bytes_stream(stream, queue: Queue, transformer=None):
         _output_load_complete.set()
 
     def _item_process_func():
-        while not _middle_queue.empty() and not _output_load_complete.is_set():
+        while not _middle_queue.empty() or not _output_load_complete.is_set():
             try:
                 item = _middle_queue.get(timeout=0.2)
             except Empty:
