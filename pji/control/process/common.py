@@ -27,8 +27,8 @@ class CommonProcess:
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
 
-    def communicate(self, stdin: bytes, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
-        self.__communicate_stdin.value = stdin
+    def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
+        self.__communicate_stdin.value = stdin or b''
         self.__communicate_event.set()
 
         if wait:

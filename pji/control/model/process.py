@@ -26,13 +26,19 @@ class _IStatus:
     @property
     def signal(self) -> Optional[signal.Signals]:
         """
-        获取信号
-        :return: 信号
+        :return: signal object
         """
         if self.signal_code:
             return signal.Signals(self.signal_code)
         else:
             return None
+
+    @property
+    def ok(self) -> bool:
+        """
+        :return: true if quit normally, otherwise false
+        """
+        return not self.__status
 
 
 class _IDuration:
