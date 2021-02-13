@@ -6,6 +6,8 @@ from multiprocessing.synchronize import Event as EventClass
 from threading import Thread
 from typing import Optional, Tuple, Mapping
 
+import where
+
 from .base import measure_thread, killer_thread, read_all_from_stream
 from ..model import ProcessResult
 from ...utils import ValueProxy, args_split
@@ -65,7 +67,11 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     _full_lifetime_complete = Event()
     args = args_split(args)
+    arg_file = where.first(args[0])
     environ = dict(environ or {})
+
+    if not arg_file:
+        raise EnvironmentError('Executable {exec} not found.'.format(exec=args[0]))
 
     _parent_initialized = Event()
     _start_time = Value('d', 0.0)
@@ -88,7 +94,7 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
         _start_time.value = time.time()
         _start_time_ok.set()
 
-        os.execvpe(args[0], args, environ)
+        os.execvpe(arg_file, args, environ)
 
     def _execute_parent() -> CommonProcess:
         os.close(stdin_read)
