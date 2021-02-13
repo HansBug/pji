@@ -1,16 +1,13 @@
 import os
-import sys
-import time
 from multiprocessing import Event, Value
 from multiprocessing.synchronize import Event as EventClass
 from threading import Thread
 from typing import Optional, Tuple, Mapping
 
-import where
-
-from .base import measure_thread, killer_thread, read_all_from_stream
+from .base import measure_thread, killer_thread, read_all_from_bytes_stream
+from .executor import get_executor_func
 from ..model import ProcessResult
-from ...utils import ValueProxy, args_split
+from ...utils import ValueProxy
 
 
 class CommonProcess:
@@ -66,35 +63,11 @@ class CommonProcess:
 def common_process(args, preexec_fn=None, real_time_limit=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     _full_lifetime_complete = Event()
-    args = args_split(args)
-    arg_file = where.first(args[0])
     environ = dict(environ or {})
-
-    if not arg_file:
-        raise EnvironmentError('Executable {exec} not found.'.format(exec=args[0]))
 
     _parent_initialized = Event()
     _start_time = Value('d', 0.0)
     _start_time_ok = Event()
-
-    def _execute_child():
-        os.close(stdin_write)
-        os.dup2(stdin_read, sys.stdin.fileno())
-
-        os.close(stdout_read)
-        os.dup2(stdout_write, sys.stdout.fileno())
-
-        os.close(stderr_read)
-        os.dup2(stderr_write, sys.stderr.fileno())
-
-        if preexec_fn is not None:
-            preexec_fn()
-
-        _parent_initialized.wait()
-        _start_time.value = time.time()
-        _start_time_ok.set()
-
-        os.execvpe(arg_file, args, environ)
 
     def _execute_parent() -> CommonProcess:
         os.close(stdin_read)
@@ -134,11 +107,11 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
 
                 def _read_stdout():
                     nonlocal _stdout
-                    _stdout = read_all_from_stream(fstdout)
+                    _stdout = read_all_from_bytes_stream(fstdout)
 
                 def _read_stderr():
                     nonlocal _stderr
-                    _stderr = read_all_from_stream(fstderr)
+                    _stderr = read_all_from_bytes_stream(fstderr)
 
                 _stdout_thread = Thread(target=_read_stdout)
                 _stderr_thread = Thread(target=_read_stderr)
@@ -187,6 +160,16 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
     stdin_read, stdin_write = os.pipe()
     stdout_read, stdout_write = os.pipe()
     stderr_read, stderr_write = os.pipe()
+
+    _execute_child = get_executor_func(
+        args, dict(environ or {}), preexec_fn,
+        _parent_initialized,
+        _start_time_ok, _start_time,
+        (stdin_read, stdin_write),
+        (stdout_read, stdout_write),
+        (stderr_read, stderr_write),
+    )
+
     child_pid = os.fork()
 
     if not child_pid:

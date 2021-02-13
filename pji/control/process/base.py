@@ -3,15 +3,48 @@ import signal
 import time
 from multiprocessing import Event, Value
 from multiprocessing.synchronize import Event as EventClass
+from queue import Empty, Queue
 from threading import Thread
 from typing import Callable, Tuple, Optional
 
 from ..model import ProcessResult
 from ...utils import ValueProxy
 
+BYTES_LINESEQ = bytes(os.linesep, 'utf8')
 
-def read_all_from_stream(stream) -> bytes:
+
+def read_all_from_bytes_stream(stream) -> bytes:
     return b''.join([line for line in stream])
+
+
+def load_lines_from_bytes_stream(stream, queue: Queue, transformer=None):
+    _middle_queue = Queue()
+    _output_load_complete = Event()
+    transformer = transformer or (lambda x: x)
+
+    def _output_load_func():
+        for line in stream:
+            _middle_queue.put((time.time(), line))
+
+        _output_load_complete.set()
+
+    def _item_process_func():
+        while not _middle_queue.empty() and not _output_load_complete.is_set():
+            try:
+                item = _middle_queue.get(timeout=0.2)
+            except Empty:
+                continue
+            else:
+                queue.put(transformer(item))
+
+    _output_load_thread = Thread(target=_output_load_func)
+    _item_process_func = Thread(target=_item_process_func)
+
+    _output_load_thread.start()
+    _item_process_func.start()
+
+    _output_load_thread.join()
+    _item_process_func.join()
 
 
 def measure_thread(start_time_ok: Event, start_time: Value, child_pid: int) \

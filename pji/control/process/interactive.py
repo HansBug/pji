@@ -4,10 +4,10 @@ from multiprocessing import Event
 from multiprocessing.synchronize import Event as EventClass
 from queue import Queue, Empty
 from threading import Thread
+from typing import Optional, Mapping
 
-from .base import measure_thread, killer_thread, preexec_fn_merge
+from .base import BYTES_LINESEQ
 from ..model import ProcessResult
-from ...utils import args_split
 
 
 class InteractiveProcess:
@@ -31,10 +31,10 @@ class InteractiveProcess:
     def output_yield(self):
         return self.__output_yield
 
-    def print_stdin(self, *args, **kwargs):
-        kwargs['file'] = self.__process.stdin
-        kwargs['flush'] = kwargs.get('flush', True)
-        print(*args, **kwargs)
+    def print_stdin(self, line: bytes, flush: bool = True, end: bytes = BYTES_LINESEQ):
+        self.__process.stdin.write(line + end)
+        if flush:
+            self.__process.stdin.flush()
 
     def close_stdin(self):
         self.__process.stdin.close()
@@ -73,68 +73,23 @@ def _read_stream(stream, start_time: float, tag: str, queue: Queue):
     _output_thread.join()
 
 
-def interactive_process(args, preexec_fn=None, real_time_limit=None) -> InteractiveProcess:
+def interactive_process(args, preexec_fn=None, real_time_limit=None,
+                        environ: Optional[Mapping[str, str]] = None) -> InteractiveProcess:
     _full_lifetime_complete = Event()
-    _start_time_ok, _start_time, _before_exec = preexec_fn_merge(preexec_fn)
+    environ = dict(environ or {})
+    pass
 
-    process = subprocess.Popen(
-        args=args_split(args),
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        bufsize=1,
-        universal_newlines=True,
-        preexec_fn=_before_exec,
-    )
-
-    # thread for process control and resource measure
-    resource_measure_thread, _process_complete, _process_result = \
-        measure_thread(_start_time_ok, _start_time, process)
-    resource_measure_thread.start()
-
-    # thread for killing the process when real time exceed
-    killer_threadx = killer_thread(_start_time_ok, _start_time, process, real_time_limit, _process_complete)
-    killer_threadx.start()
-
-    # output control thread
-    _all_output_queue = Queue()
-    _all_output_start = Event()
-    _all_output_complete = Event()
-    _start_time_ok.wait()
-    stdout_thread = Thread(target=lambda: _read_stream(process.stdout, _start_time.value, 'stdout', _all_output_queue))
-    stderr_thread = Thread(target=lambda: _read_stream(process.stderr, _start_time.value, 'stderr', _all_output_queue))
-
-    def _output_queue():
-        stdout_thread.start()
-        stderr_thread.start()
-        _all_output_start.set()
-        stdout_thread.join()
-        stderr_thread.join()
-        resource_measure_thread.join()
-        killer_threadx.join()
-        _all_output_complete.set()
-
-    que_thread = Thread(target=_output_queue)
-    que_thread.start()
-
-    # output yield function (can iter output lines)
-    def _output_yield():
-        _all_output_start.wait()
-        while not _all_output_complete.is_set() or not _all_output_queue.empty():
-            try:
-                _time, _tag, _line = _all_output_queue.get(timeout=0.2)
-            except Empty:
-                pass
-            else:
-                yield _time, _tag, _line
-
-        que_thread.join()
-        _full_lifetime_complete.set()
-
-    return InteractiveProcess(
-        process=process,
-        start_time=_start_time.value,
-        output_yield_func=_output_yield,
-        result_func=lambda: _process_result.value,
-        lifetime_event=_full_lifetime_complete,
-    )
+    # if not arg_file:
+    #     raise EnvironmentError('Executable {exec} not found.'.format(exec=args[0]))
+    #
+    # _parent_initialized = Event()
+    # _start_time = Value('d', 0.0)
+    # _start_time_ok = Event()
+    #
+    # return InteractiveProcess(
+    #     process=process,
+    #     start_time=_start_time.value,
+    #     output_yield_func=_output_yield,
+    #     result_func=lambda: _process_result.value,
+    #     lifetime_event=_full_lifetime_complete,
+    # )
