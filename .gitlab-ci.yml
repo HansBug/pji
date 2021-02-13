@@ -47,22 +47,26 @@ demo_production:
     - cd ${DEMO_ROOT}
     - cd ..
 
-_unit_tests: &unit_test_script
-  - pip3 install -e .
-  - pytest --version
-  - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
-
 unit_test_in_3.6.3:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
-  script: *unit_test_script
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
 
 unit_test_in_3.7.6:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
-  script: *unit_test_script
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
 
 unit_test_in_3.8.1:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
-  script: *unit_test_script
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
