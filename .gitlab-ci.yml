@@ -9,7 +9,6 @@ stages:
   - deploy
 
 variables:
-  MIN_UNITTEST_COVERAGE: 50
   TWINE_REPOSITORY: pypi
   OSS_NAME: oss
   OSS_RELEASE_ROOT: ${OSS_NAME}/releases/${CI_PROJECT_NAME}
@@ -50,23 +49,29 @@ demo_production:
 unit_test_in_3.6.3:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  variables:
+    MIN_COVERAGE: 50
   script:
     - pip3 install -e .
     - pytest --version
-    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
+    - make test
 
 unit_test_in_3.7.6:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  variables:
+    MIN_COVERAGE: 50
   script:
     - pip3 install -e .
     - pytest --version
-    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
+    - make test
 
 unit_test_in_3.8.1:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  variables:
+    MIN_COVERAGE: 50
   script:
     - pip3 install -e .
     - pytest --version
-    - pytest ./test --cov-report term-missing --cov=./pji -sv -m unittest --cov-fail-under=${MIN_UNITTEST_COVERAGE}
+    - make test
