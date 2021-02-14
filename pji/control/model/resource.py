@@ -2,6 +2,12 @@ import resource
 
 from bitmath import MiB
 
+from ...utils import allow_none, size_to_bytes, time_to_duration
+
+_memory_process = allow_none(size_to_bytes)
+_duration_process = allow_none(time_to_duration)
+_number_process = allow_none(lambda x: x)
+
 
 class ResourceLimit:
     __RESOURCE_UNLIMITED = -1
@@ -25,12 +31,12 @@ class ResourceLimit:
         :param max_process_number: max process count
         :param max_output_size: max output size (unit: B)
         """
-        self.__max_stack = max_stack
-        self.__max_memory = max_memory
-        self.__max_cpu_time = max_cpu_time
-        self.__max_real_time = max_real_time
-        self.__max_process_number = max_process_number
-        self.__max_output_size = max_output_size
+        self.__max_stack = _memory_process(max_stack)
+        self.__max_memory = _memory_process(max_memory)
+        self.__max_cpu_time = _duration_process(max_cpu_time)
+        self.__max_real_time = _duration_process(max_real_time)
+        self.__max_process_number = _number_process(max_process_number)
+        self.__max_output_size = _memory_process(max_output_size)
 
     @property
     def max_stack(self):
