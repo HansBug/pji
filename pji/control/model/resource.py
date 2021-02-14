@@ -2,7 +2,7 @@ import resource
 
 from bitmath import MiB
 
-from ...utils import allow_none, size_to_bytes, time_to_duration
+from ...utils import allow_none, size_to_bytes, time_to_duration, get_repr_info, size_to_bytes_str
 
 _UNLIMITED = -1
 
@@ -238,4 +238,17 @@ class ResourceLimit:
             max_real_time=_max_real_time,
             max_process_number=_max_process_number,
             max_output_size=_max_output_size,
+        )
+
+    def __repr__(self):
+        return get_repr_info(
+            cls=self.__class__,
+            args=[
+                ('cpu time', (lambda: '%.3fs' % self.max_cpu_time, lambda: self.max_cpu_time is not None)),
+                ('real time', (lambda: '%.3fs' % self.max_real_time, lambda: self.max_real_time is not None)),
+                ('memory', (lambda: size_to_bytes_str(self.max_memory), lambda: self.max_memory is not None)),
+                ('stack', (lambda: size_to_bytes_str(self.max_stack), lambda: self.max_stack is not None)),
+                ('process', (lambda: self.max_process_number, lambda: self.max_process_number is not None)),
+                ('output size', (lambda: self.max_output_size, lambda: self.max_output_size is not None)),
+            ]
         )
