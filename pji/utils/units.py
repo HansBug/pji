@@ -1,10 +1,12 @@
+from typing import Union
+
 from bitmath import Byte
 from bitmath import parse_string_unsafe as parse_bytes
 from pytimeparse import parse as parse_duration
 
 
-def size_to_bytes(size) -> int:
-    if isinstance(size, int):
+def size_to_bytes(size) -> Union[float, int]:
+    if isinstance(size, (float, int)):
         return size
     elif isinstance(size, str):
         return parse_bytes(size).bytes
@@ -19,7 +21,7 @@ def size_to_bytes(size) -> int:
         ))
 
 
-def time_to_duration(time_):
+def time_to_duration(time_) -> Union[float, int]:
     if isinstance(time_, (float, int)):
         return time_
     elif isinstance(time_, str):
