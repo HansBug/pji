@@ -5,7 +5,7 @@ from multiprocessing import Event, Value
 from multiprocessing.synchronize import Event as EventClass
 from queue import Empty, Queue
 from threading import Thread
-from typing import Callable, Tuple, Optional
+from typing import Tuple
 
 from ..model import ProcessResult
 from ...utils import ValueProxy
@@ -17,12 +17,13 @@ def read_all_from_bytes_stream(stream) -> bytes:
     return b''.join([line for line in stream])
 
 
-def load_lines_from_bytes_stream(stream, queue: Queue, transformer=None):
+def load_lines_from_bytes_stream(stream, loader_initialized: EventClass, queue: Queue, transformer=None):
     _middle_queue = Queue()
     _output_load_complete = Event()
     transformer = transformer or (lambda x: x)
 
     def _output_load_func():
+        loader_initialized.set()
         for line in stream:
             _middle_queue.put((time.time(), line))
 
@@ -81,16 +82,3 @@ def killer_thread(start_time_ok: Event, start_time: Value, child_pid: int,
                 process_complete.wait()
 
     return Thread(target=_thread_func), _killer_initialized
-
-
-def preexec_fn_merge(preexec_fn: Optional[Callable[[], None]]) -> Tuple[Event, Value, Callable[[], None]]:
-    _start_time_ok = Event()
-    _start_time = Value('d', 0.0)
-
-    def _preexec_fn():
-        if preexec_fn is not None:
-            preexec_fn()
-        _start_time.value = time.time()
-        _start_time_ok.set()
-
-    return _start_time_ok, _start_time, _preexec_fn

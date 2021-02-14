@@ -1,5 +1,5 @@
 import os
-from multiprocessing import Event, Value
+from multiprocessing import Event, Value, Lock
 from multiprocessing.synchronize import Event as EventClass
 from queue import Queue, Empty
 from threading import Thread
@@ -21,48 +21,81 @@ class InteractiveProcess:
         self.__lifetime_event = lifetime_event
 
         self.__closed = False
+        self.__lock = Lock()
+
+    def __write_stdin(self, data: bytes):
+        try:
+            if not self.__closed:
+                self.__stdin_stream.write(data)
+        except BrokenPipeError:
+            self.__closed = True
+
+    def __flush_stdin(self):
+        try:
+            if not self.__closed:
+                self.__stdin_stream.flush()
+        except BrokenPipeError:
+            self.__closed = True
+
+    def __close_stdin(self):
+        try:
+            if not self.__closed:
+                self.__stdin_stream.close()
+                self.__closed = True
+        except BrokenPipeError:
+            self.__closed = True
+
+    def __join(self):
+        self.__lifetime_event.wait()
 
     @property
     def result(self) -> ProcessResult:
-        return self.__result_func()
+        with self.__lock:
+            return self.__result_func()
 
     @property
     def start_time(self) -> float:
-        return self.__start_time
+        with self.__lock:
+            return self.__start_time
 
     @property
     def output_yield(self):
-        return self.__output_iter
+        with self.__lock:
+            return self.__output_iter
 
     def print_stdin(self, line: bytes, flush: bool = True, end: bytes = BYTES_LINESEQ):
-        self.__stdin_stream.write(line + end)
-        if flush:
-            self.__stdin_stream.flush()
+        with self.__lock:
+            self.__write_stdin(line + end)
+            if flush:
+                self.__flush_stdin()
 
     def close_stdin(self):
-        self.__stdin_stream.close()
-        self.__closed = True
+        with self.__lock:
+            self.__close_stdin()
 
     def join(self):
-        return self.__lifetime_event.wait()
+        with self.__lock:
+            self.__join()
 
     def __enter__(self):
-        return self
+        with self.__lock:
+            return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if not self.__closed:
-            self.close_stdin()
-        self.join()
+        with self.__lock:
+            self.__close_stdin()
+            self.__join()
 
 
-def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value, tag: str, queue: Queue):
+def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
+               tag: str, loader_initialized: EventClass, queue: Queue):
     def _transform_func(item):
         _time, _line = item
+        start_time_ok.wait()
         return _time - start_time.value, tag, _line.rstrip(b'\r\n')
 
     with os.fdopen(pipe_entry, 'rb', 0) as stream:
-        start_time_ok.wait()
-        return load_lines_from_bytes_stream(stream, queue, _transform_func)
+        return load_lines_from_bytes_stream(stream, loader_initialized, queue, _transform_func)
 
 
 # noinspection DuplicatedCode
@@ -102,14 +135,31 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
         # lines output
         _output_queue = Queue()
         _output_start, _output_complete = Event(), Event()
+        _stdout_initialized, _stderr_initialized = Event(), Event()
         _stdout_thread = Thread(
-            target=lambda: _read_pipe(stdout_read, _start_time_ok, _start_time, 'stdout', _output_queue))
+            target=lambda: _read_pipe(
+                pipe_entry=stdout_read,
+                start_time_ok=_start_time_ok,
+                start_time=_start_time,
+                tag='stdout',
+                loader_initialized=_stdout_initialized,
+                queue=_output_queue,
+            ))
         _stderr_thread = Thread(
-            target=lambda: _read_pipe(stderr_read, _start_time_ok, _start_time, 'stderr', _output_queue))
+            target=lambda: _read_pipe(
+                pipe_entry=stderr_read,
+                start_time_ok=_start_time_ok,
+                start_time=_start_time,
+                tag='stderr',
+                loader_initialized=_stderr_initialized,
+                queue=_output_queue,
+            ))
 
         def _output_queue_func():
             _stdout_thread.start()
             _stderr_thread.start()
+            _stdout_initialized.wait()
+            _stderr_initialized.wait()
             _output_start.set()
 
             _stdout_thread.join()
