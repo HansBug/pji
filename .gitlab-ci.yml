@@ -9,7 +9,7 @@ stages:
   - deploy
 
 variables:
-  MIN_UNITTEST_COVERAGE: 90
+  MIN_UNITTEST_COVERAGE: 50
   TWINE_REPOSITORY: pypi
   OSS_NAME: oss
   OSS_RELEASE_ROOT: ${OSS_NAME}/releases/${CI_PROJECT_NAME}
