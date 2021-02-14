@@ -1,5 +1,5 @@
 import os
-from multiprocessing import Event, Value
+from multiprocessing import Event, Value, Lock
 from multiprocessing.synchronize import Event as EventClass
 from threading import Thread
 from typing import Optional, Tuple, Mapping
@@ -26,38 +26,47 @@ class CommonProcess:
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
 
-    def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
-        self.__communicate_stdin.value = stdin or b''
-        self.__communicate_event.set()
+        self.__lock = Lock()
 
-        if wait:
-            self.__communicate_complete.wait()
-            return self.__communicate_stdout.value, self.__communicate_stderr.value
-        else:
-            return None
+    def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
+        with self.__lock:
+            self.__communicate_stdin.value = stdin or b''
+            self.__communicate_event.set()
+
+            if wait:
+                self.__communicate_complete.wait()
+                return self.__communicate_stdout.value, self.__communicate_stderr.value
+            else:
+                return None
 
     @property
     def start_time(self) -> float:
-        return self.__start_time
+        with self.__lock:
+            return self.__start_time
 
     @property
     def result(self) -> ProcessResult:
-        return self.__result_func()
+        with self.__lock:
+            return self.__result_func()
 
     @property
     def stdin(self) -> Optional[bytes]:
-        return self.__communicate_stdin.value
+        with self.__lock:
+            return self.__communicate_stdin.value
 
     @property
     def stdout(self) -> Optional[bytes]:
-        return self.__communicate_stdout.value
+        with self.__lock:
+            return self.__communicate_stdout.value
 
     @property
     def stderr(self) -> Optional[bytes]:
-        return self.__communicate_stderr.value
+        with self.__lock:
+            return self.__communicate_stderr.value
 
     def join(self):
-        self.__lifetime_event.wait()
+        with self.__lock:
+            self.__lifetime_event.wait()
 
 
 # noinspection DuplicatedCode
