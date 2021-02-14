@@ -1,5 +1,7 @@
 import resource
 
+from bitmath import MiB
+
 
 class ResourceLimit:
     __RESOURCE_UNLIMITED = -1
@@ -96,7 +98,7 @@ class ResourceLimit:
         apply max rss memory limit
         """
         if self.max_memory:
-            real = max(round(self.max_memory * 1.5), round(self.max_memory + 512 << 20))
+            real = round(self.max_memory + MiB(256).bytes)
         else:
             real = self.__RESOURCE_UNLIMITED
         self.__apply_limit(resource.RLIMIT_AS, real)
