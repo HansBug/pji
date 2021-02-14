@@ -75,3 +75,30 @@ unit_test_in_3.8.1:
     - pip3 install -e .
     - pytest --version
     - make test
+
+source_install_in_3.6.3:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pysystem.config.meta import *;print(__TITLE__, __VERSION__);'
+    - cd .. && ls -al
+
+source_install_in_3.7.6:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pysystem.config.meta import *;print(__TITLE__, __VERSION__);'
+    - cd .. && ls -al
+
+source_install_in_3.8.1:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pysystem.config.meta import *;print(__TITLE__, __VERSION__);'
+    - cd .. && ls -al
