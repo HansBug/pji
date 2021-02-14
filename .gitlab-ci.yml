@@ -102,3 +102,56 @@ source_install_in_3.8.1:
     - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
     - python3 -c 'from pji.config.meta import *;print(__TITLE__, __VERSION__);'
     - cd .. && ls -al
+
+package_in_3.6.3:
+  stage: package
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  script:
+    - python3 setup.py bdist_wheel
+    - ls -al
+    - tree -a build dist
+  artifacts:
+    name: ${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_JOB_ID}-${CI_COMMIT_SHA}
+    when: on_success
+    expire_in: 2 hrs
+    paths:
+      - 'dist'
+
+package_test_in_3.6.3:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import *;print(__TITLE__, __VERSION__);'
+
+package_test_in_3.7.6:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import *;print(__TITLE__, __VERSION__);'
+
+package_test_in_3.8.1:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import *;print(__TITLE__, __VERSION__);'
