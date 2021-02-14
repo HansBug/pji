@@ -7,9 +7,71 @@ import pytest
 from pji.control import interactive_process
 
 
+# noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestControlProcessInteractive:
     def test_interactive_process_simple(self):
+        _before_start = time.time()
+        with interactive_process(
+                args="sh -c 'echo 233 && sleep 2 && echo 2334'",
+        ) as ip:
+            _after_start = time.time()
+            assert _before_start <= ip.start_time <= _after_start
+            _output = []
+
+            def _ip_loader():
+                for _rel_time, _tag, _line in ip.output_yield:
+                    _output.append(_line)
+
+            ip_loader_thread = Thread(target=_ip_loader)
+            ip_loader_thread.start()
+
+            time.sleep(0.5)
+            assert _output == [b'233']
+
+            time.sleep(2)
+            assert _output == [b'233', b'2334']
+
+            ip.close_stdin()
+            ip.join()
+
+            _result = ip.result
+            assert _result is not None
+            assert _result.exitcode == 0
+            assert _result.signal_code == 0
+
+    def test_interactive_process_with_env(self):
+        _before_start = time.time()
+        with interactive_process(
+                args="sh -c 'echo 233 && sleep 2 && echo ${ENV_TEST}'",
+                environ={'ENV_TEST': '2334'},
+        ) as ip:
+            _after_start = time.time()
+            assert _before_start <= ip.start_time <= _after_start
+            _output = []
+
+            def _ip_loader():
+                for _rel_time, _tag, _line in ip.output_yield:
+                    _output.append(_line)
+
+            ip_loader_thread = Thread(target=_ip_loader)
+            ip_loader_thread.start()
+
+            time.sleep(0.5)
+            assert _output == [b'233']
+
+            time.sleep(2)
+            assert _output == [b'233', b'2334']
+
+            ip.close_stdin()
+            ip.join()
+
+            _result = ip.result
+            assert _result is not None
+            assert _result.exitcode == 0
+            assert _result.signal_code == 0
+
+    def test_interactive_process_with_input(self):
         _before_start = time.time()
         with interactive_process(
                 args='sh',
@@ -36,6 +98,8 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233', b'233jsdf']
 
+            assert ip.result is None
+
             ip.close_stdin()
             ip.join()
 
@@ -43,6 +107,86 @@ class TestControlProcessInteractive:
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
+
+    def test_interactive_process_rtle(self):
+        _before_start = time.time()
+        with interactive_process(
+                args='sh',
+                environ={'ENV_TEST': '233jsdf'},
+                real_time_limit=2.0
+        ) as ip:
+            _after_start = time.time()
+            assert _before_start <= ip.start_time <= _after_start
+            _output = []
+
+            def _ip_loader():
+                for _rel_time, _tag, _line in ip.output_yield:
+                    _output.append(_line)
+
+            ip_loader_thread = Thread(target=_ip_loader)
+            ip_loader_thread.start()
+
+            ip.print_stdin(bytes('echo 233', 'utf8'))
+            time.sleep(0.2)
+            assert _output == [b'233']
+
+            time.sleep(2.0)
+            assert _output == [b'233']
+            ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
+            time.sleep(0.2)
+            assert _output == [b'233']
+
+            ip.close_stdin()
+            ip.join()
+
+            _result = ip.result
+            assert _result is not None
+            assert _result.exitcode == 0
+            assert _result.signal_code == 9
+
+    def test_interactive_process_rtle_pass(self):
+        _before_start = time.time()
+        with interactive_process(
+                args='sh',
+                environ={'ENV_TEST': '233jsdf'},
+                real_time_limit=4.0,
+        ) as ip:
+            _after_start = time.time()
+            assert _before_start <= ip.start_time <= _after_start
+            _output = []
+
+            def _ip_loader():
+                for _rel_time, _tag, _line in ip.output_yield:
+                    _output.append(_line)
+
+            ip_loader_thread = Thread(target=_ip_loader)
+            ip_loader_thread.start()
+
+            ip.print_stdin(bytes('echo 233', 'utf8'))
+            time.sleep(0.2)
+            assert _output == [b'233']
+
+            time.sleep(2.0)
+            assert _output == [b'233']
+            ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
+            time.sleep(0.2)
+            assert _output == [b'233', b'233jsdf']
+
+            assert ip.result is None
+
+            ip.close_stdin()
+            ip.join()
+
+            _result = ip.result
+            assert _result is not None
+            assert _result.exitcode == 0
+            assert _result.signal_code == 0
+
+    def test_interactive_process_wtf(self):
+        with pytest.raises(EnvironmentError):
+            interactive_process(
+                args="what_the_fuck -c 'echo 233 && sleep 2 && echo 2334'",
+            )
 
 
 if __name__ == "__main__":
