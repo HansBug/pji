@@ -6,6 +6,7 @@ from threading import Thread
 from typing import Optional, Mapping
 
 from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream
+from .decorator import process_setter
 from .executor import get_child_executor_func
 from ..model import ProcessResult
 
@@ -99,6 +100,7 @@ def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
 
 
 # noinspection DuplicatedCode
+@process_setter
 def interactive_process(args, preexec_fn=None, real_time_limit=None,
                         environ: Optional[Mapping[str, str]] = None) -> InteractiveProcess:
     _full_lifetime_complete = Event()

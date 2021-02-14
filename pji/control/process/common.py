@@ -5,6 +5,7 @@ from threading import Thread
 from typing import Optional, Tuple, Mapping
 
 from .base import measure_thread, killer_thread, read_all_from_bytes_stream
+from .decorator import process_setter
 from .executor import get_child_executor_func
 from ..model import ProcessResult
 from ...utils import ValueProxy
@@ -70,6 +71,7 @@ class CommonProcess:
 
 
 # noinspection DuplicatedCode
+@process_setter
 def common_process(args, preexec_fn=None, real_time_limit=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     _full_lifetime_complete = Event()
