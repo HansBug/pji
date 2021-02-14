@@ -1,1 +1,2 @@
 from .test_common import TestControlProcessCommon
+from .test_interactive import TestControlProcessInteractive
