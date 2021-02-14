@@ -1,3 +1,4 @@
+import datetime
 from typing import Union
 
 from bitmath import Byte
@@ -21,6 +22,10 @@ def size_to_bytes(size) -> Union[float, int]:
         ))
 
 
+def size_to_bytes_str(size) -> str:
+    return str(Byte(size_to_bytes(size)).best_prefix())
+
+
 def time_to_duration(time_) -> Union[float, int]:
     if isinstance(time_, (float, int)):
         return time_
@@ -33,3 +38,7 @@ def time_to_duration(time_) -> Union[float, int]:
             str=str.__name__,
             actual=type(time_).__name__,
         ))
+
+
+def time_to_delta_str(time_) -> str:
+    return str(datetime.timedelta(seconds=time_to_duration(time_)))
