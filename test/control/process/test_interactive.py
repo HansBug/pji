@@ -4,7 +4,7 @@ from threading import Thread
 
 import pytest
 
-from pji.control import interactive_process
+from pji.control import interactive_process, ResourceLimit
 
 
 # noinspection DuplicatedCode
@@ -113,7 +113,9 @@ class TestControlProcessInteractive:
         with interactive_process(
                 args='sh',
                 environ={'ENV_TEST': '233jsdf'},
-                real_time_limit=2.0
+                resources=ResourceLimit(
+                    max_real_time='2s',
+                )
         ) as ip:
             _after_start = time.time()
             assert _before_start <= ip.start_time <= _after_start
@@ -149,7 +151,9 @@ class TestControlProcessInteractive:
         with interactive_process(
                 args='sh',
                 environ={'ENV_TEST': '233jsdf'},
-                real_time_limit=4.0,
+                resources=ResourceLimit(
+                    max_real_time='4s',
+                )
         ) as ip:
             _after_start = time.time()
             assert _before_start <= ip.start_time <= _after_start

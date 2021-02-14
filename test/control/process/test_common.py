@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from pji.control.process import common_process, CommonProcess
+from pji.control import ResourceLimit, common_process, CommonProcess
 
 
 # noinspection DuplicatedCode
@@ -112,7 +112,9 @@ class TestControlProcessCommon:
         _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]));import time;time.sleep(4.0);\"",
-            real_time_limit=2.0
+            resources=ResourceLimit(
+                max_real_time='2s',
+            )
         )
         _after_start = time.time()
         assert isinstance(cp, CommonProcess)
@@ -131,7 +133,9 @@ class TestControlProcessCommon:
         _before_start = time.time()
         cp = common_process(
             args="python3 -c \"print(sum([int(value) for value in input().split(' ')]));import time;time.sleep(4.0);\"",
-            real_time_limit=20.0
+            resources=ResourceLimit(
+                max_real_time='20s',
+            )
         )
         _after_start = time.time()
         assert isinstance(cp, CommonProcess)

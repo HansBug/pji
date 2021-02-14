@@ -1,12 +1,9 @@
-from typing import Optional
-
 from ..model import ResourceLimit
 
 
-def resources_load(limits=None) -> Optional[ResourceLimit]:
-    if limits is None:
-        return None
-    elif isinstance(limits, ResourceLimit):
+def resources_load(limits=None) -> ResourceLimit:
+    limits = limits or {}
+    if isinstance(limits, ResourceLimit):
         return limits
     elif isinstance(limits, dict):
         return ResourceLimit.load_from_json(json_data=limits)
@@ -19,6 +16,4 @@ def resources_load(limits=None) -> Optional[ResourceLimit]:
 
 
 def resources_apply(limits=None):
-    limits = resources_load(limits)
-    if limits:
-        limits.apply()
+    resources_load(limits).apply()
