@@ -48,6 +48,7 @@ def resources_setter(func):
         resources = resources_load(resources)
 
         def _apply_resource_limit_func():
+            # pass
             resources_apply(resources)
 
         preexec_fn = _attach_preexec_fn(preexec_fn, post_attach=_apply_resource_limit_func)
@@ -73,10 +74,9 @@ def users_setter(func):
 def process_setter(func):
     @wraps(func)
     @users_setter
-    # @resources_setter
+    @resources_setter
     @workdir_setter
     def _func(*args, **kwargs):
-        print("enter")
         return func(*args, **kwargs)
 
     return _func

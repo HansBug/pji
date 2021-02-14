@@ -4,15 +4,39 @@ from bitmath import MiB
 
 from ...utils import allow_none, size_to_bytes, time_to_duration
 
+_UNLIMITED = -1
+
+
+def _rmin(x, y):
+    if x == _UNLIMITED:
+        return y
+    elif y == _UNLIMITED:
+        return x
+    else:
+        return min(x, y)
+
+
+def _rprocess(cur, new):
+    _cur_soft, _cur_hard = cur
+    if isinstance(new, tuple):
+        _new_soft, _new_hard = new
+    else:
+        _new_soft, _new_hard = new, new
+
+    _hard = _rmin(_cur_hard, _new_hard)
+    _soft = _rmin(_new_soft, _hard)
+
+    return _soft, _hard
+
+
 _memory_process = allow_none(size_to_bytes)
 _duration_process = allow_none(time_to_duration)
 _number_process = allow_none(lambda x: x)
 
 
 class ResourceLimit:
-    __RESOURCE_UNLIMITED = -1
-    __RESOURCE_LIMITS = {"max_stack", "max_memory", "max_cpu_time", "max_real_time",
-                         "max_process_number", "max_output_size", }
+    __RESOURCES = {"max_stack", "max_memory", "max_cpu_time", "max_real_time",
+                   "max_process_number", "max_output_size", }
 
     def __init__(
             self,
@@ -87,7 +111,8 @@ class ResourceLimit:
         :param limit_type: type of limitation
         :param value: limitation value
         """
-        resource.setrlimit(limit_type, (value, value))
+        _limit_value = _rprocess(resource.getrlimit(limit_type), value)
+        resource.setrlimit(limit_type, _limit_value)
 
     def __apply_max_stack(self):
         """
@@ -96,7 +121,7 @@ class ResourceLimit:
         if self.max_stack:
             real = self.max_stack
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_STACK, real)
 
     def __apply_max_memory(self):
@@ -104,9 +129,9 @@ class ResourceLimit:
         apply max rss memory limit
         """
         if self.max_memory:
-            real = round(self.max_memory + MiB(256).bytes)
+            real = (self.max_memory, round(self.max_memory + MiB(256).bytes))
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_AS, real)
 
     def __apply_max_cpu_time(self):
@@ -114,9 +139,9 @@ class ResourceLimit:
         apply max cpu time limit
         """
         if self.max_cpu_time:
-            real = round(self.max_cpu_time) + 1
+            real = (self.max_cpu_time, round(self.max_cpu_time) + 1)
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_CPU, real)
 
     def __apply_max_process_number(self):
@@ -126,7 +151,7 @@ class ResourceLimit:
         if self.max_process_number:
             real = self.max_process_number
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_NPROC, real)
 
     def __apply_max_output_size(self):
@@ -136,7 +161,7 @@ class ResourceLimit:
         if self.max_output_size:
             real = self.max_output_size
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_FSIZE, real)
 
     @property
@@ -181,7 +206,7 @@ class ResourceLimit:
         :return: filtered arguments
         """
         return {
-            key: value for key, value in kwargs.items() if key in cls.__RESOURCE_LIMITS
+            key: value for key, value in kwargs.items() if key in cls.__RESOURCES
         }
 
     @classmethod
