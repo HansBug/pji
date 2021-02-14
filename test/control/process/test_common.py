@@ -34,6 +34,32 @@ class TestControlProcessCommon:
         assert _result.ok
         assert _result.cpu_time < 0.5
 
+    def test_common_process_with_env(self):
+        _before_start = time.time()
+        cp = common_process(
+            args="sh -c 'echo ${ENV_TEST}'",
+            environ={'ENV_TEST': '233'},
+        )
+        _after_start = time.time()
+        assert isinstance(cp, CommonProcess)
+        assert _before_start <= cp.start_time <= _after_start
+
+        _cresult = cp.communicate()
+        assert cp.stdin == b''
+        assert cp.stdout.decode().strip() == '233'
+        assert cp.stderr.decode().strip() == ''
+
+        assert _cresult is not None
+        _stdout, _stderr = _cresult
+        assert _stdout == cp.stdout
+        assert _stderr == cp.stderr
+
+        cp.join()
+        _result = cp.result
+        assert _result is not None
+        assert _result.ok
+        assert _result.cpu_time < 0.5
+
     def test_common_process_with_input(self):
         _before_start = time.time()
         cp = common_process(
