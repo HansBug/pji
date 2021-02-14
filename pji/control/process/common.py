@@ -28,17 +28,30 @@ class CommonProcess:
         self.__lifetime_event = lifetime_event
 
         self.__lock = Lock()
+        self.__communicated = False
 
-    def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
-        with self.__lock:
+    def __communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
+        if not self.__communicated:
             self.__communicate_stdin.value = stdin or b''
             self.__communicate_event.set()
+            self.__communicated = True
 
             if wait:
                 self.__communicate_complete.wait()
                 return self.__communicate_stdout.value, self.__communicate_stderr.value
             else:
                 return None
+
+    def __join(self):
+        self.__lifetime_event.wait()
+
+    def __exit(self):
+        self.__communicate()
+        self.__join()
+
+    def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
+        with self.__lock:
+            return self.__communicate(stdin, wait)
 
     @property
     def start_time(self) -> float:
@@ -67,7 +80,14 @@ class CommonProcess:
 
     def join(self):
         with self.__lock:
-            self.__lifetime_event.wait()
+            self.__join()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        with self.__lock:
+            self.__exit()
 
 
 # noinspection DuplicatedCode

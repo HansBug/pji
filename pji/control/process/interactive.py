@@ -49,6 +49,10 @@ class InteractiveProcess:
     def __join(self):
         self.__lifetime_event.wait()
 
+    def __exit(self):
+        self.__close_stdin()
+        self.__join()
+
     @property
     def result(self) -> ProcessResult:
         with self.__lock:
@@ -84,8 +88,7 @@ class InteractiveProcess:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         with self.__lock:
-            self.__close_stdin()
-            self.__join()
+            self.__exit()
 
 
 def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,

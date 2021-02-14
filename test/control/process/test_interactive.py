@@ -4,7 +4,7 @@ from threading import Thread
 
 import pytest
 
-from pji.control import interactive_process, ResourceLimit
+from pji.control import interactive_process, ResourceLimit, InteractiveProcess
 
 
 # noinspection DuplicatedCode
@@ -186,11 +186,24 @@ class TestControlProcessInteractive:
             assert _result.exitcode == 0
             assert _result.signal_code == 0
 
+    def test_interactive_process_direct_close(self):
+        with interactive_process(
+                args="sh",
+        ) as ip:
+            assert isinstance(ip, InteractiveProcess)
+            ip.close_stdin()
+            _outputs = list(ip.output_yield)
+
+        assert len(_outputs) == 0
+        _result = ip.result
+        assert _result.ok
+
     def test_interactive_process_wtf(self):
         with pytest.raises(EnvironmentError):
-            interactive_process(
-                args="what_the_fuck -c 'echo 233 && sleep 2 && echo 2334'",
-            )
+            with interactive_process(
+                    args="what_the_fuck -c 'echo 233 && sleep 2 && echo 2334'",
+            ):
+                pytest.fail('Should not reach here')
 
 
 if __name__ == "__main__":
