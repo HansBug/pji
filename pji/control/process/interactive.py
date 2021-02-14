@@ -6,7 +6,7 @@ from threading import Thread
 from typing import Optional, Mapping
 
 from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream
-from .executor import get_executor_func
+from .executor import get_child_executor_func
 from ..model import ProcessResult
 
 
@@ -206,7 +206,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
     stdout_read, stdout_write = os.pipe()
     stderr_read, stderr_write = os.pipe()
 
-    _execute_child = get_executor_func(
+    _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
         _parent_initialized,
         _start_time_ok, _start_time,

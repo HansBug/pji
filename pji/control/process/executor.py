@@ -10,10 +10,10 @@ import where
 from ...utils import args_split
 
 
-def get_executor_func(args, environ: Mapping[str, str], preexec_fn,
-                      parent_initialized: EventClass,
-                      start_time_ok: EventClass, start_time: Value,
-                      stdin_pipes, stdout_pipes, stderr_pipes):
+def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
+                            parent_initialized: EventClass,
+                            start_time_ok: EventClass, start_time: Value,
+                            stdin_pipes, stdout_pipes, stderr_pipes):
     args = args_split(args)
     arg_file = where.first(args[0])
 
