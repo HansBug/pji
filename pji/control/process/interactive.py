@@ -13,12 +13,13 @@ from ..model import ProcessResult
 
 
 class InteractiveProcess:
-    def __init__(self, stdin_stream, start_time: float,
+    def __init__(self, start_time: float, stdin_stream,
                  output_iter, result_func, lifetime_event: EventClass):
-        self.__stdin_stream = stdin_stream
         self.__start_time = start_time
 
+        self.__stdin_stream = stdin_stream
         self.__output_iter = output_iter
+
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
 
@@ -224,8 +225,8 @@ def interactive_process(args, preexec_fn=None, resources=None,
 
         _start_time_ok.wait()
         return InteractiveProcess(
-            stdin_stream=_stdin_stream,
             start_time=_start_time.value,
+            stdin_stream=_stdin_stream,
             output_iter=_output_iter,
             result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
