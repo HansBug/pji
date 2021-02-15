@@ -48,15 +48,13 @@ _REAL_TIME_LIMIT_KEY = 'real_time_limit'
 def resources_setter(func):
     @wraps(func)
     def _func(*args, resources=None, preexec_fn=None, **kwargs):
-        if _REAL_TIME_LIMIT_KEY in kwargs:
-            raise KeyError('Invalid argument {key}.'.format(key=repr(_REAL_TIME_LIMIT_KEY)))
         resources = resources_load(resources)
 
         def _apply_resource_limit_func():
             resources_apply(resources)
 
         preexec_fn = _attach_preexec_fn(preexec_fn, post_attach=_apply_resource_limit_func)
-        return func(*args, preexec_fn=preexec_fn, real_time_limit=resources.max_real_time, **kwargs)
+        return func(*args, preexec_fn=preexec_fn, resources=resources, **kwargs)
 
     return _func
 

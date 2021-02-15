@@ -76,14 +76,6 @@ class TestControlProcessOthers:
             ):
                 pytest.fail('Should not reach here.')
 
-    def test_real_time_limit_key(self):
-        with pytest.raises(KeyError):
-            with common_process(
-                    args='echo 233',
-                    real_time_limit=4.0,
-            ):
-                pytest.fail('Should not reach here.')
-
     @pytest.mark.timeout(5.0)
     def test_exception_in_executor(self):
         def _preexec_fn():

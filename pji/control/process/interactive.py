@@ -8,6 +8,7 @@ from typing import Optional, Mapping
 from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream
 from .decorator import process_setter
 from .executor import get_child_executor_func
+from .resource import resources_load
 from ..model import ProcessResult
 
 
@@ -104,8 +105,9 @@ def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
 
 # noinspection DuplicatedCode
 @process_setter
-def interactive_process(args, preexec_fn=None, real_time_limit=None,
+def interactive_process(args, preexec_fn=None, resources=None,
                         environ: Optional[Mapping[str, str]] = None) -> InteractiveProcess:
+    resources = resources_load(resources)
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
 
@@ -135,7 +137,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
             start_time_ok=_start_time_ok,
             start_time=_start_time,
             child_pid=child_pid,
-            real_time_limit=real_time_limit,
+            real_time_limit=resources.max_real_time,
             process_complete=_process_complete,
         )
 
