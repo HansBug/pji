@@ -8,7 +8,7 @@ from .base import measure_thread, killer_thread, read_all_from_bytes_stream
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from .resource import resources_load
-from ..model import ProcessResult
+from ..model import ProcessResult, ResourceLimit
 from ...utils import ValueProxy
 
 
@@ -16,7 +16,7 @@ class CommonProcess:
     def __init__(self, start_time: float,
                  communicate_event: EventClass, communicate_complete: EventClass,
                  communicate_stdin: ValueProxy, communicate_stdout: ValueProxy, communicate_stderr: ValueProxy,
-                 result_func, lifetime_event: EventClass):
+                 limits: ResourceLimit, result_func, lifetime_event: EventClass):
         self.__start_time = start_time
 
         self.__communicate_event = communicate_event
@@ -25,6 +25,7 @@ class CommonProcess:
         self.__communicate_stdout = communicate_stdout
         self.__communicate_stderr = communicate_stderr
 
+        self.__limits = limits
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
 
@@ -212,6 +213,7 @@ def common_process(args, preexec_fn=None, resources=None,
             communicate_stdin=_communicate_stdin,
             communicate_stdout=_communicate_stdout,
             communicate_stderr=_communicate_stderr,
+            limits=resources,
             result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )

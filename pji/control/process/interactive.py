@@ -9,17 +9,19 @@ from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from .resource import resources_load
-from ..model import ProcessResult
+from ..model import ProcessResult, ResourceLimit
 
 
 class InteractiveProcess:
-    def __init__(self, start_time: float, stdin_stream,
-                 output_iter, result_func, lifetime_event: EventClass):
+    def __init__(self, start_time: float,
+                 stdin_stream, output_iter,
+                 limits: ResourceLimit, result_func, lifetime_event: EventClass):
         self.__start_time = start_time
 
         self.__stdin_stream = stdin_stream
         self.__output_iter = output_iter
 
+        self.__limits = limits
         self.__result_func = result_func
         self.__lifetime_event = lifetime_event
 
@@ -228,6 +230,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
             start_time=_start_time.value,
             stdin_stream=_stdin_stream,
             output_iter=_output_iter,
+            limits=resources,
             result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )
