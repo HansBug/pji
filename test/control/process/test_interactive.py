@@ -186,15 +186,23 @@ class TestControlProcessInteractive:
             assert _result.exitcode == 0
             assert _result.signal_code == 0
 
+    @pytest.mark.timeout(5.0)
     def test_interactive_process_direct_close(self):
         with interactive_process(
                 args="sh",
         ) as ip:
             assert isinstance(ip, InteractiveProcess)
-            ip.close_stdin()
-            _outputs = list(ip.output_yield)
 
-        assert len(_outputs) == 0
+            ip.print_stdin(b'echo 233')
+            _, _tag, _line = next(ip.output_yield)
+            assert _tag == 'stdout'
+            assert _line.rstrip(b'\r\n') == b'233'
+
+            ip.print_stdin(b'echo 2334')
+            _, _tag, _line = next(ip.output_yield)
+            assert _tag == 'stdout'
+            assert _line.rstrip(b'\r\n') == b'2334'
+
         _result = ip.process_result
         assert _result.ok
 

@@ -36,7 +36,9 @@ class GeneralProcess(metaclass=ABCMeta):
     @property
     def process_result(self) -> Optional[ProcessResult]:
         with self.__lock:
-            return self.__result_func()
+            if self.__result is None:
+                self.__result = self.__result or self.__result_func()
+            return self.__result
 
     def _wait_for_end(self):
         self.__lifetime_event.wait()

@@ -169,6 +169,15 @@ class TestControlProcessCommon:
             with common_process(args="what_the_fuck -a 1 -b 2"):
                 pytest.fail('Should not reach here')
 
+    def test_common_process_double_communicate(self):
+        with common_process(args='cat') as cp:
+            _stdout, _stderr = cp.communicate(b'123')
+            assert _stdout.rstrip(b'\r\n') == b'123'
+            assert _stderr.rstrip(b'\r\n') == b''
+
+            with pytest.raises(RuntimeError):
+                cp.communicate(b'')
+
 
 if __name__ == "__main__":
     pytest.main([os.path.abspath(__file__)])

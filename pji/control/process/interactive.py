@@ -44,8 +44,12 @@ class InteractiveProcess(GeneralProcess):
         except BrokenPipeError:
             self.__stdin_closed = True
 
+    def __load_all_output(self):
+        _ = list(self.__output_iter)
+
     def __exit(self):
         self.__close_stdin()
+        self.__load_all_output()
         self._wait_for_end()
 
     @property
