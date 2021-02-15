@@ -3,7 +3,7 @@ import os
 import pytest
 import where
 
-from pji.control import common_process
+from pji.control import common_process, ExecutorException
 
 
 @pytest.mark.unittest
@@ -50,7 +50,6 @@ class TestControlProcessOthers:
 
         _result = cp.result
         assert _result is not None
-        print(_result)
 
     def test_invalid_resource(self):
         with pytest.raises(TypeError):
@@ -84,6 +83,25 @@ class TestControlProcessOthers:
                     real_time_limit=4.0,
             ):
                 pytest.fail('Should not reach here.')
+
+    @pytest.mark.timeout(5.0)
+    def test_exception_in_executor(self):
+        def _preexec_fn():
+            raise RuntimeError
+
+        with pytest.raises(ExecutorException) as ei:
+            with common_process(
+                    args="echo 233",
+                    preexec_fn=_preexec_fn,
+                    resources=dict(
+                        max_real_time='2s',
+                    )
+            ):
+                pytest.fail('Should not reach here.')
+
+        err = ei.value
+        assert isinstance(err, ExecutorException)
+        assert isinstance(err.exception, RuntimeError)
 
 
 if __name__ == "__main__":

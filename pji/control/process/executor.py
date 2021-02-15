@@ -10,8 +10,19 @@ import where
 from ...utils import args_split
 
 
+class ExecutorException(Exception):
+    def __init__(self, exception):
+        self.__exception = exception
+        Exception.__init__(self, repr(exception))
+
+    @property
+    def exception(self):
+        return self.__exception
+
+
 def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
-                            prepare_ok: EventClass, prepare_exceptions: Queue,
+                            executor_prepare_ok: EventClass, executor_has_exception: EventClass,
+                            executor_exceptions: Queue,
                             parent_initialized: EventClass,
                             start_time_ok: EventClass, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
@@ -43,8 +54,9 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
             _exception = err
 
         if _exception is not None:
-            prepare_exceptions.put(_exception)
-        prepare_ok.set()
+            executor_has_exception.set()
+            executor_exceptions.put(ExecutorException(_exception))
+        executor_prepare_ok.set()
 
         if _exception is None:
             parent_initialized.wait()

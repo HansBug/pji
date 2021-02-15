@@ -110,6 +110,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
     environ = dict(environ or {})
 
     _executor_prepare_ok = Event()
+    _executor_has_exception = Event()
     _executor_exceptions = Queue()
 
     _parent_initialized = Event()
@@ -191,9 +192,8 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
 
         # waiting for prepare ok
         _executor_prepare_ok.wait()
-        if not _executor_exceptions.empty():
-            _exception = _executor_exceptions.get()
-            raise _exception
+        if _executor_has_exception.is_set():
+            raise _executor_exceptions.get()
 
         # start all the threads and services
         _measure_thread.start()
@@ -223,7 +223,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
 
     _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
-        _executor_prepare_ok, _executor_exceptions,
+        _executor_prepare_ok, _executor_has_exception, _executor_exceptions,
         _parent_initialized,
         _start_time_ok, _start_time,
         (stdin_read, stdin_write),
