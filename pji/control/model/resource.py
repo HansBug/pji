@@ -240,6 +240,14 @@ class ResourceLimit:
             max_output_size=_max_output_size,
         )
 
+    def __eq__(self, other):
+        if other is self:
+            return True
+        elif isinstance(other, self.__class__):
+            return other.json == self.json
+        else:
+            return False
+
     def __repr__(self):
         return get_repr_info(
             cls=self.__class__,
@@ -249,6 +257,7 @@ class ResourceLimit:
                 ('memory', (lambda: size_to_bytes_str(self.max_memory), lambda: self.max_memory is not None)),
                 ('stack', (lambda: size_to_bytes_str(self.max_stack), lambda: self.max_stack is not None)),
                 ('process', (lambda: self.max_process_number, lambda: self.max_process_number is not None)),
-                ('output size', (lambda: self.max_output_size, lambda: self.max_output_size is not None)),
+                ('output size',
+                 (lambda: size_to_bytes_str(self.max_output_size), lambda: self.max_output_size is not None)),
             ]
         )

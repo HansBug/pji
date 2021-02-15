@@ -12,4 +12,7 @@ def get_repr_info(cls: type, args: List[Tuple[str, Union[Callable, Tuple[Callabl
         if _present_func():
             _data_items.append('{name}: {data}'.format(name=name, data=_data_func()))
 
-    return '<{cls} {data}>'.format(cls=cls.__name__, data=', '.join(_data_items))
+    if _data_items:
+        return '<{cls} {data}>'.format(cls=cls.__name__, data=', '.join(_data_items))
+    else:
+        return '<{cls}>'.format(cls=cls.__name__)

@@ -25,6 +25,15 @@ class TestUtilsRepr:
         assert repr(Sum(1, 2)) == '<Sum b: 2, a: 1>'
         assert repr(Sum(None, None)) == '<Sum a: None>'
 
+        class Emp:
+            def __repr__(self):
+                return get_repr_info(
+                    cls=self.__class__,
+                    args=[]
+                )
+
+        assert repr(Emp()) == '<Emp>'
+
 
 if __name__ == "__main__":
     pytest.main([os.path.abspath(__file__)])
