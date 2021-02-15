@@ -1,1 +1,2 @@
+from .test_process import TestControlModelProcessNormal, TestControlModelProcessKilled
 from .test_resource import TestControlModelResource

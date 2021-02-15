@@ -1,5 +1,6 @@
 import os
 import signal
+from resource import struct_rusage
 from typing import Optional
 
 from ...utils import size_to_bytes_str, get_repr_info
@@ -77,7 +78,7 @@ class _IDuration:
 
 
 class _IResource:
-    def __init__(self, resource_usage):
+    def __init__(self, resource_usage: struct_rusage):
         self.__resource_usage = resource_usage
 
     @property
