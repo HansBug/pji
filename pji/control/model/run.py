@@ -1,4 +1,5 @@
 from enum import unique, IntEnum
+from multiprocessing import Lock
 from typing import Optional
 
 from .process import ProcessResult
@@ -29,17 +30,9 @@ class RunResult:
     def __init__(self, limit: ResourceLimit, result: Optional[ProcessResult]):
         self.__limit = limit
         self.__result = result
+        self.__lock = Lock()
 
-    @property
-    def limit(self) -> ResourceLimit:
-        return self.__limit
-
-    @property
-    def result(self) -> ProcessResult:
-        return self.__result
-
-    @property
-    def status(self) -> RunResultStatus:
+    def __get_status(self) -> RunResultStatus:
         if self.__result is None:
             return RunResultStatus.NOT_COMPLETED
         elif self.__limit.max_cpu_time is not None and self.__result.cpu_time > self.__limit.max_cpu_time:
@@ -56,12 +49,28 @@ class RunResult:
             return RunResultStatus.ACCEPTED
 
     @property
+    def limit(self) -> ResourceLimit:
+        return self.__limit
+
+    @property
+    def result(self) -> ProcessResult:
+        with self.__lock:
+            return self.__result
+
+    @property
+    def status(self) -> RunResultStatus:
+        with self.__lock:
+            return self.__get_status()
+
+    @property
     def ok(self) -> bool:
-        return self.__result.ok and self.status.ok
+        with self.__lock:
+            return self.__result is not None and self.__result.ok and self.__get_status().ok
 
     @property
     def completed(self) -> bool:
-        return self.status.completed
+        with self.__lock:
+            return self.__get_status().completed
 
     def __repr__(self):
         return get_repr_info(

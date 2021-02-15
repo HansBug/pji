@@ -8,7 +8,7 @@ from queue import Empty, Queue
 from threading import Thread
 from typing import Tuple, Callable, Optional
 
-from ..model import ProcessResult, ResourceLimit, RunResult
+from ..model import ProcessResult, ResourceLimit, RunResult, RunResultStatus
 from ...utils import ValueProxy
 
 
@@ -51,6 +51,21 @@ class GeneralProcess(metaclass=ABCMeta):
     def result(self) -> RunResult:
         with self.__lock:
             return self.__get_result()
+
+    @property
+    def ok(self) -> bool:
+        with self.__lock:
+            return self.__get_result().ok
+
+    @property
+    def completed(self) -> bool:
+        with self.__lock:
+            return self.__get_result().completed
+
+    @property
+    def status(self) -> RunResultStatus:
+        with self.__lock:
+            return self.__get_result().status
 
     def join(self):
         with self.__lock:

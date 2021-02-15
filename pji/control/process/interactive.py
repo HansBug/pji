@@ -10,6 +10,7 @@ from .decorator import process_setter
 from .executor import get_child_executor_func
 from .resource import resources_load
 from ..model import ResourceLimit
+from ...utils import gen_lock
 
 
 class InteractiveProcess(GeneralProcess):
@@ -198,7 +199,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
         _killer_thread.start()
         _queue_thread.start()
         _stdin_stream = os.fdopen(stdin_write, 'wb', 0)
-        _output_iter = _output_yield()
+        _output_iter = gen_lock(_output_yield())
 
         # wait for all the thread initialized
         _measure_initialized.wait()

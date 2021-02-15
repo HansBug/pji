@@ -99,12 +99,17 @@ class TestControlProcessInteractive:
             assert _output == [b'233', b'233jsdf']
 
             assert ip.result.result is None
-            assert ip.result.status == RunResultStatus.NOT_COMPLETED
+            assert ip.status == RunResultStatus.NOT_COMPLETED
+            assert not ip.ok
+            assert not ip.completed
 
             ip.close_stdin()
             ip.join()
 
             _result = ip.result.result
+            assert ip.ok
+            assert ip.completed
+            assert ip.status == RunResultStatus.ACCEPTED
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -179,11 +184,16 @@ class TestControlProcessInteractive:
 
             assert ip.result.result is None
             assert ip.result.status == RunResultStatus.NOT_COMPLETED
+            assert not ip.ok
+            assert not ip.completed
 
             ip.close_stdin()
             ip.join()
 
             _result = ip.result.result
+            assert ip.ok
+            assert ip.completed
+            assert ip.status == RunResultStatus.ACCEPTED
             assert _result.ok
             assert _result is not None
             assert _result.exitcode == 0
