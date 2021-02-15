@@ -19,7 +19,7 @@ class TestControlProcessOthers:
         assert cp.stdout.rstrip(b'\r\n') == b'nobody nogroup'
         assert cp.stderr.rstrip(b'\r\n') == b''
 
-        _result = cp.result
+        _result = cp.process_result
         assert _result is not None
         assert _result.ok
 
@@ -34,7 +34,7 @@ class TestControlProcessOthers:
         assert cp.stdout.rstrip(b'\r\n') == b'root nogroup'
         assert cp.stderr.rstrip(b'\r\n') == b''
 
-        _result = cp.result
+        _result = cp.process_result
         assert _result is not None
         assert _result.ok
 
@@ -48,7 +48,7 @@ class TestControlProcessOthers:
         ) as cp:
             pass
 
-        _result = cp.result
+        _result = cp.process_result
         assert _result is not None
 
     def test_invalid_resource(self):

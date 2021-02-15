@@ -1,14 +1,50 @@
 import os
 import signal
 import time
-from multiprocessing import Event, Value
+from abc import ABCMeta
+from multiprocessing import Event, Value, Lock
 from multiprocessing.synchronize import Event as EventClass
 from queue import Empty, Queue
 from threading import Thread
-from typing import Tuple
+from typing import Tuple, Callable, Optional
 
-from ..model import ProcessResult
+from ..model import ProcessResult, ResourceLimit
 from ...utils import ValueProxy
+
+
+class GeneralProcess(metaclass=ABCMeta):
+    def __init__(self, start_time: float, resources: ResourceLimit,
+                 result_func: Callable[[], Optional[ProcessResult]],
+                 lifetime_event: EventClass, lock: Optional[Lock] = None):
+        self.__start_time = start_time
+        self.__resources = resources
+        self.__result = None
+        self.__result_func = result_func
+        self.__lifetime_event = lifetime_event
+        self.__lock = lock or Lock()
+
+    @property
+    def start_time(self) -> float:
+        with self.__lock:
+            return self.__start_time
+
+    @property
+    def resources(self) -> ResourceLimit:
+        with self.__lock:
+            return self.__resources
+
+    @property
+    def process_result(self) -> Optional[ProcessResult]:
+        with self.__lock:
+            return self.__result_func()
+
+    def _wait_for_end(self):
+        self.__lifetime_event.wait()
+
+    def join(self):
+        with self.__lock:
+            self._wait_for_end()
+
 
 BYTES_LINESEQ = bytes(os.linesep, 'utf8')
 

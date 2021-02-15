@@ -4,32 +4,27 @@ from multiprocessing.synchronize import Event as EventClass
 from threading import Thread
 from typing import Optional, Tuple, Mapping
 
-from .base import measure_thread, killer_thread, read_all_from_bytes_stream
+from .base import measure_thread, killer_thread, read_all_from_bytes_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from .resource import resources_load
-from ..model import ProcessResult, ResourceLimit
+from ..model import ResourceLimit
 from ...utils import ValueProxy
 
 
-class CommonProcess:
+class CommonProcess(GeneralProcess):
     def __init__(self, start_time: float,
                  communicate_event: EventClass, communicate_complete: EventClass,
                  communicate_stdin: ValueProxy, communicate_stdout: ValueProxy, communicate_stderr: ValueProxy,
-                 limits: ResourceLimit, result_func, lifetime_event: EventClass):
-        self.__start_time = start_time
+                 resources: ResourceLimit, result_func, lifetime_event: EventClass):
+        self.__lock = Lock()
+        GeneralProcess.__init__(self, start_time, resources, result_func, lifetime_event, self.__lock)
 
         self.__communicate_event = communicate_event
         self.__communicate_complete = communicate_complete
         self.__communicate_stdin = communicate_stdin
         self.__communicate_stdout = communicate_stdout
         self.__communicate_stderr = communicate_stderr
-
-        self.__limits = limits
-        self.__result_func = result_func
-        self.__lifetime_event = lifetime_event
-
-        self.__lock = Lock()
         self.__communicated = False
 
     def __communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
@@ -43,27 +38,17 @@ class CommonProcess:
                 return self.__communicate_stdout.value, self.__communicate_stderr.value
             else:
                 return None
-
-    def __join(self):
-        self.__lifetime_event.wait()
+        else:
+            raise RuntimeError('Already communicated.')
 
     def __exit(self):
-        self.__communicate()
-        self.__join()
+        if not self.__communicated:
+            self.__communicate()
+        self._wait_for_end()
 
     def communicate(self, stdin: Optional[bytes] = None, wait: bool = True) -> Optional[Tuple[bytes, bytes]]:
         with self.__lock:
             return self.__communicate(stdin, wait)
-
-    @property
-    def start_time(self) -> float:
-        with self.__lock:
-            return self.__start_time
-
-    @property
-    def result(self) -> ProcessResult:
-        with self.__lock:
-            return self.__result_func()
 
     @property
     def stdin(self) -> Optional[bytes]:
@@ -79,10 +64,6 @@ class CommonProcess:
     def stderr(self) -> Optional[bytes]:
         with self.__lock:
             return self.__communicate_stderr.value
-
-    def join(self):
-        with self.__lock:
-            self.__join()
 
     def __enter__(self):
         return self
@@ -213,7 +194,7 @@ def common_process(args, preexec_fn=None, resources=None,
             communicate_stdin=_communicate_stdin,
             communicate_stdout=_communicate_stdout,
             communicate_stderr=_communicate_stderr,
-            limits=resources,
+            resources=resources,
             result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )

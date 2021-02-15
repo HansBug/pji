@@ -5,67 +5,48 @@ from queue import Queue, Empty
 from threading import Thread
 from typing import Optional, Mapping
 
-from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream
+from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from .resource import resources_load
-from ..model import ProcessResult, ResourceLimit
+from ..model import ResourceLimit
 
 
-class InteractiveProcess:
-    def __init__(self, start_time: float,
-                 stdin_stream, output_iter,
-                 limits: ResourceLimit, result_func, lifetime_event: EventClass):
-        self.__start_time = start_time
+class InteractiveProcess(GeneralProcess):
+    def __init__(self, start_time: float, stdin_stream, output_iter,
+                 resources: ResourceLimit, result_func, lifetime_event: EventClass):
+        self.__lock = Lock()
+        GeneralProcess.__init__(self, start_time, resources, result_func, lifetime_event, self.__lock)
 
         self.__stdin_stream = stdin_stream
         self.__output_iter = output_iter
-
-        self.__limits = limits
-        self.__result_func = result_func
-        self.__lifetime_event = lifetime_event
-
-        self.__closed = False
-        self.__lock = Lock()
+        self.__stdin_closed = False
 
     def __write_stdin(self, data: bytes):
         try:
-            if not self.__closed:
+            if not self.__stdin_closed:
                 self.__stdin_stream.write(data)
         except BrokenPipeError:
-            self.__closed = True
+            self.__stdin_closed = True
 
     def __flush_stdin(self):
         try:
-            if not self.__closed:
+            if not self.__stdin_closed:
                 self.__stdin_stream.flush()
         except BrokenPipeError:
-            self.__closed = True
+            self.__stdin_closed = True
 
     def __close_stdin(self):
         try:
-            if not self.__closed:
+            if not self.__stdin_closed:
                 self.__stdin_stream.close()
-                self.__closed = True
+                self.__stdin_closed = True
         except BrokenPipeError:
-            self.__closed = True
-
-    def __join(self):
-        self.__lifetime_event.wait()
+            self.__stdin_closed = True
 
     def __exit(self):
         self.__close_stdin()
-        self.__join()
-
-    @property
-    def result(self) -> ProcessResult:
-        with self.__lock:
-            return self.__result_func()
-
-    @property
-    def start_time(self) -> float:
-        with self.__lock:
-            return self.__start_time
+        self._wait_for_end()
 
     @property
     def output_yield(self):
@@ -81,10 +62,6 @@ class InteractiveProcess:
     def close_stdin(self):
         with self.__lock:
             self.__close_stdin()
-
-    def join(self):
-        with self.__lock:
-            self.__join()
 
     def __enter__(self):
         with self.__lock:
@@ -230,7 +207,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
             start_time=_start_time.value,
             stdin_stream=_stdin_stream,
             output_iter=_output_iter,
-            limits=resources,
+            resources=resources,
             result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )

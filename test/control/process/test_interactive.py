@@ -35,7 +35,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.result
+            _result = ip.process_result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -66,7 +66,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.result
+            _result = ip.process_result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -98,12 +98,12 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233', b'233jsdf']
 
-            assert ip.result is None
+            assert ip.process_result is None
 
             ip.close_stdin()
             ip.join()
 
-            _result = ip.result
+            _result = ip.process_result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -141,7 +141,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.result
+            _result = ip.process_result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 9
@@ -176,12 +176,12 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233', b'233jsdf']
 
-            assert ip.result is None
+            assert ip.process_result is None
 
             ip.close_stdin()
             ip.join()
 
-            _result = ip.result
+            _result = ip.process_result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -195,7 +195,7 @@ class TestControlProcessInteractive:
             _outputs = list(ip.output_yield)
 
         assert len(_outputs) == 0
-        _result = ip.result
+        _result = ip.process_result
         assert _result.ok
 
     def test_interactive_process_wtf(self):
