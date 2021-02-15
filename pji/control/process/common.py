@@ -1,5 +1,5 @@
 import os
-from multiprocessing import Event, Value, Lock
+from multiprocessing import Event, Value, Lock, Queue
 from multiprocessing.synchronize import Event as EventClass
 from threading import Thread
 from typing import Optional, Tuple, Mapping
@@ -97,6 +97,9 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
 
+    _executor_prepare_ok = Event()
+    _executor_exceptions = Queue()
+
     _parent_initialized = Event()
     _start_time = Value('d', 0.0)
     _start_time_ok = Event()
@@ -113,7 +116,6 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
             start_time=_start_time,
             child_pid=child_pid,
         )
-        _measure_thread.start()
 
         # killer thread
         _killer_thread, _killer_initialized = killer_thread(
@@ -123,7 +125,6 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
             real_time_limit=real_time_limit,
             process_complete=_process_complete,
         )
-        _killer_thread.start()
 
         # communication thread
         _communicate_initialized, _communicate_event, _communicate_complete = Event(), Event(), Event()
@@ -171,6 +172,16 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
                 _full_lifetime_complete.set()
 
         _communicate_thread = Thread(target=_communicate_func)
+
+        # waiting for prepare ok
+        _executor_prepare_ok.wait()
+        if not _executor_exceptions.empty():
+            _exception = _executor_exceptions.get()
+            raise _exception
+
+        # start all the threads and services
+        _measure_thread.start()
+        _killer_thread.start()
         _communicate_thread.start()
 
         # wait for all the thread initialized
@@ -197,6 +208,7 @@ def common_process(args, preexec_fn=None, real_time_limit=None,
 
     _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
+        _executor_prepare_ok, _executor_exceptions,
         _parent_initialized,
         _start_time_ok, _start_time,
         (stdin_read, stdin_write),

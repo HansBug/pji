@@ -109,6 +109,9 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
 
+    _executor_prepare_ok = Event()
+    _executor_exceptions = Queue()
+
     _parent_initialized = Event()
     _start_time = Value('d', 0.0)
     _start_time_ok = Event()
@@ -125,7 +128,6 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
             start_time=_start_time,
             child_pid=child_pid,
         )
-        _measure_thread.start()
 
         # killer thread
         _killer_thread, _killer_initialized = killer_thread(
@@ -135,7 +137,6 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
             real_time_limit=real_time_limit,
             process_complete=_process_complete,
         )
-        _killer_thread.start()
 
         # lines output
         _output_queue = Queue()
@@ -172,7 +173,6 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
             _output_complete.set()
 
         _queue_thread = Thread(target=_output_queue_func)
-        _queue_thread.start()
 
         def _output_yield():
             _output_start.wait()
@@ -189,6 +189,16 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
             _queue_thread.join()
             _full_lifetime_complete.set()
 
+        # waiting for prepare ok
+        _executor_prepare_ok.wait()
+        if not _executor_exceptions.empty():
+            _exception = _executor_exceptions.get()
+            raise _exception
+
+        # start all the threads and services
+        _measure_thread.start()
+        _killer_thread.start()
+        _queue_thread.start()
         _stdin_stream = os.fdopen(stdin_write, 'wb', 0)
         _output_iter = _output_yield()
 
@@ -213,6 +223,7 @@ def interactive_process(args, preexec_fn=None, real_time_limit=None,
 
     _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
+        _executor_prepare_ok, _executor_exceptions,
         _parent_initialized,
         _start_time_ok, _start_time,
         (stdin_read, stdin_write),

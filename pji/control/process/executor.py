@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from multiprocessing import Value
+from multiprocessing import Value, Queue
 from multiprocessing.synchronize import Event as EventClass
 from typing import Mapping
 
@@ -11,6 +11,7 @@ from ...utils import args_split
 
 
 def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
+                            prepare_ok: EventClass, prepare_exceptions: Queue,
                             parent_initialized: EventClass,
                             start_time_ok: EventClass, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
@@ -34,13 +35,22 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
         os.close(stderr_read)
         os.dup2(stderr_write, sys.stderr.fileno())
 
-        if preexec_fn is not None:
-            preexec_fn()
+        _exception = None
+        try:
+            if preexec_fn is not None:
+                preexec_fn()
+        except Exception as err:
+            _exception = err
 
-        parent_initialized.wait()
-        start_time.value = time.time()
-        start_time_ok.set()
+        if _exception is not None:
+            prepare_exceptions.put(_exception)
+        prepare_ok.set()
 
-        os.execvpe(arg_file, args, environ)
+        if _exception is None:
+            parent_initialized.wait()
+            start_time.value = time.time()
+            start_time_ok.set()
+
+            os.execvpe(arg_file, args, environ)
 
     return _execute_child
