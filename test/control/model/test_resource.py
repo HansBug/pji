@@ -1,4 +1,6 @@
 import os
+import resource
+from multiprocessing import Manager, Process
 
 import pytest
 
@@ -129,6 +131,71 @@ class TestControlModelResource:
             max_output_size=2,
             max_process_number=1,
         )
+
+    def test_apply_1(self):
+        with Manager() as manager:
+            _result = manager.dict(dict(
+                max_cpu_time=None,
+                max_memory=None,
+                max_stack=None,
+                max_output_size=None,
+            ))
+
+            # noinspection PyTypeChecker,DuplicatedCode
+            def _get_user_and_group():
+                rl = ResourceLimit(
+                    max_cpu_time='5s',
+                    max_memory='512mb',
+                    max_stack='1G',
+                    max_output_size='64m'
+                )
+                rl.apply()
+                _result['max_cpu_time'] = resource.getrlimit(resource.RLIMIT_CPU)
+                _result['max_memory'] = resource.getrlimit(resource.RLIMIT_AS)
+                _result['max_stack'] = resource.getrlimit(resource.RLIMIT_STACK)
+                _result['max_output_size'] = resource.getrlimit(resource.RLIMIT_FSIZE)
+
+            p = Process(target=_get_user_and_group)
+            p.start()
+            p.join()
+
+            _result = dict(_result)
+            assert _result == dict(
+                max_cpu_time=(5, 6),
+                max_memory=(512000000, 780435456),
+                max_stack=(1000000000, 1000000000),
+                max_output_size=(64000000, 64000000),
+            )
+
+    def test_apply_2(self):
+        with Manager() as manager:
+            _result = manager.dict(dict(
+                max_cpu_time=None,
+                max_memory=None,
+                max_stack=None,
+                max_output_size=None,
+            ))
+
+            # noinspection PyTypeChecker,DuplicatedCode
+            def _get_user_and_group():
+                rl = ResourceLimit()
+                rl.apply()
+                _result['max_cpu_time'] = resource.getrlimit(resource.RLIMIT_CPU)
+                _result['max_memory'] = resource.getrlimit(resource.RLIMIT_AS)
+                _result['max_stack'] = resource.getrlimit(resource.RLIMIT_STACK)
+                _result['max_output_size'] = resource.getrlimit(resource.RLIMIT_FSIZE)
+
+            p = Process(target=_get_user_and_group)
+            p.start()
+            p.join()
+
+            _result = dict(_result)
+            assert _result == dict(
+                max_cpu_time=(-1, -1),
+                max_memory=(-1, -1),
+                max_stack=(-1, -1),
+                max_output_size=(-1, -1),
+            )
 
 
 if __name__ == "__main__":
