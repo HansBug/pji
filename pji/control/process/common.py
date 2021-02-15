@@ -91,10 +91,22 @@ class CommonProcess:
             self.__exit()
 
 
-# noinspection DuplicatedCode
+# Attention: only real_time_limit will be processed in this function, other limits will be processed in decorator
+# noinspection DuplicatedCode,PyIncorrectDocstring,PyUnresolvedReferences
 @process_setter
 def common_process(args, preexec_fn=None, resources=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
+    """
+    Create an common process
+    :param args: arguments for execution
+    :param preexec_fn: pre execute function to attach before that
+    :param resources: resource limit
+    :param environ: environment variables
+    :param cwd: new work dir
+    :param user: new user for execute
+    :param group: new group for execute
+    :return: CommonProcess object to do interaction
+    """
     resources = resources_load(resources)
     _full_lifetime_complete = Event()
     environ = dict(environ or {})

@@ -103,10 +103,22 @@ def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
         return load_lines_from_bytes_stream(stream, loader_initialized, queue, _transform_func)
 
 
-# noinspection DuplicatedCode
+# Attention: only real_time_limit will be processed in this function, other limits will be processed in decorator
+# noinspection DuplicatedCode, PyIncorrectDocstring,PyUnresolvedReferences,SpellCheckingInspection
 @process_setter
 def interactive_process(args, preexec_fn=None, resources=None,
                         environ: Optional[Mapping[str, str]] = None) -> InteractiveProcess:
+    """
+    Create an interactive process
+    :param args: arguments for execution
+    :param preexec_fn: pre execute function to attach before that
+    :param resources: resource limit
+    :param environ: environment variables
+    :param cwd: new work dir
+    :param user: new user for execute
+    :param group: new group for execute
+    :return: InteractiveProcess object to do interaction
+    """
     resources = resources_load(resources)
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
