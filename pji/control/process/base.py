@@ -8,20 +8,34 @@ from queue import Empty, Queue
 from threading import Thread
 from typing import Tuple, Callable, Optional
 
-from ..model import ProcessResult, ResourceLimit
+from ..model import ProcessResult, ResourceLimit, RunResult
 from ...utils import ValueProxy
 
 
 class GeneralProcess(metaclass=ABCMeta):
     def __init__(self, start_time: float, resources: ResourceLimit,
-                 result_func: Callable[[], Optional[ProcessResult]],
+                 process_result_func: Callable[[], Optional[ProcessResult]],
                  lifetime_event: EventClass, lock: Optional[Lock] = None):
         self.__start_time = start_time
         self.__resources = resources
+        self.__process_result = None
+        self.__process_result_func = process_result_func
         self.__result = None
-        self.__result_func = result_func
         self.__lifetime_event = lifetime_event
         self.__lock = lock or Lock()
+
+    def __get_process_result(self) -> ProcessResult:
+        if self.__process_result is None:
+            self.__process_result = self.__process_result_func()
+        return self.__process_result
+
+    def __get_result(self) -> RunResult:
+        if self.__result is None or self.__result.result is None:
+            self.__result = RunResult(self.__resources, self.__get_process_result())
+        return self.__result
+
+    def _wait_for_end(self):
+        self.__lifetime_event.wait()
 
     @property
     def start_time(self) -> float:
@@ -34,14 +48,9 @@ class GeneralProcess(metaclass=ABCMeta):
             return self.__resources
 
     @property
-    def process_result(self) -> Optional[ProcessResult]:
+    def result(self) -> RunResult:
         with self.__lock:
-            if self.__result is None:
-                self.__result = self.__result or self.__result_func()
-            return self.__result
-
-    def _wait_for_end(self):
-        self.__lifetime_event.wait()
+            return self.__get_result()
 
     def join(self):
         with self.__lock:

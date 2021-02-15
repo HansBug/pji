@@ -1,4 +1,5 @@
 from enum import unique, IntEnum
+from typing import Optional
 
 from .process import ProcessResult
 from .resource import ResourceLimit
@@ -7,6 +8,7 @@ from ...utils import get_repr_info
 
 @unique
 class RunResultStatus(IntEnum):
+    NOT_COMPLETED = -1
     ACCEPTED = 0
     CPU_TIME_LIMIT_EXCEED = 1
     REAL_TIME_LIMIT_EXCEED = 2
@@ -18,9 +20,13 @@ class RunResultStatus(IntEnum):
     def ok(self):
         return self == RunResultStatus.ACCEPTED
 
+    @property
+    def completed(self):
+        return self != RunResultStatus.NOT_COMPLETED
+
 
 class RunResult:
-    def __init__(self, limit: ResourceLimit, result: ProcessResult):
+    def __init__(self, limit: ResourceLimit, result: Optional[ProcessResult]):
         self.__limit = limit
         self.__result = result
 
@@ -34,7 +40,9 @@ class RunResult:
 
     @property
     def status(self) -> RunResultStatus:
-        if self.__limit.max_cpu_time is not None and self.__result.cpu_time > self.__limit.max_cpu_time:
+        if self.__result is None:
+            return RunResultStatus.NOT_COMPLETED
+        elif self.__limit.max_cpu_time is not None and self.__result.cpu_time > self.__limit.max_cpu_time:
             return RunResultStatus.CPU_TIME_LIMIT_EXCEED
         elif self.__limit.max_real_time is not None and self.__result.real_time > self.__limit.max_real_time:
             return RunResultStatus.REAL_TIME_LIMIT_EXCEED
@@ -50,6 +58,10 @@ class RunResult:
     @property
     def ok(self) -> bool:
         return self.__result.ok and self.status.ok
+
+    @property
+    def completed(self) -> bool:
+        return self.status.completed
 
     def __repr__(self):
         return get_repr_info(

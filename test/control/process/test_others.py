@@ -19,10 +19,6 @@ class TestControlProcessOthers:
         assert cp.stdout.rstrip(b'\r\n') == b'nobody nogroup'
         assert cp.stderr.rstrip(b'\r\n') == b''
 
-        _result = cp.process_result
-        assert _result is not None
-        assert _result.ok
-
     def test_group_change(self):
         cp = common_process(
             args="python3 -c 'import os, grp, getpass;print(getpass.getuser(), grp.getgrgid(os.getgid()).gr_name)'",
@@ -34,7 +30,7 @@ class TestControlProcessOthers:
         assert cp.stdout.rstrip(b'\r\n') == b'root nogroup'
         assert cp.stderr.rstrip(b'\r\n') == b''
 
-        _result = cp.process_result
+        _result = cp.result.result
         assert _result is not None
         assert _result.ok
 
@@ -48,7 +44,7 @@ class TestControlProcessOthers:
         ) as cp:
             pass
 
-        _result = cp.process_result
+        _result = cp.result.result
         assert _result is not None
 
     def test_invalid_resource(self):

@@ -4,7 +4,7 @@ from threading import Thread
 
 import pytest
 
-from pji.control import interactive_process, ResourceLimit, InteractiveProcess
+from pji.control import interactive_process, ResourceLimit, InteractiveProcess, RunResultStatus
 
 
 # noinspection DuplicatedCode
@@ -35,7 +35,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.process_result
+            _result = ip.result.result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -66,7 +66,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.process_result
+            _result = ip.result.result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -98,12 +98,13 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233', b'233jsdf']
 
-            assert ip.process_result is None
+            assert ip.result.result is None
+            assert ip.result.status == RunResultStatus.NOT_COMPLETED
 
             ip.close_stdin()
             ip.join()
 
-            _result = ip.process_result
+            _result = ip.result.result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -141,7 +142,7 @@ class TestControlProcessInteractive:
             ip.close_stdin()
             ip.join()
 
-            _result = ip.process_result
+            _result = ip.result.result
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 9
@@ -176,12 +177,14 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233', b'233jsdf']
 
-            assert ip.process_result is None
+            assert ip.result.result is None
+            assert ip.result.status == RunResultStatus.NOT_COMPLETED
 
             ip.close_stdin()
             ip.join()
 
-            _result = ip.process_result
+            _result = ip.result.result
+            assert _result.ok
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -203,7 +206,7 @@ class TestControlProcessInteractive:
             assert _tag == 'stdout'
             assert _line.rstrip(b'\r\n') == b'2334'
 
-        _result = ip.process_result
+        _result = ip.result.result
         assert _result.ok
 
     def test_interactive_process_wtf(self):

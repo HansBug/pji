@@ -14,9 +14,9 @@ from ..model import ResourceLimit
 
 class InteractiveProcess(GeneralProcess):
     def __init__(self, start_time: float, stdin_stream, output_iter,
-                 resources: ResourceLimit, result_func, lifetime_event: EventClass):
+                 resources: ResourceLimit, process_result_func, lifetime_event: EventClass):
         self.__lock = Lock()
-        GeneralProcess.__init__(self, start_time, resources, result_func, lifetime_event, self.__lock)
+        GeneralProcess.__init__(self, start_time, resources, process_result_func, lifetime_event, self.__lock)
 
         self.__stdin_stream = stdin_stream
         self.__output_iter = output_iter
@@ -212,7 +212,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
             stdin_stream=_stdin_stream,
             output_iter=_output_iter,
             resources=resources,
-            result_func=lambda: _result_proxy.value,
+            process_result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )
 

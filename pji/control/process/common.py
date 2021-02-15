@@ -16,9 +16,9 @@ class CommonProcess(GeneralProcess):
     def __init__(self, start_time: float,
                  communicate_event: EventClass, communicate_complete: EventClass,
                  communicate_stdin: ValueProxy, communicate_stdout: ValueProxy, communicate_stderr: ValueProxy,
-                 resources: ResourceLimit, result_func, lifetime_event: EventClass):
+                 resources: ResourceLimit, process_result_func, lifetime_event: EventClass):
         self.__lock = Lock()
-        GeneralProcess.__init__(self, start_time, resources, result_func, lifetime_event, self.__lock)
+        GeneralProcess.__init__(self, start_time, resources, process_result_func, lifetime_event, self.__lock)
 
         self.__communicate_event = communicate_event
         self.__communicate_complete = communicate_complete
@@ -195,7 +195,7 @@ def common_process(args, preexec_fn=None, resources=None,
             communicate_stdout=_communicate_stdout,
             communicate_stderr=_communicate_stderr,
             resources=resources,
-            result_func=lambda: _result_proxy.value,
+            process_result_func=lambda: _result_proxy.value,
             lifetime_event=_full_lifetime_complete,
         )
 

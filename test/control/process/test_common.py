@@ -29,7 +29,7 @@ class TestControlProcessCommon:
             assert _stderr == cp.stderr
 
             cp.join()
-            _result = cp.process_result
+            _result = cp.result.result
             assert _result is not None
             assert _result.ok
             assert _result.cpu_time < 0.5
@@ -55,7 +55,7 @@ class TestControlProcessCommon:
             assert _stderr == cp.stderr
 
             cp.join()
-            _result = cp.process_result
+            _result = cp.result.result
             assert _result is not None
             assert _result.ok
             assert _result.cpu_time < 0.5
@@ -80,7 +80,7 @@ class TestControlProcessCommon:
             assert _stderr == cp.stderr
 
             cp.join()
-            _result = cp.process_result
+            _result = cp.result.result
             assert _result is not None
             assert _result.ok
             assert _result.cpu_time < 0.5
@@ -103,7 +103,7 @@ class TestControlProcessCommon:
             assert _cresult is None
 
             cp.join()
-            _result = cp.process_result
+            _result = cp.result.result
             assert _result is not None
             assert _result.ok
             assert _result.cpu_time < 0.5
@@ -124,7 +124,7 @@ class TestControlProcessCommon:
             cp.communicate(b'2 3 4 5 6')
             cp.join()
 
-            _result = cp.process_result
+            _result = cp.result.result
             assert not _result.ok
             assert _result.signal_code == 9
             assert _result.exitcode == 0
@@ -152,7 +152,7 @@ class TestControlProcessCommon:
             assert _cresult is None
 
             cp.join()
-            _result = cp.process_result
+            _result = cp.result.result
             assert _result is not None
             assert _result.ok
             assert _result.cpu_time < 0.5
@@ -161,7 +161,7 @@ class TestControlProcessCommon:
         with common_process(args="echo 233") as cp:
             assert isinstance(cp, CommonProcess)
 
-        _result = cp.process_result
+        _result = cp.result.result
         assert _result.ok
 
     def test_common_process_wtf(self):
