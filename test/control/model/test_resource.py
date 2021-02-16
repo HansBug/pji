@@ -139,6 +139,7 @@ class TestControlModelResource:
                 max_memory=None,
                 max_stack=None,
                 max_output_size=None,
+                max_process_number=None,
             ))
 
             # noinspection PyTypeChecker,DuplicatedCode
@@ -147,13 +148,15 @@ class TestControlModelResource:
                     max_cpu_time='5s',
                     max_memory='512mb',
                     max_stack='1G',
-                    max_output_size='64m'
+                    max_output_size='64m',
+                    max_process_number=3,
                 )
                 rl.apply()
                 _result['max_cpu_time'] = resource.getrlimit(resource.RLIMIT_CPU)
                 _result['max_memory'] = resource.getrlimit(resource.RLIMIT_AS)
                 _result['max_stack'] = resource.getrlimit(resource.RLIMIT_STACK)
                 _result['max_output_size'] = resource.getrlimit(resource.RLIMIT_FSIZE)
+                _result['max_process_number'] = resource.getrlimit(resource.RLIMIT_NPROC)
 
             p = Process(target=_get_user_and_group)
             p.start()
@@ -165,6 +168,7 @@ class TestControlModelResource:
                 max_memory=(780435456, 780435456),
                 max_stack=(1000000000, 1000000000),
                 max_output_size=(64000000, 64000000),
+                max_process_number=(3, 3),
             )
 
     def test_apply_2(self):
