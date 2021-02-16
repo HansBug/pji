@@ -42,6 +42,7 @@ class Identification:
 
     @classmethod
     def loads(cls, data) -> 'Identification':
+        data = data or {}
         if isinstance(data, Identification):
             return data
         elif isinstance(data, dict):

@@ -60,8 +60,8 @@ def resources_setter(func):
 
 def users_setter(func):
     @wraps(func)
-    def _func(*args, user=None, group=None, preexec_fn=None, **kwargs):
-        identification = Identification(user, group, auto_group=True)
+    def _func(*args, identification=None, preexec_fn=None, **kwargs):
+        identification = Identification.loads(identification)
 
         def _apply_user_func():
             identification.apply()
