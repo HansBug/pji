@@ -1,4 +1,5 @@
 import resource
+from typing import Optional, Union
 
 from bitmath import MiB
 
@@ -187,6 +188,25 @@ class ResourceLimit:
         :return: resource limit object
         """
         return cls(**cls.__filter_by_properties(**json_data))
+
+    @classmethod
+    def loads(cls, data: Optional[Union[dict, 'ResourceLimit']]) -> 'ResourceLimit':
+        """
+        load object from json data or resource limit object
+        :param data: json data or object
+        :return: resource limit object
+        """
+        data = data or {}
+        if isinstance(data, ResourceLimit):
+            return data
+        elif isinstance(data, dict):
+            return ResourceLimit.load_from_json(json_data=data)
+        else:
+            raise TypeError('{rl} or {dict} expected, but {actual} found.'.format(
+                rl=ResourceLimit.__name__,
+                dict=dict.__name__,
+                actual=type(data).__name__,
+            ))
 
     def apply(self):
         """

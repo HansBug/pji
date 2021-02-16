@@ -7,7 +7,6 @@ from typing import Optional, Tuple, Mapping
 from .base import measure_thread, killer_thread, read_all_from_bytes_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
-from .resource import resources_load
 from ..model import ResourceLimit
 from ...utils import ValueProxy
 
@@ -90,7 +89,7 @@ def common_process(args, shell: bool = False, preexec_fn=None, resources=None,
     :param group: new group for execute
     :return: CommonProcess object to do interaction
     """
-    resources = resources_load(resources)
+    resources = ResourceLimit.loads(resources)
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
 

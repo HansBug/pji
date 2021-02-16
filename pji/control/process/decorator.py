@@ -2,8 +2,8 @@ import os
 from functools import wraps
 from typing import Optional
 
-from .resource import resources_load, resources_apply
 from .user import users_apply, users_load
+from ..model import ResourceLimit
 
 
 def _do_nothing():
@@ -48,10 +48,10 @@ _REAL_TIME_LIMIT_KEY = 'real_time_limit'
 def resources_setter(func):
     @wraps(func)
     def _func(*args, resources=None, preexec_fn=None, **kwargs):
-        resources = resources_load(resources)
+        resources = ResourceLimit.loads(resources)
 
         def _apply_resource_limit_func():
-            resources_apply(resources)
+            resources.apply()
 
         preexec_fn = _attach_preexec_fn(preexec_fn, post_attach=_apply_resource_limit_func)
         return func(*args, preexec_fn=preexec_fn, resources=resources, **kwargs)

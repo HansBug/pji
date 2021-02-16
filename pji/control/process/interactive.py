@@ -8,7 +8,6 @@ from typing import Optional, Mapping
 from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
-from .resource import resources_load
 from ..model import ResourceLimit
 from ...utils import gen_lock
 
@@ -105,7 +104,7 @@ def interactive_process(args, shell: bool = False, preexec_fn=None, resources=No
     :param group: new group for execute
     :return: InteractiveProcess object to do interaction
     """
-    resources = resources_load(resources)
+    resources = ResourceLimit.loads(resources)
     _full_lifetime_complete = Event()
     environ = dict(environ or {})
 
