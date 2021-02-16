@@ -85,8 +85,7 @@ def common_process(args, preexec_fn=None, resources=None,
     :param resources: resource limit
     :param environ: environment variables
     :param cwd: new work dir
-    :param user: new user for execute
-    :param group: new group for execute
+    :param identification: user and group for execution
     :return: CommonProcess object to do interaction
     """
     resources = ResourceLimit.loads(resources)
