@@ -19,20 +19,34 @@ class RunResultStatus(IntEnum):
 
     @property
     def ok(self):
+        """
+        :return: run success or not
+        """
         return self == RunResultStatus.ACCEPTED
 
     @property
     def completed(self):
+        """
+        :return: process completed or not
+        """
         return self != RunResultStatus.NOT_COMPLETED
 
 
 class RunResult:
     def __init__(self, limit: ResourceLimit, result: Optional[ProcessResult]):
+        """
+        :param limit: resource limit
+        :param result: process running result
+        """
         self.__limit = limit
         self.__result = result
         self.__lock = Lock()
 
     def __get_status(self) -> RunResultStatus:
+        """
+        Get status information
+        :return: status information
+        """
         if self.__result is None:
             return RunResultStatus.NOT_COMPLETED
         elif self.__limit.max_cpu_time is not None and self.__result.cpu_time > self.__limit.max_cpu_time:
@@ -50,29 +64,47 @@ class RunResult:
 
     @property
     def limit(self) -> ResourceLimit:
+        """
+        :return: resource limit
+        """
         return self.__limit
 
     @property
     def result(self) -> ProcessResult:
+        """
+        :return: process running result
+        """
         with self.__lock:
             return self.__result
 
     @property
     def status(self) -> RunResultStatus:
+        """
+        :return: current status
+        """
         with self.__lock:
             return self.__get_status()
 
     @property
     def ok(self) -> bool:
+        """
+        :return: process run success or not
+        """
         with self.__lock:
             return self.__result is not None and self.__result.ok and self.__get_status().ok
 
     @property
     def completed(self) -> bool:
+        """
+        :return: process run completed or not
+        """
         with self.__lock:
             return self.__get_status().completed
 
     def __repr__(self):
+        """
+        :return: string representation format
+        """
         return get_repr_info(
             cls=self.__class__,
             args=[
