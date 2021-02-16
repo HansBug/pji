@@ -86,7 +86,7 @@ def common_process(args, preexec_fn=None, resources=None,
     :param environ: environment variables
     :param cwd: new work dir
     :param identification: user and group for execution
-    :return: CommonProcess object to do interaction
+    :return: CommonProcess object to do run
     """
     resources = ResourceLimit.loads(resources)
     _full_lifetime_complete = Event()
