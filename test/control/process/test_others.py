@@ -91,6 +91,14 @@ class TestControlProcessOthers:
         assert isinstance(err, ExecutorException)
         assert isinstance(err.exception, RuntimeError)
 
+    def test_shell_list_args(self):
+        with pytest.raises(ValueError):
+            with common_process(
+                    args=["echo", "233"],
+                    shell=True,
+            ):
+                pytest.fail('Should not reach here.')
+
 
 if __name__ == "__main__":
     pytest.main([os.path.abspath(__file__)])
