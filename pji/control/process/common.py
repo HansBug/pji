@@ -75,7 +75,7 @@ class CommonProcess(GeneralProcess):
 # Attention: only real_time_limit will be processed in this function, other limits will be processed in decorator
 # noinspection DuplicatedCode,PyIncorrectDocstring,PyUnresolvedReferences
 @process_setter
-def common_process(args, shell: bool = False, preexec_fn=None, resources=None,
+def common_process(args, preexec_fn=None, resources=None,
                    environ: Optional[Mapping[str, str]] = None) -> CommonProcess:
     """
     Create an common process
@@ -204,7 +204,7 @@ def common_process(args, shell: bool = False, preexec_fn=None, resources=None,
     stderr_read, stderr_write = os.pipe()
 
     _execute_child = get_child_executor_func(
-        args, shell, dict(environ or {}), preexec_fn,
+        args, dict(environ or {}), preexec_fn,
         _executor_prepare_ok, _executor_has_exception, _executor_exceptions,
         _parent_initialized,
         _start_time_ok, _start_time,

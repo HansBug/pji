@@ -2,7 +2,10 @@ import os
 from functools import wraps
 from typing import Optional
 
+import where
+
 from ..model import ResourceLimit, Identification
+from ...utils import args_split
 
 
 def _do_nothing():
@@ -72,11 +75,34 @@ def users_setter(func):
     return _func
 
 
+def shell_setter(func):
+    @wraps(func)
+    def _func(*args_, args, shell: bool = False, **kwargs):
+        if shell:
+            if isinstance(args, str):
+                if where.first('sh'):
+                    args = [where.first('sh'), '-c', args]
+                elif where.first('cmd'):
+                    args = [where.first('cmd'), '/c', args]
+                else:
+                    raise EnvironmentError('Neither shell nor cmd found in this environment.')
+            else:
+                raise ValueError(
+                    'When shell is enabled, args should be str but {actual} found.'.format(actual=repr(type(args))))
+        else:
+            args = args_split(args)
+
+        return func(*args_, args=args, **kwargs)
+
+    return _func
+
+
 def process_setter(func):
     @wraps(func)
     @users_setter
     @resources_setter
     @workdir_setter
+    @shell_setter
     def _func(*args, **kwargs):
         return func(*args, **kwargs)
 
