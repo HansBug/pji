@@ -147,6 +147,12 @@ class TestControlProcessInteractive:
             time.sleep(0.2)
             assert _output == [b'233']
 
+            with pytest.raises(BrokenPipeError):
+                ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
+
+            with pytest.raises(BrokenPipeError):
+                ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
+
             ip.close_stdin()
             ip.join()
 
