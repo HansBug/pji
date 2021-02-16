@@ -2,8 +2,7 @@ import os
 from functools import wraps
 from typing import Optional
 
-from .user import users_apply, users_load
-from ..model import ResourceLimit
+from ..model import ResourceLimit, Identification
 
 
 def _do_nothing():
@@ -62,10 +61,10 @@ def resources_setter(func):
 def users_setter(func):
     @wraps(func)
     def _func(*args, user=None, group=None, preexec_fn=None, **kwargs):
-        user, group = users_load(user, group)
+        identification = Identification(user, group, auto_group=True)
 
         def _apply_user_func():
-            users_apply(user, group)
+            identification.apply()
 
         preexec_fn = _attach_preexec_fn(preexec_fn, post_attach=_apply_user_func)
         return func(*args, preexec_fn=preexec_fn, **kwargs)
