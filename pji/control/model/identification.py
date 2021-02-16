@@ -3,6 +3,8 @@ from typing import Mapping, Union, Optional
 
 from pysystem import SystemUser, SystemGroup
 
+from ...utils import get_repr_info
+
 
 class Identification:
     def __init__(self, user=None, group=None, auto_group: bool = False):
@@ -56,13 +58,16 @@ class Identification:
         elif isinstance(data, SystemGroup):
             return cls(user=None, group=data)
         else:
-            raise ValueError('Unrecognized {actual} value for {cls}.'.format(
-                actual=repr(type(data)),
-                cls=repr(cls),
-            ))
+            try:
+                return cls(user=SystemUser.loads(data), auto_group=True)
+            except KeyError:
+                raise ValueError('Unrecognized {actual} value for {cls}.'.format(
+                    actual=repr(type(data)),
+                    cls=repr(cls),
+                ))
 
     @classmethod
-    def merge(cls, *commands: 'Identification') -> 'Identification':
+    def merge(cls, *commands) -> 'Identification':
         def _merge(a: 'Identification', b: 'Identification') -> 'Identification':
             return cls(
                 user=b.user or a.user,
@@ -70,4 +75,29 @@ class Identification:
             )
 
         # noinspection PyTypeChecker
+        commands = [cls.loads(item) for item in commands]
         return reduce(_merge, commands, cls())
+
+    def __tuple(self):
+        _json = self.to_json()
+        return _json['user'], _json['group']
+
+    def __hash__(self):
+        return hash(self.__tuple())
+
+    def __eq__(self, other) -> bool:
+        if other is self:
+            return True
+        elif isinstance(other, Identification):
+            return other.to_json() == self.to_json()
+        else:
+            return False
+
+    def __repr__(self) -> str:
+        return get_repr_info(
+            cls=self.__class__,
+            args=[
+                ('user', (lambda: self.user.name, lambda: self.user)),
+                ('group', (lambda: self.group.name, lambda: self.group)),
+            ]
+        )
