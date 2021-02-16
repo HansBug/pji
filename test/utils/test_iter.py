@@ -28,11 +28,12 @@ class TestUtilsIter:
             for item in _generator:
                 _list.append(item)
 
-        t1 = Thread(target=_yield_func)
-        t2 = Thread(target=_yield_func)
-        t3 = Thread(target=_yield_func)
-
-        ts = [t1, t2, t3]
+        ts = [
+            Thread(target=_yield_func),
+            Thread(target=_yield_func),
+            Thread(target=_yield_func),
+            Thread(target=_yield_func),
+        ]
         for t in ts:
             t.start()
         for t in ts:
