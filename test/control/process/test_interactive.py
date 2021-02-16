@@ -142,7 +142,8 @@ class TestControlProcessInteractive:
 
             time.sleep(2.0)
             assert _output == [b'233']
-            ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
+            with pytest.raises(BrokenPipeError):
+                ip.print_stdin(bytes('echo ${ENV_TEST}', 'utf8'))
             time.sleep(0.2)
             assert _output == [b'233']
 
@@ -202,7 +203,7 @@ class TestControlProcessInteractive:
             assert _result.signal_code == 0
 
     @pytest.mark.timeout(5.0)
-    def test_interactive_process_direct_close(self):
+    def test_interactive_process_direct_close_1(self):
         with interactive_process(
                 args="sh",
         ) as ip:
@@ -217,6 +218,28 @@ class TestControlProcessInteractive:
             _, _tag, _line = next(ip.output_yield)
             assert _tag == 'stdout'
             assert _line.rstrip(b'\r\n') == b'2334'
+
+        _result = ip.result.result
+        assert _result.ok
+
+    @pytest.mark.timeout(5.0)
+    def test_interactive_process_direct_close_2(self):
+        with interactive_process(
+                args="sh",
+        ) as ip:
+            assert isinstance(ip, InteractiveProcess)
+
+            ip.print_stdin(b'echo 233')
+            _, _tag, _line = next(ip.output_yield)
+            assert _tag == 'stdout'
+            assert _line.rstrip(b'\r\n') == b'233'
+
+            ip.print_stdin(b'echo 2334')
+            _, _tag, _line = next(ip.output_yield)
+            assert _tag == 'stdout'
+            assert _line.rstrip(b'\r\n') == b'2334'
+
+            ip.close_stdin()
 
         _result = ip.result.result
         assert _result.ok

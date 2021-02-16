@@ -24,31 +24,32 @@ class InteractiveProcess(GeneralProcess):
 
     def __write_stdin(self, data: bytes):
         try:
-            if not self.__stdin_closed:
-                self.__stdin_stream.write(data)
-        except BrokenPipeError:
+            self.__stdin_stream.write(data)
+        except BrokenPipeError as err:
             self.__stdin_closed = True
+            raise err
 
     def __flush_stdin(self):
         try:
-            if not self.__stdin_closed:
-                self.__stdin_stream.flush()
-        except BrokenPipeError:
+            self.__stdin_stream.flush()
+        except BrokenPipeError as err:
             self.__stdin_closed = True
+            raise err
 
     def __close_stdin(self):
         try:
-            if not self.__stdin_closed:
-                self.__stdin_stream.close()
-                self.__stdin_closed = True
-        except BrokenPipeError:
+            self.__stdin_stream.close()
             self.__stdin_closed = True
+        except BrokenPipeError as err:
+            self.__stdin_closed = True
+            raise err
 
     def __load_all_output(self):
         _ = list(self.__output_iter)
 
     def __exit(self):
-        self.__close_stdin()
+        if not self.__stdin_closed:
+            self.__close_stdin()
         self.__load_all_output()
         self._wait_for_end()
 
