@@ -26,6 +26,12 @@ class Identification:
     def group(self) -> SystemGroup:
         return self.__group
 
+    def apply(self):
+        if self.__group is not None:
+            self.__group.apply()
+        if self.__user is not None:
+            self.__user.apply(include_group=False)
+
     def to_json(self) -> Mapping[str, Optional[Union[SystemUser, SystemGroup]]]:
         return {
             'user': self.user.name if self.user else None,
