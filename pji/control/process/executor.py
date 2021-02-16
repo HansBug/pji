@@ -20,13 +20,25 @@ class ExecutorException(Exception):
         return self.__exception
 
 
-def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
+def get_child_executor_func(args, shell: bool, environ: Mapping[str, str], preexec_fn,
                             executor_prepare_ok: EventClass, executor_has_exception: EventClass,
                             executor_exceptions: Queue,
                             parent_initialized: EventClass,
                             start_time_ok: EventClass, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
-    args = args_split(args)
+    if shell:
+        if isinstance(args, str):
+            if where.first('sh'):
+                args = [where.first('sh'), '-c', args]
+            elif where.first('cmd'):
+                args = [where.first('cmd'), '/c', args]
+            else:
+                raise EnvironmentError('Neither shell nor cmd found in this environment.')
+        else:
+            raise ValueError(
+                'When shell is enabled, args should be str but {actual} found.'.format(actual=repr(type(args))))
+    else:
+        args = args_split(args)
     arg_file = where.first(args[0])
 
     if not arg_file:

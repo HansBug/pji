@@ -91,11 +91,12 @@ def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
 # Attention: only real_time_limit will be processed in this function, other limits will be processed in decorator
 # noinspection DuplicatedCode, PyIncorrectDocstring,PyUnresolvedReferences,SpellCheckingInspection
 @process_setter
-def interactive_process(args, preexec_fn=None, resources=None,
+def interactive_process(args, shell: bool = False, preexec_fn=None, resources=None,
                         environ: Optional[Mapping[str, str]] = None) -> InteractiveProcess:
     """
     Create an interactive process
     :param args: arguments for execution
+    :param shell: use shell to execute args
     :param preexec_fn: pre execute function to attach before that
     :param resources: resource limit
     :param environ: environment variables
@@ -222,7 +223,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
     stderr_read, stderr_write = os.pipe()
 
     _execute_child = get_child_executor_func(
-        args, dict(environ or {}), preexec_fn,
+        args, shell, dict(environ or {}), preexec_fn,
         _executor_prepare_ok, _executor_has_exception, _executor_exceptions,
         _parent_initialized,
         _start_time_ok, _start_time,

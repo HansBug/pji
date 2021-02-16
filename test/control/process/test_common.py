@@ -37,7 +37,8 @@ class TestControlProcessCommon:
     def test_common_process_with_env(self):
         _before_start = time.time()
         with common_process(
-                args="sh -c 'echo ${ENV_TEST}'",
+                args="echo ${ENV_TEST}",
+                shell=True,
                 environ={'ENV_TEST': '233'},
         ) as cp:
             _after_start = time.time()

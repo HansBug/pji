@@ -13,7 +13,8 @@ class TestControlProcessInteractive:
     def test_interactive_process_simple(self):
         _before_start = time.time()
         with interactive_process(
-                args="sh -c 'echo 233 && sleep 2 && echo 2334'",
+                args="echo 233 && sleep 2 && echo 2334",
+                shell=True,
         ) as ip:
             _after_start = time.time()
             assert _before_start <= ip.start_time <= _after_start
@@ -43,7 +44,8 @@ class TestControlProcessInteractive:
     def test_interactive_process_with_env(self):
         _before_start = time.time()
         with interactive_process(
-                args="sh -c 'echo 233 && sleep 2 && echo ${ENV_TEST}'",
+                args="echo 233 && sleep 2 && echo ${ENV_TEST}",
+                shell=True,
                 environ={'ENV_TEST': '2334'},
         ) as ip:
             _after_start = time.time()
