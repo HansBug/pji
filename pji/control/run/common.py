@@ -1,15 +1,11 @@
 import io
-from typing import Mapping, Optional
 
-from ..model import ResourceLimit, Identification
+from ..model import RunResult
 from ..process import common_process
 
 
-def common_run(args, shell: bool = False,
-               stdin=None, stdout=None, stderr=None,
-               environ: Optional[Mapping[str, str]] = None, cwd: Optional[str] = None,
-               resources: Optional[ResourceLimit] = None, identification: Optional[Identification] = None
-               ):
+def common_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
+               environ=None, cwd=None, resources=None, identification=None) -> RunResult:
     """
     Create an common process with stream
     :param args: arguments for execution
@@ -21,7 +17,7 @@ def common_run(args, shell: bool = False,
     :param cwd: new work dir
     :param resources: resource limit
     :param identification: user and group for execution
-    :return: CommonProcess object to do run
+    :return: run result of this time
     """
 
     stdin = stdin or io.BytesIO()
@@ -38,3 +34,5 @@ def common_run(args, shell: bool = False,
 
         stdout.write(cp.stdout)
         stderr.write(cp.stderr)
+
+    return cp.result

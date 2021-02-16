@@ -161,8 +161,8 @@ class TestControlModelResource:
 
             _result = dict(_result)
             assert _result == dict(
-                max_cpu_time=(5, 6),
-                max_memory=(512000000, 780435456),
+                max_cpu_time=(6, 6),
+                max_memory=(780435456, 780435456),
                 max_stack=(1000000000, 1000000000),
                 max_output_size=(64000000, 64000000),
             )

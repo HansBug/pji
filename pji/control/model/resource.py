@@ -130,7 +130,7 @@ class ResourceLimit:
         apply max rss memory limit
         """
         if self.max_memory:
-            real = (self.max_memory, round(self.max_memory + MiB(256).bytes))
+            real = round(self.max_memory + MiB(256).bytes)
         else:
             real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_AS, real)
@@ -140,7 +140,7 @@ class ResourceLimit:
         apply max cpu time limit
         """
         if self.max_cpu_time:
-            real = (self.max_cpu_time, round(self.max_cpu_time) + 1)
+            real = round(self.max_cpu_time) + 1
         else:
             real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_CPU, real)
