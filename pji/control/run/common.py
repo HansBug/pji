@@ -2,6 +2,7 @@ import io
 
 from ..model import RunResult
 from ..process import common_process
+from ...utils import eclosing
 
 
 def common_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
@@ -20,19 +21,27 @@ def common_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
     :return: run result of this time
     """
 
+    stdin_need_close = not stdin
     stdin = stdin or io.BytesIO()
+
+    stdout_need_close = not stdout
     stdout = stdout or io.BytesIO()
+
+    stderr_need_close = not stderr
     stderr = stderr or io.BytesIO()
 
-    with common_process(
-            args=args, shell=shell,
-            environ=environ, cwd=cwd,
-            resources=resources, identification=identification,
-    ) as cp:
-        cp.communicate(stdin.read(), wait=False)
-        cp.join()
+    with eclosing(stdin, stdin_need_close)as stdin, \
+            eclosing(stdout, stdout_need_close) as stdout, \
+            eclosing(stderr, stderr_need_close) as stderr:
+        with common_process(
+                args=args, shell=shell,
+                environ=environ, cwd=cwd,
+                resources=resources, identification=identification,
+        ) as cp:
+            cp.communicate(stdin.read(), wait=False)
+            cp.join()
 
-        stdout.write(cp.stdout)
-        stderr.write(cp.stderr)
+            stdout.write(cp.stdout)
+            stderr.write(cp.stderr)
 
-    return cp.result
+        return cp.result

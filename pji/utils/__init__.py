@@ -1,4 +1,5 @@
 from .args import args_split
+from .context import eclosing
 from .decorator import allow_none
 from .encoding import auto_decode, auto_encode, auto_decode_support, auto_encode_support
 from .iter import gen_lock
