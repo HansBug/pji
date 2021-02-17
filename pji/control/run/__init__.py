@@ -1,2 +1,2 @@
 from .common import common_run
-from .timing import TimingStdin
+from .timing import timing_run, TimingStdin
