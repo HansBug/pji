@@ -3,3 +3,4 @@ pysystem~=0.3.0
 where>=1.0.2
 pytimeparse>=1.1.8
 chardet>=3.0.4
+pyyaml>=5.3.1
