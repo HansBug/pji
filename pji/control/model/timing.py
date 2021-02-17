@@ -1,4 +1,6 @@
 import io
+import math
+import os
 import re
 from abc import ABCMeta
 from typing import List, Tuple, Optional, Union, TypeVar, Type
@@ -42,6 +44,34 @@ class TimingContent(metaclass=ABCMeta):
     @classmethod
     def loads(cls, data) -> 'TimingContent':
         return _load_from_data(data, cls)
+
+    def to_json(self):
+        return self.lines
+
+    __DUMP_FLOAT_LENGTH = 6
+
+    def dumps(self) -> str:
+        if self.__lines:
+            _end_time = self.__lines[-1][0]
+            _int_length = int(math.floor(math.log10(_end_time)) + 1)
+            _mask = '%%.%sf' % self.__DUMP_FLOAT_LENGTH
+            with io.StringIO() as s:
+                for _time, _line in self.__lines:
+                    _time_str = _mask % _time
+                    _time_str = ' ' * (self.__DUMP_FLOAT_LENGTH + 1 + _int_length - len(_time_str)) + _time_str
+                    s.write('[%s]%s%s' % (_time_str, _auto_decode(_line), _auto_decode(os.linesep)))
+
+                return s.getvalue()
+        else:
+            return ''
+
+    def dump(self, stream):
+        _str_content = self.dumps()
+        _bytes_content = _auto_encode(_str_content)
+        try:
+            stream.write(_bytes_content)
+        except TypeError:
+            stream.write(_str_content)
 
     def __eq__(self, other):
         if other is self:

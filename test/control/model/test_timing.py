@@ -252,6 +252,64 @@ class TestControlModelTiming:
         with pytest.raises(TypeError):
             TimingContent.loads(1)
 
+    def test_to_json(self):
+        _ts = TimingContent.loads("""
+        [0.0]this is first line
+         [2.5]this is third line
+         [ 1.0]this is second line
+
+        # this is comment
+         [ 3.0 ]this is last line
+                """)
+        assert _ts.to_json() == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+
+    def test_dumps(self):
+        _ts = TimingContent.loads("""
+                [0.0]this is first line
+                 [2.5]this is third line
+                 [ 1.0]this is second line
+
+                # this is comment
+                 [ 100.0 ]this is last line
+                        """)
+
+        assert _ts.dumps().rstrip('\r\n') == """[  0.000000]this is first line
+[  1.000000]this is second line
+[  2.500000]this is third line
+[100.000000]this is last line"""
+
+        _ts = TimingContent.loads([])
+        assert _ts.dumps() == ''
+
+    def test_dump(self):
+        _ts = TimingContent.loads("""
+                        [0.0]this is first line
+                         [2.5]this is third line
+                         [ 1.0]this is second line
+
+                        # this is comment
+                         [ 100.0 ]this is last line
+                                """)
+
+        with io.StringIO() as s:
+            _ts.dump(s)
+            assert s.getvalue().rstrip('\r\n') == """[  0.000000]this is first line
+[  1.000000]this is second line
+[  2.500000]this is third line
+[100.000000]this is last line"""
+
+        with io.BytesIO() as b:
+            _ts.dump(b)
+            assert b.getvalue().rstrip(b'\r\n') == b"""[  0.000000]this is first line
+[  1.000000]this is second line
+[  2.500000]this is third line
+[100.000000]this is last line"""
+
     def test_eq(self):
         _ts = TimingContent([
             (0.0, b'this is first line'),
