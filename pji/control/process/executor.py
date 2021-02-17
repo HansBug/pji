@@ -37,6 +37,7 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
     stderr_read, stderr_write = stderr_pipes
     exception_read, exception_write = exception_pipes
 
+    # noinspection DuplicatedCode
     def _execute_child():
         os.close(stdin_write)
         os.dup2(stdin_read, sys.stdin.fileno())

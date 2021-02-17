@@ -40,7 +40,7 @@ def _load_func_from_str(source: str) -> _INTERACT_FUNC:
 
 def _load_func(func) -> _INTERACT_FUNC:
     if func is None:
-        return lambda x: None
+        return lambda: None
     elif hasattr(func, '__call__'):
         return func
     elif isinstance(func, str):
@@ -49,13 +49,13 @@ def _load_func(func) -> _INTERACT_FUNC:
         raise TypeError('Callable or str source expected but {actual} found.'.format(actual=repr(type(func).__name__)))
 
 
-def mutual_run(args, shell: bool = False, stdin_func=None, stdout=None, stderr=None,
+def mutual_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                environ=None, cwd=None, resources=None, identification=None):
     """
     Create an mutual process with stream
     :param args: arguments for execution
     :param shell: use shell to execute args
-    :param stdin_func: stdin interaction function (none means nothing)
+    :param stdin: stdin interaction function (none means nothing)
     :param stdout: stdout stream (none means nothing)
     :param stderr: stderr stream (none means nothing)
     :param environ: environment variables
@@ -64,7 +64,7 @@ def mutual_run(args, shell: bool = False, stdin_func=None, stdout=None, stderr=N
     :param identification: user and group for execution
     :return: run result of this time
     """
-    stdin_func = _load_func(stdin_func)
+    stdin = _load_func(stdin)
 
     stdout_need_close = not stdout
     stdout = stdout or io.BytesIO()
@@ -81,18 +81,20 @@ def mutual_run(args, shell: bool = False, stdin_func=None, stdout=None, stderr=N
         _mutual_initialize_ok = Event()
         _prepare_ok = Event()
 
+        # noinspection DuplicatedCode
         def _launch_mutual():
             os.close(mutual_stdin_put)
-            os.close(mutual_stdout_get)
-            os.close(mutual_stderr_get)
-
             os.dup2(mutual_stdin_get, sys.stdin.fileno())
+
+            os.close(mutual_stdout_get)
             os.dup2(mutual_stdout_put, sys.stdout.fileno())
+
+            os.close(mutual_stderr_get)
             os.dup2(mutual_stderr_put, sys.stderr.fileno())
 
             _mutual_initialize_ok.set()
             _prepare_ok.wait()
-            stdin_func()
+            stdin()
 
         _mutual_process = Process(target=_launch_mutual)
 
