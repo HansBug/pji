@@ -1,6 +1,7 @@
 import io
 import re
-from typing import List, Tuple, Optional, Union
+from abc import ABCMeta
+from typing import List, Tuple, Optional, Union, TypeVar, Type
 
 from ...utils import auto_encode_support, auto_decode_support, auto_load_json, JsonLoadError, get_repr_info
 
@@ -22,7 +23,7 @@ def _to_delta_lines(lines: _TIMING_LIST_TYPING) -> _TIMING_LIST_TYPING:
     return [(_time - (lines[i - 1][0] if i > 0 else 0.0), _line) for i, (_time, _line) in enumerate(lines)]
 
 
-class TimingScript:
+class TimingContent(metaclass=ABCMeta):
     def __init__(self, lines: Optional[_TIMING_LIST_TYPING] = None):
         self.__lines = _stable_process(lines or [])
 
@@ -35,17 +36,17 @@ class TimingScript:
         return _to_delta_lines(self.__lines)
 
     @classmethod
-    def load(cls, stream) -> 'TimingScript':
-        return _load_from_stream(stream)
+    def load(cls, stream) -> 'TimingContent':
+        return _load_from_stream(stream, cls)
 
     @classmethod
-    def loads(cls, data) -> 'TimingScript':
-        return _load_from_data(data)
+    def loads(cls, data) -> 'TimingContent':
+        return _load_from_data(data, cls)
 
     def __eq__(self, other):
         if other is self:
             return True
-        elif isinstance(other, TimingScript):
+        elif isinstance(other, TimingContent):
             return self.__lines == other.__lines
         else:
             return False
@@ -64,8 +65,10 @@ class TimingScript:
 _LINE_IDENT = (re.compile(r'\s*\[\s*(\d+(\.\d*)?)\s*]([\s\S]*)'), (1, 3))
 _LINE_COMMENT = re.compile(r'\s*#\s*[\s\S]*')
 
+_TS = TypeVar('_TS', bound=TimingContent)
 
-def _load_from_line_ident(stream) -> TimingScript:
+
+def _load_from_line_ident(stream, cls: Type[_TS]) -> _TS:
     _result = []
     for line in stream:
         _str_line = _auto_decode(line).rstrip('\r\n')
@@ -78,10 +81,10 @@ def _load_from_line_ident(stream) -> TimingScript:
             else:
                 raise ValueError('Invalid line {line} for timing script.'.format(line=repr(_str_line)))
 
-    return TimingScript(_result)
+    return cls(_result)
 
 
-def _load_from_json(stream) -> TimingScript:
+def _load_from_json(stream, cls: Type[_TS]) -> _TS:
     _json = auto_load_json(stream)
     if not isinstance(_json, list):
         raise TypeError('Timing script json should be a list but {actual} found.'.format(actual=type(_json).__name__))
@@ -107,7 +110,7 @@ def _load_from_json(stream) -> TimingScript:
         for _line in _lines:
             _result.append((_time, _auto_encode(_line)))
 
-    return TimingScript(_result)
+    return cls(_result)
 
 
 _METHODS = [
@@ -116,33 +119,33 @@ _METHODS = [
 ]
 
 
-def _load_from_stream(stream) -> TimingScript:
+def _load_from_stream(stream, cls: Type[_TS]) -> _TS:
     _init_position = stream.tell()
     _last_err = None
 
     for _func, _except in _METHODS:
         try:
             stream.seek(_init_position)
-            return _func(stream)
+            return _func(stream, cls)
         except _except as err:
             _last_err = err
 
     raise _last_err
 
 
-def _load_from_data(data) -> TimingScript:
-    if isinstance(data, TimingScript):
+def _load_from_data(data, cls: Type[_TS]) -> _TS:
+    if isinstance(data, cls):
         return data
     elif isinstance(data, list) or data is None:
-        return TimingScript(data)
+        return cls(data)
     elif isinstance(data, str):
         with io.StringIO(data) as file:
-            return TimingScript.load(file)
+            return cls.load(file)
     elif isinstance(data, (bytes, bytearray)):
         with io.BytesIO(bytes(data)) as file:
-            return TimingScript.load(file)
+            return cls.load(file)
     else:
         raise TypeError('{cls}, list, str or bytes expected but {actual} found.'.format(
-            cls=TimingScript.__name__,
+            cls=cls.__name__,
             actual=repr(type(data).__name__),
         ))

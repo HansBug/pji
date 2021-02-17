@@ -3,13 +3,17 @@ import os
 
 import pytest
 
-from pji.control.run import TimingScript
+from pji.control.model import TimingContent as _AbsTimingContent
 from pji.utils import JsonLoadError
+
+
+class TimingContent(_AbsTimingContent):
+    pass
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
-class TestControlRunTimingScript:
+class TestControlModelTiming:
     def test_load_ident(self):
         _text = """
 [0.0]this is first line
@@ -21,9 +25,9 @@ class TestControlRunTimingScript:
         """
 
         with io.StringIO(_text) as f:
-            _ts = TimingScript.load(f)
+            _ts = TimingContent.load(f)
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -52,9 +56,9 @@ class TestControlRunTimingScript:
                 """
 
         with io.StringIO(_text) as f:
-            _ts = TimingScript.load(f)
+            _ts = TimingContent.load(f)
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -79,9 +83,9 @@ class TestControlRunTimingScript:
                 """
 
         with io.StringIO(_text) as f:
-            _ts = TimingScript.load(f)
+            _ts = TimingContent.load(f)
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -102,7 +106,7 @@ class TestControlRunTimingScript:
 
         with pytest.raises(JsonLoadError):
             with io.StringIO(_text) as f:
-                TimingScript.load(f)
+                TimingContent.load(f)
 
     def test_load_invalid_2(self):
         _text = """
@@ -111,7 +115,7 @@ class TestControlRunTimingScript:
 
         with pytest.raises(TypeError):
             with io.StringIO(_text) as f:
-                TimingScript.load(f)
+                TimingContent.load(f)
 
     def test_load_invalid_3(self):
         _text = """
@@ -124,7 +128,7 @@ class TestControlRunTimingScript:
                         """
         with pytest.raises(TypeError):
             with io.StringIO(_text) as f:
-                TimingScript.load(f)
+                TimingContent.load(f)
 
     def test_load_invalid_4(self):
         _text = """
@@ -136,7 +140,7 @@ class TestControlRunTimingScript:
                         """
         with pytest.raises(TypeError):
             with io.StringIO(_text) as f:
-                TimingScript.load(f)
+                TimingContent.load(f)
 
     def test_load_invalid_5(self):
         _text = """
@@ -150,17 +154,17 @@ class TestControlRunTimingScript:
 
         with pytest.raises(KeyError):
             with io.StringIO(_text) as f:
-                TimingScript.load(f)
+                TimingContent.load(f)
 
     def test_loads_str_1(self):
-        _ts = TimingScript.loads(TimingScript([
+        _ts = TimingContent.loads(TimingContent([
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]))
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -175,14 +179,14 @@ class TestControlRunTimingScript:
         ]
 
     def test_loads_str_2(self):
-        _ts = TimingScript.loads([
+        _ts = TimingContent.loads([
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ])
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -197,7 +201,7 @@ class TestControlRunTimingScript:
         ]
 
     def test_loads_str_3(self):
-        _ts = TimingScript.loads("""
+        _ts = TimingContent.loads("""
         [0.0]this is first line
  [2.5]this is third line
  [ 1.0]this is second line
@@ -206,7 +210,7 @@ class TestControlRunTimingScript:
  [ 3.0 ]this is last line
         """)
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -221,7 +225,7 @@ class TestControlRunTimingScript:
         ]
 
     def test_loads_str_4(self):
-        _ts = TimingScript.loads(b"""
+        _ts = TimingContent.loads(b"""
             [0.0]this is first line
      [2.5]this is third line
      [ 1.0]this is second line
@@ -230,7 +234,7 @@ class TestControlRunTimingScript:
      [ 3.0 ]this is last line
             """)
 
-        assert isinstance(_ts, TimingScript)
+        assert isinstance(_ts, TimingContent)
         assert _ts.lines == [
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
@@ -246,10 +250,10 @@ class TestControlRunTimingScript:
 
     def test_loads_str_invalid(self):
         with pytest.raises(TypeError):
-            TimingScript.loads(1)
+            TimingContent.loads(1)
 
     def test_eq(self):
-        _ts = TimingScript([
+        _ts = TimingContent([
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
@@ -257,7 +261,7 @@ class TestControlRunTimingScript:
         ])
 
         assert _ts == _ts
-        assert _ts == TimingScript([
+        assert _ts == TimingContent([
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
@@ -266,19 +270,13 @@ class TestControlRunTimingScript:
         assert not (_ts == 1)
 
     def test_repr(self):
-        assert repr(TimingScript([
+        assert repr(TimingContent([
             (0.0, b'this is first line'),
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
-        ])) == '<TimingScript lines: 4, start_time: 0.000s, end_time: 3.000s>'
-        assert repr(TimingScript()) == '<TimingScript lines: 0>'
-
-
-@pytest.mark.unittest
-class TestControlRunTimingRun:
-    def test_timing_run(self):
-        pass
+        ])) == '<TimingContent lines: 4, start_time: 0.000s, end_time: 3.000s>'
+        assert repr(TimingContent()) == '<TimingContent lines: 0>'
 
 
 if __name__ == "__main__":

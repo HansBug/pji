@@ -2,3 +2,4 @@ from .test_identification import TestControlModelIdentification
 from .test_process import TestControlModelProcessNormal, TestControlModelProcessKilled
 from .test_resource import TestControlModelResource
 from .test_run import TestControlModelRun
+from .test_timing import TestControlModelTiming
