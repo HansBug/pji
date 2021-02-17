@@ -123,8 +123,8 @@ class TestControlRunMutual:
         def _func():
             import time
             _start_time = time.time()
-            while time.time() < _start_time + 1.5:
-                print("echo 233")
+            while time.time() < _start_time + 1.0:
+                print("echo 233 1>&2", flush=True)
                 time.sleep(0.05)
 
         with closing(io.BytesIO()) as stdout, closing(io.BytesIO()) as stderr:
@@ -139,7 +139,7 @@ class TestControlRunMutual:
             assert len(_stdout.lines) == 0
 
             _stderr = MutualStderr.loads(stderr.getvalue())
-            assert len(_stderr.lines) == 0
+            assert 7 <= len(_stderr.lines) <= 13
 
             assert not result.ok
             assert result.completed
