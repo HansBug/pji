@@ -1,6 +1,6 @@
 import os
 from contextlib import closing
-from io import BytesIO
+from io import BytesIO, StringIO
 
 import pytest
 
@@ -19,6 +19,19 @@ class TestControlRunCommon:
 
             assert stdout.getvalue().rstrip(b'\r\n') == b'1234'
             assert stderr.getvalue().rstrip(b'\r\n') == b''
+            assert result.ok
+            assert result.completed
+            assert result.status == RunResultStatus.ACCEPTED
+
+    def test_common_run_str(self):
+        with closing(StringIO('1234')) as stdin, closing(StringIO()) as stdout, closing(StringIO()) as stderr:
+            result = common_run(
+                args='cat', shell=True,
+                stdin=stdin, stdout=stdout, stderr=stderr,
+            )
+
+            assert stdout.getvalue().rstrip('\r\n') == '1234'
+            assert stderr.getvalue().rstrip('\r\n') == ''
             assert result.ok
             assert result.completed
             assert result.status == RunResultStatus.ACCEPTED

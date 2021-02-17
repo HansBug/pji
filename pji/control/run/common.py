@@ -1,5 +1,6 @@
 import io
 
+from .encoding import _try_read_to_bytes, _try_write
 from ..model import RunResult
 from ..process import common_process
 from ...utils import eclosing
@@ -38,10 +39,10 @@ def common_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                 environ=environ, cwd=cwd,
                 resources=resources, identification=identification,
         ) as cp:
-            cp.communicate(stdin.read(), wait=False)
+            cp.communicate(_try_read_to_bytes(stdin), wait=False)
             cp.join()
 
-            stdout.write(cp.stdout)
-            stderr.write(cp.stderr)
+            _try_write(stdout, cp.stdout)
+            _try_write(stderr, cp.stderr)
 
         return cp.result
