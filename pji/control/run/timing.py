@@ -23,7 +23,7 @@ class TimingStderr(_AbstractTimingContent):
 def timing_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                environ=None, cwd=None, resources=None, identification=None) -> RunResult:
     """
-    Create an common process with stream
+    Create an timing process with stream
     :param args: arguments for execution
     :param shell: use shell to execute args
     :param stdin: stdin stream (none means nothing)
