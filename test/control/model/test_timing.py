@@ -34,12 +34,6 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
-        ]
 
     def test_load_yaml(self):
         _text = """
@@ -65,12 +59,6 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
-        ]
 
     def test_load_json(self):
         _text = """
@@ -91,12 +79,6 @@ class TestControlModelTiming:
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
-        ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
         ]
 
     def test_load_invalid_1(self):
@@ -171,12 +153,6 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
-        ]
 
     def test_loads_str_2(self):
         _ts = TimingContent.loads([
@@ -192,12 +168,6 @@ class TestControlModelTiming:
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
-        ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
         ]
 
     def test_loads_str_3(self):
@@ -217,12 +187,6 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
-        ]
 
     def test_loads_str_4(self):
         _ts = TimingContent.loads(b"""
@@ -241,12 +205,6 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
-        ]
 
     def test_loads_str_5(self):
         _ts = TimingContent.loads([
@@ -262,12 +220,6 @@ class TestControlModelTiming:
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
-        ]
-        assert _ts.delta_lines == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (1.5, b'this is third line'),
-            (0.5, b'this is last line'),
         ]
 
     def test_loads_str_invalid(self):

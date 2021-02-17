@@ -22,10 +22,6 @@ def _stable_process(lines: _TIMING_LIST_TYPING) -> _TIMING_LIST_TYPING:
     return [(_time, _line) for _time, i, _line in _sorted]
 
 
-def _to_delta_lines(lines: _TIMING_LIST_TYPING) -> _TIMING_LIST_TYPING:
-    return [(_time - (lines[i - 1][0] if i > 0 else 0.0), _line) for i, (_time, _line) in enumerate(lines)]
-
-
 class TimingContent(metaclass=ABCMeta):
     def __init__(self, lines: Optional[_TIMING_LIST_TYPING] = None):
         self.__lines = _stable_process(lines or [])
@@ -33,10 +29,6 @@ class TimingContent(metaclass=ABCMeta):
     @property
     def lines(self):
         return list(self.__lines)
-
-    @property
-    def delta_lines(self):
-        return _to_delta_lines(self.__lines)
 
     @classmethod
     def load(cls, stream) -> 'TimingContent':
