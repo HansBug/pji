@@ -1,4 +1,5 @@
 import io
+import json
 import math
 import os
 import re
@@ -46,7 +47,10 @@ class TimingContent(metaclass=ABCMeta):
         return _load_from_data(data, cls)
 
     def to_json(self):
-        return self.lines
+        return [{
+            'time': _time,
+            'line': _auto_decode(_line),
+        } for _time, _line in self.__lines]
 
     __DUMP_FLOAT_LENGTH = 6
 
@@ -167,7 +171,12 @@ def _load_from_data(data, cls: Type[_TS]) -> _TS:
     if isinstance(data, cls):
         return data
     elif isinstance(data, list) or data is None:
-        return cls(data)
+        data = data or []
+        if data and isinstance(data[0], tuple):
+            return cls(data)
+        else:
+            with io.BytesIO(_auto_encode(json.dumps(data))) as b:
+                return _load_from_json(b, cls)
     elif isinstance(data, str):
         with io.StringIO(data) as file:
             return cls.load(file)

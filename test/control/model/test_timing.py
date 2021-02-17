@@ -248,6 +248,28 @@ class TestControlModelTiming:
             (0.5, b'this is last line'),
         ]
 
+    def test_loads_str_5(self):
+        _ts = TimingContent.loads([
+            {'time': 0.0, 'line': 'this is first line'},
+            {'time': 1.0, 'line': 'this is second line'},
+            {'time': 2.5, 'line': 'this is third line'},
+            {'time': 3.0, 'line': 'this is last line'},
+        ])
+
+        assert isinstance(_ts, TimingContent)
+        assert _ts.lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+        assert _ts.delta_lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (1.5, b'this is third line'),
+            (0.5, b'this is last line'),
+        ]
+
     def test_loads_str_invalid(self):
         with pytest.raises(TypeError):
             TimingContent.loads(1)
@@ -262,10 +284,10 @@ class TestControlModelTiming:
          [ 3.0 ]this is last line
                 """)
         assert _ts.to_json() == [
-            (0.0, b'this is first line'),
-            (1.0, b'this is second line'),
-            (2.5, b'this is third line'),
-            (3.0, b'this is last line'),
+            {'time': 0.0, 'line': 'this is first line'},
+            {'time': 1.0, 'line': 'this is second line'},
+            {'time': 2.5, 'line': 'this is third line'},
+            {'time': 3.0, 'line': 'this is last line'},
         ]
 
     def test_dumps(self):
