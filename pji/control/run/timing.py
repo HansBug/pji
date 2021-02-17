@@ -58,12 +58,9 @@ def timing_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                 while time.time() < _target_time and not ip.completed:
                     time.sleep(max(min(0.2, _target_time - time.time()), 0.0))
 
-                if not ip.completed:
-                    try:
-                        ip.print_stdin(_line)
-                    except BrokenPipeError:
-                        break
-                else:
+                try:
+                    ip.print_stdin(_line)
+                except BrokenPipeError:
                     break
 
             ip.close_stdin()
