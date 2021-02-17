@@ -22,7 +22,7 @@ class ExecutorException(Exception):
 
 
 def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
-                            executor_prepare_ok: EventClass, executor_has_exception: EventClass, exception_put,
+                            executor_prepare_ok: EventClass, exception_pipes,
                             parent_initialized: EventClass,
                             start_time_ok: EventClass, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
@@ -35,6 +35,7 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
     stdin_read, stdin_write = stdin_pipes
     stdout_read, stdout_write = stdout_pipes
     stderr_read, stderr_write = stderr_pipes
+    exception_read, exception_write = exception_pipes
 
     def _execute_child():
         os.close(stdin_write)
@@ -53,10 +54,12 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
         except Exception as err:
             _exception = err
 
-        if _exception is not None:
-            executor_has_exception.set()
-            with os.fdopen(exception_put, 'wb', 0) as ef:
+        os.close(exception_read)
+        with os.fdopen(exception_write, 'wb', 0) as ef:
+            if _exception is not None:
                 pickle.dump(ExecutorException(_exception), ef)
+            else:
+                pickle.dump(None, ef)
         executor_prepare_ok.set()
 
         if _exception is None:

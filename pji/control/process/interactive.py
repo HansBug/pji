@@ -110,7 +110,6 @@ def interactive_process(args, preexec_fn=None, resources=None,
     environ = dict(environ or {})
 
     _executor_prepare_ok = Event()
-    _executor_has_exception = Event()
     _exception_get, _exception_put = os.pipe()
 
     _parent_initialized = Event()
@@ -192,9 +191,10 @@ def interactive_process(args, preexec_fn=None, resources=None,
 
         # waiting for prepare ok
         _executor_prepare_ok.wait()
-        if _executor_has_exception.is_set():
-            with os.fdopen(_exception_get, 'rb', 0) as ef:
-                raise pickle.load(ef)
+        with os.fdopen(_exception_get, 'rb', 0) as ef:
+            _exception = pickle.load(ef)
+            if _exception:
+                raise _exception
 
         # start all the threads and services
         _measure_thread.start()
@@ -225,7 +225,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
 
     _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
-        _executor_prepare_ok, _executor_has_exception, _exception_put,
+        _executor_prepare_ok, (_exception_get, _exception_put),
         _parent_initialized,
         _start_time_ok, _start_time,
         (stdin_read, stdin_write),
