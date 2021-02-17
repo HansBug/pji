@@ -1,6 +1,7 @@
 import io
 import time
 
+from .encoding import _try_write, _try_read_to_bytes
 from ..model import RunResult
 from ..model import TimingContent as _AbstractTimingContent
 from ..process import interactive_process
@@ -43,7 +44,7 @@ def timing_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
     stderr_need_close = not stderr
     stderr = stderr or io.BytesIO()
 
-    with eclosing(stdin, stdin_need_close)as stdin, \
+    with eclosing(stdin, stdin_need_close) as stdin, \
             eclosing(stdout, stdout_need_close) as stdout, \
             eclosing(stderr, stderr_need_close) as stderr:
         with interactive_process(
@@ -51,7 +52,7 @@ def timing_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                 environ=environ, cwd=cwd,
                 resources=resources, identification=identification,
         ) as ip:
-            _stdin = TimingStdin.load(stdin)
+            _stdin = TimingStdin.loads(_try_read_to_bytes(stdin))
             for _time, _line in _stdin.lines:
                 _target_time = ip.start_time + _time
                 while time.time() < _target_time and not ip.completed:
@@ -77,9 +78,7 @@ def timing_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
                     raise ValueError('Unknown output type - {type}.'.format(type=repr(_time)))
 
             ip.join()
-            _stdout = TimingStdout.loads(_stdout)
-            _stderr = TimingStderr.loads(_stderr)
-            _stdout.dump(stdout)
-            _stderr.dump(stderr)
+            _try_write(stdout, TimingStdout.loads(_stdout).dumps())
+            _try_write(stderr, TimingStderr.loads(_stderr).dumps())
 
             return ip.result

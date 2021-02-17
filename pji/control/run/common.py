@@ -31,7 +31,7 @@ def common_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
     stderr_need_close = not stderr
     stderr = stderr or io.BytesIO()
 
-    with eclosing(stdin, stdin_need_close)as stdin, \
+    with eclosing(stdin, stdin_need_close) as stdin, \
             eclosing(stdout, stdout_need_close) as stdout, \
             eclosing(stderr, stderr_need_close) as stderr:
         with common_process(
