@@ -1,3 +1,4 @@
+import io
 import re
 from typing import List, Tuple, Optional, Union
 
@@ -36,6 +37,10 @@ class TimingScript:
     @classmethod
     def load(cls, stream) -> 'TimingScript':
         return _load_from_stream(stream)
+
+    @classmethod
+    def loads(cls, data) -> 'TimingScript':
+        return _load_from_data(data)
 
     def __eq__(self, other):
         if other is self:
@@ -123,3 +128,21 @@ def _load_from_stream(stream) -> TimingScript:
             _last_err = err
 
     raise _last_err
+
+
+def _load_from_data(data) -> TimingScript:
+    if isinstance(data, TimingScript):
+        return data
+    elif isinstance(data, list) or data is None:
+        return TimingScript(data)
+    elif isinstance(data, str):
+        with io.StringIO(data) as file:
+            return TimingScript.load(file)
+    elif isinstance(data, (bytes, bytearray)):
+        with io.BytesIO(bytes(data)) as file:
+            return TimingScript.load(file)
+    else:
+        raise TypeError('{cls}, list, str or bytes expected but {actual} found.'.format(
+            cls=TimingScript.__name__,
+            actual=repr(type(data).__name__),
+        ))

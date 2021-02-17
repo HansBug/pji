@@ -10,7 +10,7 @@ from pji.utils import JsonLoadError
 # noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestControlRunTimingScript:
-    def test_loads_ident(self):
+    def test_load_ident(self):
         _text = """
 [0.0]this is first line
  [2.5]this is third line
@@ -37,7 +37,7 @@ class TestControlRunTimingScript:
             (0.5, b'this is last line'),
         ]
 
-    def test_loads_yaml(self):
+    def test_load_yaml(self):
         _text = """
 - time: 0
   line: this is first line
@@ -68,7 +68,7 @@ class TestControlRunTimingScript:
             (0.5, b'this is last line'),
         ]
 
-    def test_loads_json(self):
+    def test_load_json(self):
         _text = """
 [
     {"time": 0, line: "this is first line"},
@@ -95,7 +95,7 @@ class TestControlRunTimingScript:
             (0.5, b'this is last line'),
         ]
 
-    def test_loads_invalid_1(self):
+    def test_load_invalid_1(self):
         _text = """
         [1s3]fk
         """
@@ -104,7 +104,7 @@ class TestControlRunTimingScript:
             with io.StringIO(_text) as f:
                 TimingScript.load(f)
 
-    def test_loads_invalid_2(self):
+    def test_load_invalid_2(self):
         _text = """
         lksdgflksdfl;g
         """
@@ -113,7 +113,7 @@ class TestControlRunTimingScript:
             with io.StringIO(_text) as f:
                 TimingScript.load(f)
 
-    def test_loads_invalid_3(self):
+    def test_load_invalid_3(self):
         _text = """
         [
             {"time": 0, line: "this is first line"},
@@ -126,7 +126,7 @@ class TestControlRunTimingScript:
             with io.StringIO(_text) as f:
                 TimingScript.load(f)
 
-    def test_loads_invalid_4(self):
+    def test_load_invalid_4(self):
         _text = """
         [
             {"time": 0, line: {"name": "this is first line"}},
@@ -138,7 +138,7 @@ class TestControlRunTimingScript:
             with io.StringIO(_text) as f:
                 TimingScript.load(f)
 
-    def test_loads_invalid_5(self):
+    def test_load_invalid_5(self):
         _text = """
         [
             {"time": 0, line: "this is first line"},
@@ -151,6 +151,102 @@ class TestControlRunTimingScript:
         with pytest.raises(KeyError):
             with io.StringIO(_text) as f:
                 TimingScript.load(f)
+
+    def test_loads_str_1(self):
+        _ts = TimingScript.loads(TimingScript([
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]))
+
+        assert isinstance(_ts, TimingScript)
+        assert _ts.lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+        assert _ts.delta_lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (1.5, b'this is third line'),
+            (0.5, b'this is last line'),
+        ]
+
+    def test_loads_str_2(self):
+        _ts = TimingScript.loads([
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ])
+
+        assert isinstance(_ts, TimingScript)
+        assert _ts.lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+        assert _ts.delta_lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (1.5, b'this is third line'),
+            (0.5, b'this is last line'),
+        ]
+
+    def test_loads_str_3(self):
+        _ts = TimingScript.loads("""
+        [0.0]this is first line
+ [2.5]this is third line
+ [ 1.0]this is second line
+
+# this is comment
+ [ 3.0 ]this is last line
+        """)
+
+        assert isinstance(_ts, TimingScript)
+        assert _ts.lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+        assert _ts.delta_lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (1.5, b'this is third line'),
+            (0.5, b'this is last line'),
+        ]
+
+    def test_loads_str_4(self):
+        _ts = TimingScript.loads(b"""
+            [0.0]this is first line
+     [2.5]this is third line
+     [ 1.0]this is second line
+
+    # this is comment
+     [ 3.0 ]this is last line
+            """)
+
+        assert isinstance(_ts, TimingScript)
+        assert _ts.lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (2.5, b'this is third line'),
+            (3.0, b'this is last line'),
+        ]
+        assert _ts.delta_lines == [
+            (0.0, b'this is first line'),
+            (1.0, b'this is second line'),
+            (1.5, b'this is third line'),
+            (0.5, b'this is last line'),
+        ]
+
+    def test_loads_str_invalid(self):
+        with pytest.raises(TypeError):
+            TimingScript.loads(1)
 
     def test_eq(self):
         _ts = TimingScript([
