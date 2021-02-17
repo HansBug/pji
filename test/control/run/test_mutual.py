@@ -6,7 +6,7 @@ from contextlib import closing
 import pytest
 
 from pji.control.model import RunResultStatus
-from pji.control.run import mutual_run, MutualStdout
+from pji.control.run import mutual_run, MutualStdout, MutualStderr
 
 demo_value = 1
 
@@ -35,7 +35,7 @@ class TestControlRunMutual:
             assert _stdout.lines[0][1].rstrip(b'\r\n') == b'line: 233'
             assert _stdout.lines[1][1].rstrip(b'\r\n') == b'line: nobody'
 
-            _stderr = MutualStdout.loads(stderr.getvalue())
+            _stderr = MutualStderr.loads(stderr.getvalue())
             assert len(_stderr.lines) == 1
             assert _stderr.lines[0][1].rstrip(b'\r\n') == b'stderr'
 
@@ -56,7 +56,7 @@ class TestControlRunMutual:
             assert _stdout.lines[0][1].rstrip(b'\r\n') == b'line: 233'
             assert _stdout.lines[1][1].rstrip(b'\r\n') == b'line: nobody'
 
-            _stderr = MutualStdout.loads(stderr.getvalue())
+            _stderr = MutualStderr.loads(stderr.getvalue())
             assert len(_stderr.lines) == 1
             assert _stderr.lines[0][1].rstrip(b'\r\n') == b'stderr'
 
@@ -111,7 +111,7 @@ class TestControlRunMutual:
             _stdout = MutualStdout.loads(stdout.getvalue())
             assert len(_stdout.lines) == 0
 
-            _stderr = MutualStdout.loads(stderr.getvalue())
+            _stderr = MutualStderr.loads(stderr.getvalue())
             assert len(_stderr.lines) == 1
             assert _stderr.lines[0][1].rstrip(b'\r\n') == b'233'
 
@@ -138,7 +138,7 @@ class TestControlRunMutual:
             _stdout = MutualStdout.loads(stdout.getvalue())
             assert len(_stdout.lines) == 0
 
-            _stderr = MutualStdout.loads(stderr.getvalue())
+            _stderr = MutualStderr.loads(stderr.getvalue())
             assert 7 <= len(_stderr.lines) <= 13
 
             assert not result.ok
@@ -156,7 +156,7 @@ class TestControlRunMutual:
             _stdout = MutualStdout.loads(stdout.getvalue())
             assert len(_stdout.lines) == 0
 
-            _stderr = MutualStdout.loads(stderr.getvalue())
+            _stderr = MutualStderr.loads(stderr.getvalue())
             assert len(_stdout.lines) == 0
 
             assert result.ok
