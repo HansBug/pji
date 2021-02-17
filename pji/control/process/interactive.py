@@ -1,4 +1,5 @@
 import os
+import pickle
 from multiprocessing import Event, Value, Lock
 from multiprocessing.synchronize import Event as EventClass
 from queue import Queue, Empty
@@ -110,7 +111,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
 
     _executor_prepare_ok = Event()
     _executor_has_exception = Event()
-    _executor_exceptions = Queue()
+    _exception_get, _exception_put = os.pipe()
 
     _parent_initialized = Event()
     _start_time = Value('d', 0.0)
@@ -192,7 +193,8 @@ def interactive_process(args, preexec_fn=None, resources=None,
         # waiting for prepare ok
         _executor_prepare_ok.wait()
         if _executor_has_exception.is_set():
-            raise _executor_exceptions.get()
+            with os.fdopen(_exception_get, 'rb', 0) as ef:
+                raise pickle.load(ef)
 
         # start all the threads and services
         _measure_thread.start()
@@ -223,7 +225,7 @@ def interactive_process(args, preexec_fn=None, resources=None,
 
     _execute_child = get_child_executor_func(
         args, dict(environ or {}), preexec_fn,
-        _executor_prepare_ok, _executor_has_exception, _executor_exceptions,
+        _executor_prepare_ok, _executor_has_exception, _exception_put,
         _parent_initialized,
         _start_time_ok, _start_time,
         (stdin_read, stdin_write),

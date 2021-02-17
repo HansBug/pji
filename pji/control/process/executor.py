@@ -1,7 +1,8 @@
 import os
+import pickle
 import sys
 import time
-from multiprocessing import Value, Queue
+from multiprocessing import Value
 from multiprocessing.synchronize import Event as EventClass
 from typing import Mapping
 
@@ -21,8 +22,7 @@ class ExecutorException(Exception):
 
 
 def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
-                            executor_prepare_ok: EventClass, executor_has_exception: EventClass,
-                            executor_exceptions: Queue,
+                            executor_prepare_ok: EventClass, executor_has_exception: EventClass, exception_put,
                             parent_initialized: EventClass,
                             start_time_ok: EventClass, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
@@ -55,7 +55,8 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
 
         if _exception is not None:
             executor_has_exception.set()
-            executor_exceptions.put(ExecutorException(_exception))
+            with os.fdopen(exception_put, 'wb', 0) as ef:
+                pickle.dump(ExecutorException(_exception), ef)
         executor_prepare_ok.set()
 
         if _exception is None:
