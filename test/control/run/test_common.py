@@ -85,6 +85,7 @@ class TestControlRunCommon:
         assert result.status == RunResultStatus.REAL_TIME_LIMIT_EXCEED
         assert 2.0 < result.result.real_time < 3.0
 
+    @pytest.mark.flaky(reruns=5)
     @pytest.mark.timeout(5.0)
     def test_common_run_ctle(self):
         result = common_run(

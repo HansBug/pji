@@ -119,6 +119,7 @@ class TestControlRunMutual:
             assert result.completed
             assert result.status == RunResultStatus.ACCEPTED
 
+    @pytest.mark.flaky(reruns=5)
     def test_process_killed(self):
         def _func():
             import time
