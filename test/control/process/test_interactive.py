@@ -30,7 +30,7 @@ class TestControlProcessInteractive:
             time.sleep(0.5)
             assert _output == [b'233']
 
-            time.sleep(2)
+            time.sleep(3)
             assert _output == [b'233', b'2334']
 
             ip.close_stdin()
@@ -62,7 +62,7 @@ class TestControlProcessInteractive:
             time.sleep(0.5)
             assert _output == [b'233']
 
-            time.sleep(2)
+            time.sleep(3)
             assert _output == [b'233', b'2334']
 
             ip.close_stdin()
