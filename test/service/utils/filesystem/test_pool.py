@@ -5,7 +5,7 @@ import warnings
 import pytest
 from pysystem import chmod, SystemUser
 
-from pji.service.filesystem.pool import FilePool
+from pji.service.utils.filesystem.pool import FilePool
 
 
 # noinspection DuplicatedCode
