@@ -1,6 +1,7 @@
 import os
 
 import pytest
+import where
 from pysystem import SystemUser, SystemGroup
 
 from pji.control import Identification
@@ -16,6 +17,17 @@ class TestControlModelIdentification:
         ident = Identification('root', 'root')
         assert ident.user.name == 'root'
         assert ident.group.name == 'root'
+
+    def test_current(self):
+        ci = Identification.current()
+        assert ci.user == SystemUser.current()
+        assert ci.group == SystemGroup.current()
+
+    def test_load_from_file(self):
+        _sh_file = where.first('sh')
+        fi = Identification.load_from_file(_sh_file)
+        assert fi.user == SystemUser.load_from_file(_sh_file)
+        assert fi.group == SystemGroup.load_from_file(_sh_file)
 
     def test_init(self):
         ident = Identification('nobody')

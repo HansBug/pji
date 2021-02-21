@@ -1,9 +1,11 @@
 import os
 from typing import Optional, Mapping
 
-from pysystem import FileAuthority, chmod
+from pysystem import FileAuthority
 
-from .base import FileInput, FileInputTemplate, _load_privilege, _check_workdir_path
+from .base import FileInput, FileInputTemplate, _load_privilege, _check_workdir_path, \
+    _apply_privilege_and_identification
+from ....control.model import Identification
 from ....utils import get_repr_info, FilePool, env_template
 
 
@@ -67,7 +69,8 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
     def privilege(self) -> Optional[FileAuthority]:
         return self.__privilege
 
-    def __call__(self, workdir: str, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagFileInput':
+    def __call__(self, workdir: str, pool: FilePool, identification=None,
+                 environ: Optional[Mapping[str, str]] = None) -> 'TagFileInput':
         """
         get tag file input object
         :param workdir: local work directory
@@ -78,15 +81,19 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         environ = environ or {}
         _tag = _check_tag(env_template(self.__tag, environ))
         _local = os.path.normpath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ))))
+        _identification = Identification.loads(identification)
 
         return TagFileInput(
             pool=pool, tag=_tag, local=_local,
             privilege=self.__privilege,
+            identification=_identification,
         )
 
 
 class TagFileInput(FileInput, _ITagFileInput):
-    def __init__(self, pool: FilePool, tag: str, local: str, privilege: Optional[FileAuthority] = None):
+    def __init__(self, pool: FilePool, tag: str, local: str,
+                 privilege: Optional[FileAuthority],
+                 identification: Optional[Identification]):
         """
         :param pool: file pool
         :param tag: pool tag
@@ -97,6 +104,7 @@ class TagFileInput(FileInput, _ITagFileInput):
         self.__tag = tag
         self.__local = local
         self.__privilege = privilege
+        self.__identification = identification
 
         _ITagFileInput.__init__(self, self.__tag, self.__local, self.__privilege)
 
@@ -117,5 +125,4 @@ class TagFileInput(FileInput, _ITagFileInput):
         execute this file input
         """
         self.__pool.export(self.__tag, self.__local)
-        if self.__privilege is not None:
-            chmod(self.__local, self.__privilege, recursive=True)
+        _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)

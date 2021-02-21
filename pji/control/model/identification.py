@@ -41,6 +41,15 @@ class Identification:
         }
 
     @classmethod
+    def current(cls) -> 'Identification':
+        return cls.loads((SystemUser.current(), SystemGroup.current()))
+
+    @classmethod
+    def load_from_file(cls, filename: str) -> 'Identification':
+        return cls.loads((SystemUser.load_from_file(filename),
+                          SystemGroup.load_from_file(filename)))
+
+    @classmethod
     def loads(cls, data) -> 'Identification':
         data = data or {}
         if isinstance(data, Identification):

@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from pysystem import FileAuthority
+from pysystem import FileAuthority, SystemUser, SystemGroup
 
 from pji.service.section.input import CopyFileInputTemplate
 
@@ -50,7 +50,7 @@ class TestServiceSectionInputCopy:
         )
         with tempfile.TemporaryDirectory() as fd:
             with pytest.raises(ValueError):
-                cf(os.curdir, fd, dict(DIR='..'))
+                cf(os.curdir, fd, None, dict(DIR='..'))
 
     def test_copy_repr(self):
         cf = CopyFileInputTemplate(
@@ -119,12 +119,14 @@ class TestServiceSectionInputCopy:
             privilege='r--'
         )
         with tempfile.TemporaryDirectory() as fd:
-            c = cf(os.curdir, fd, dict(DIR='123'))
+            c = cf(os.curdir, fd, 'nobody', dict(DIR='123'))
             c()
 
             _target_file = os.path.normpath(os.path.join(fd, '123', 'r.md'))
             assert os.path.exists(_target_file)
             assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
+            assert SystemUser.load_from_file(_target_file) == SystemUser.loads('nobody')
+            assert SystemGroup.load_from_file(_target_file) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
                     open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()

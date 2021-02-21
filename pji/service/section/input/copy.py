@@ -1,10 +1,21 @@
 import os
 from typing import Optional, Mapping
 
-from pysystem import FileAuthority, chmod
+from pysystem import FileAuthority
 
-from .base import FileInputTemplate, FileInput, _load_privilege, _check_os_path, _check_workdir_path
+from .base import FileInputTemplate, FileInput, _load_privilege, _check_workdir_path, \
+    _apply_privilege_and_identification
+from ....control.model import Identification
 from ....utils import auto_copy_file, get_repr_info, env_template
+
+
+def _check_os_path(path: str) -> str:
+    """
+    check file valid or not, when valid, just process it
+    :param path: original file path
+    :return: normalized file path
+    """
+    return os.path.normpath(path)
 
 
 class _ICopyFileInput:
@@ -59,34 +70,42 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
     def privilege(self) -> Optional[FileAuthority]:
         return self.__privilege
 
-    def __call__(self, scriptdir: str, workdir: str, environ: Optional[Mapping[str, str]] = None) -> 'CopyFileInput':
+    def __call__(self, scriptdir: str, workdir: str, identification=None,
+                 environ: Optional[Mapping[str, str]] = None) -> 'CopyFileInput':
         """
         generate copy file input object from extension information
         :param scriptdir: script directory
         :param workdir: work directory
+        :param identification: identification
         :param environ: environment variable
         :return: copy file input object
         """
         environ = environ or {}
         _file = os.path.normpath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ))))
         _local = os.path.normpath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ))))
+        _identification = Identification.loads(identification)
 
         return CopyFileInput(
             file=_file, local=_local,
             privilege=self.__privilege,
+            identification=_identification,
         )
 
 
 class CopyFileInput(FileInput, _ICopyFileInput):
-    def __init__(self, file: str, local: str, privilege: Optional[FileAuthority]):
+    def __init__(self, file: str, local: str,
+                 privilege: Optional[FileAuthority],
+                 identification: Optional[Identification]):
         """
         :param file: file path
         :param local: local path
         :param privilege: local path privilege
+        :param identification: identification
         """
         self.__file = file
         self.__local = local
         self.__privilege = privilege
+        self.__identification = identification
 
         _ICopyFileInput.__init__(self, self.__file, self.__local, self.__privilege)
 
@@ -107,5 +126,4 @@ class CopyFileInput(FileInput, _ICopyFileInput):
         execute this copy event
         """
         auto_copy_file(self.__file, self.__local)
-        if self.__privilege is not None:
-            chmod(self.__local, self.__privilege, recursive=True)
+        _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)
