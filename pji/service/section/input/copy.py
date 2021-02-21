@@ -8,10 +8,20 @@ from ....utils import is_inner_relative_path, auto_copy_file, get_repr_info, env
 
 
 def _check_file(file: str) -> str:
+    """
+    check file valid or not, when valid, just process it
+    :param file: original file path
+    :return: normalized file path
+    """
     return os.path.normpath(file)
 
 
 def _check_local(local: str) -> str:
+    """
+    check local path valid or not, when valid, just process it
+    :param local: original local path
+    :return: normalized local path
+    """
     if not is_inner_relative_path(local, allow_root=False):
         raise ValueError(
             'Inner relative file path expected for local but {actual} found.'.format(actual=repr(local)))
@@ -20,11 +30,21 @@ def _check_local(local: str) -> str:
 
 class _ICopyFileInput:
     def __init__(self, file: str, local: str, privilege):
+        """
+        :param file: file path
+        :param local: local path
+        :param privilege: local privilege
+        """
+
         self.__file = file
         self.__local = local
         self.__privilege = privilege
 
     def __repr__(self):
+        """
+        :return: representation string
+        """
+
         return get_repr_info(
             cls=self.__class__,
             args=[
@@ -37,6 +57,11 @@ class _ICopyFileInput:
 
 class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
     def __init__(self, file: str, local: str, privilege=None):
+        """
+        :param file: file path
+        :param local: local path
+        :param privilege: local path privilege
+        """
         self.__file = file
         self.__local = local
         self.__privilege = _load_privilege_for_file_input(privilege)
@@ -56,6 +81,13 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
         return self.__privilege
 
     def __call__(self, scriptdir: str, workdir: str, environ: Optional[Mapping[str, str]] = None) -> 'CopyFileInput':
+        """
+        generate copy file input object from extension information
+        :param scriptdir: script directory
+        :param workdir: work directory
+        :param environ: environment variable
+        :return: copy file input object
+        """
         environ = environ or {}
         _file = os.path.normpath(os.path.join(scriptdir, _check_file(env_template(self.__file, environ))))
         _local = os.path.normpath(os.path.join(workdir, _check_local(env_template(self.__local, environ))))
@@ -68,6 +100,11 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
 
 class CopyFileInput(FileInput, _ICopyFileInput):
     def __init__(self, file: str, local: str, privilege: Optional[FileAuthority]):
+        """
+        :param file: file path
+        :param local: local path
+        :param privilege: local path privilege
+        """
         self.__file = file
         self.__local = local
         self.__privilege = privilege
@@ -87,6 +124,9 @@ class CopyFileInput(FileInput, _ICopyFileInput):
         return self.__privilege
 
     def __call__(self):
+        """
+        execute this copy event
+        """
         auto_copy_file(self.__file, self.__local)
         if self.__privilege is not None:
             chmod(self.__local, self.__privilege, recursive=True)
