@@ -10,7 +10,7 @@ from ...utils import get_repr_info
 @unique
 class RunResultStatus(IntEnum):
     NOT_COMPLETED = -1
-    ACCEPTED = 0
+    SUCCESS = 0
     CPU_TIME_LIMIT_EXCEED = 1
     REAL_TIME_LIMIT_EXCEED = 2
     MEMORY_LIMIT_EXCEED = 3
@@ -22,7 +22,7 @@ class RunResultStatus(IntEnum):
         """
         :return: run success or not
         """
-        return self == RunResultStatus.ACCEPTED
+        return self == RunResultStatus.SUCCESS
 
     @property
     def completed(self):
@@ -60,7 +60,7 @@ class RunResult:
         elif not self.__result.ok:
             return RunResultStatus.SYSTEM_ERROR
         else:
-            return RunResultStatus.ACCEPTED
+            return RunResultStatus.SUCCESS
 
     @property
     def limit(self) -> ResourceLimit:

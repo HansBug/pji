@@ -111,7 +111,7 @@ class TestControlProcessInteractive:
             _result = ip.result.result
             assert ip.ok
             assert ip.completed
-            assert ip.status == RunResultStatus.ACCEPTED
+            assert ip.status == RunResultStatus.SUCCESS
             assert _result is not None
             assert _result.exitcode == 0
             assert _result.signal_code == 0
@@ -202,7 +202,7 @@ class TestControlProcessInteractive:
             _result = ip.result.result
             assert ip.ok
             assert ip.completed
-            assert ip.status == RunResultStatus.ACCEPTED
+            assert ip.status == RunResultStatus.SUCCESS
             assert _result.ok
             assert _result is not None
             assert _result.exitcode == 0

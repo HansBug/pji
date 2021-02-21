@@ -38,7 +38,7 @@ class TestControlRunTiming:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_simple_str(self):
         _stdin = """
@@ -67,7 +67,7 @@ class TestControlRunTiming:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_with_stderr(self):
         with closing(io.BytesIO()) as stdout, closing(io.BytesIO()) as stderr:
@@ -89,7 +89,7 @@ class TestControlRunTiming:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_with_break(self):
         _stdin = b"""

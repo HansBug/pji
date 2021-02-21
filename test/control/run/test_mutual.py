@@ -41,7 +41,7 @@ class TestControlRunMutual:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_simple_str_stdin(self):
         with closing(io.BytesIO()) as stdout, closing(io.BytesIO()) as stderr:
@@ -62,7 +62,7 @@ class TestControlRunMutual:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_invalid_str_not_exist(self):
         with pytest.raises(AttributeError):
@@ -117,7 +117,7 @@ class TestControlRunMutual:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     @pytest.mark.flaky(reruns=5)
     def test_process_killed(self):
@@ -162,7 +162,7 @@ class TestControlRunMutual:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
 
 if __name__ == "__main__":

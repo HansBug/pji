@@ -21,7 +21,7 @@ class TestControlRunCommon:
             assert stderr.getvalue().rstrip(b'\r\n') == b''
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_common_run_str(self):
         with closing(StringIO('1234')) as stdin, closing(StringIO()) as stdout, closing(StringIO()) as stderr:
@@ -34,7 +34,7 @@ class TestControlRunCommon:
             assert stderr.getvalue().rstrip('\r\n') == ''
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_common_run_without_stdin(self):
         with closing(BytesIO()) as stdout, closing(BytesIO()) as stderr:
@@ -47,7 +47,7 @@ class TestControlRunCommon:
             assert stderr.getvalue().rstrip(b'\r\n') == b''
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_common_run_without_output(self):
         with closing(BytesIO(b'1234')) as stdin:
@@ -58,7 +58,7 @@ class TestControlRunCommon:
 
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     def test_common_run_with_stderr_content(self):
         with closing(BytesIO(b'1234')) as stdin, closing(BytesIO()) as stdout, closing(BytesIO()) as stderr:
@@ -71,7 +71,7 @@ class TestControlRunCommon:
             assert stderr.getvalue().rstrip(b'\r\n') == b'123'
             assert result.ok
             assert result.completed
-            assert result.status == RunResultStatus.ACCEPTED
+            assert result.status == RunResultStatus.SUCCESS
 
     @pytest.mark.timeout(5.0)
     def test_common_run_rtle(self):

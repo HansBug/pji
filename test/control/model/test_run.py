@@ -39,8 +39,8 @@ class TestControlModelRun:
         assert rr.result is _DEMO_RESULT_NORMAL
 
         assert rr.ok
-        assert rr.status == RunResultStatus.ACCEPTED
-        assert repr(rr) == '<RunResult status: ACCEPTED>'
+        assert rr.status == RunResultStatus.SUCCESS
+        assert repr(rr) == '<RunResult status: SUCCESS>'
 
     def test_real_time_limit_exceed_1(self):
         rr = RunResult(
