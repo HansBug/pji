@@ -5,12 +5,12 @@ import warnings
 import pytest
 from pysystem import chmod, SystemUser
 
-from pji.utils.file_pool import FilePool
+from pji.utils.file import FilePool
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
-class TestUtilsFilepool:
+class TestUtilsFile:
     def test_simple(self):
         with FilePool() as pool:
             assert isinstance(pool, FilePool)

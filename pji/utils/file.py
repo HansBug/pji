@@ -13,7 +13,7 @@ def _auto_delete(filename: str):
         os.remove(filename)
 
 
-def _auto_copy(from_file: str, to_file: str):
+def auto_copy_file(from_file: str, to_file: str):
     if not os.path.exists(from_file):
         raise FileNotFoundError('File {filename} not found.'.format(filename=repr(from_file)))
     if not os.access(from_file, os.R_OK):
@@ -62,14 +62,14 @@ class FilePool:
 
     def __create_tag_file(self, tag: str, filename: str):
         self.__file_dirs[tag] = tempfile.TemporaryDirectory(dir=self.__root_dir.name)
-        _auto_copy(filename, self.__get_tag_file(tag))
+        auto_copy_file(filename, self.__get_tag_file(tag))
 
     def __remove_tag_file(self, tag: str):
         self.__file_dirs[tag].cleanup()
         del self.__file_dirs[tag]
 
     def __export_tag_file(self, tag: str, filename: str):
-        _auto_copy(self.__get_tag_file(tag), filename)
+        auto_copy_file(self.__get_tag_file(tag), filename)
 
     def __clear(self):
         try:
