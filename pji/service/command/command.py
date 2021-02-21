@@ -1,32 +1,72 @@
 from typing import Union, List, Optional, Mapping
 
-from .base import _ICommand, CommandMode
+from .base import _ICommandBase, CommandMode
 from ...control.model import ResourceLimit, Identification, RunResult
 from ...control.run import common_run, timing_run, mutual_run
 from ...utils import env_template, eclosing
 
 
-class Command(_ICommand):
+class Command(_ICommandBase):
     def __init__(self, args: Union[str, List[str]], shell: bool,
                  workdir: Optional[str], environ: Mapping[str, str],
                  identification: Identification, resources: ResourceLimit,
                  mode, stdin, stdout, stderr):
-        self.__environ = environ
-
         self.__args = args
         self.__shell = shell
+
+        self.__environ = environ
         self.__workdir = env_template(workdir, self.__environ)
 
         self.__identification = identification
         self.__resources = resources
 
         self.__mode = mode
-        self.__stdin = env_template(stdin, self.__environ) if stdin else None
-        self.__stdout = env_template(stdout, self.__environ) if stdout else None
-        self.__stderr = env_template(stderr, self.__environ) if stderr else None
+        self.__stdin = env_template(stdin, self.__environ) if isinstance(stdin, str) else stdin
+        self.__stdout = env_template(stdout, self.__environ) if isinstance(stdout, str) else stdout
+        self.__stderr = env_template(stderr, self.__environ) if isinstance(stderr, str) else stderr
 
-        _ICommand.__init__(self, self.__args, self.__shell, self.__workdir,
-                           self.__identification, self.__resources, self.__mode)
+        _ICommandBase.__init__(self, self.__args, self.__shell, self.__workdir,
+                               self.__identification, self.__resources, self.__mode)
+
+    @property
+    def args(self) -> Union[str, List[str]]:
+        return self.__args
+
+    @property
+    def shell(self) -> bool:
+        return self.__shell
+
+    @property
+    def environ(self) -> Mapping[str, str]:
+        return self.__environ
+
+    @property
+    def workdir(self) -> str:
+        return self.__workdir
+
+    @property
+    def identification(self) -> Identification:
+        return self.__identification
+
+    @property
+    def resources(self) -> ResourceLimit:
+        return self.__resources
+
+    @property
+    def mode(self) -> CommandMode:
+        return self.__mode
+
+    @property
+    def stdin(self):
+        return self.__stdin
+
+    @property
+    def stdout(self):
+        return self.__stdout
+
+    @property
+    def stderr(self):
+        return self.__stderr
 
     __RUN_FUNCTION = {
         CommandMode.COMMON: common_run,

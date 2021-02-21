@@ -27,8 +27,12 @@ class TimingContent(metaclass=ABCMeta):
         self.__lines = _stable_process(lines or [])
 
     @property
-    def lines(self):
+    def lines(self) -> List[Tuple[float, bytes]]:
         return list(self.__lines)
+
+    @property
+    def str_lines(self) -> List[Tuple[float, str]]:
+        return [(_time, _auto_decode(_line)) for _time, _line in self.__lines]
 
     @classmethod
     def load(cls, stream) -> 'TimingContent':

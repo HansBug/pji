@@ -1,10 +1,9 @@
 import os
 from enum import unique, IntEnum
-from textwrap import shorten
 from typing import Union, List, Optional
 
 from ...control.model import ResourceLimit, Identification
-from ...utils import get_repr_info
+from ...utils import get_repr_info, truncate
 
 
 @unique
@@ -35,7 +34,7 @@ class CommandMode(IntEnum):
             ))
 
 
-class _ICommand:
+class _ICommandBase:
     def __init__(self, args: Union[str, List[str]], shell: bool = True, workdir: Optional[str] = None,
                  identification=None, resources=None, mode=None):
         self.__args = args
@@ -49,14 +48,15 @@ class _ICommand:
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('args', lambda: shorten(repr(self.__args), width=32)),
-                ('shell', lambda: repr(self.__shell), lambda: self.__shell),
+                ('args', lambda: truncate(repr(self.__args), width=48, show_length=True, tail_length=16)),
+                ('shell', lambda: repr(self.__shell)),
                 ('mode', lambda: self.__mode.name),
-                ('workdir', lambda: self.__workdir,
+                ('workdir', lambda: repr(self.__workdir),
                  lambda: os.path.normpath(self.__workdir) != os.path.normpath('.')),
-                ('identification', lambda: shorten(repr(self.__identification), width=32),
-                 lambda: self.__identification != Identification.loads({})),
-                ('resources', lambda: shorten(repr(self.__resources), width=32),
+                ('identification',
+                 lambda: truncate(repr(self.__identification), width=48, show_length=True, tail_length=16),
+                 lambda: self.__identification and self.__identification != Identification.loads({})),
+                ('resources', lambda: truncate(repr(self.__resources), width=64, show_length=True, tail_length=16),
                  lambda: self.__resources != ResourceLimit.loads({})),
             ]
         )

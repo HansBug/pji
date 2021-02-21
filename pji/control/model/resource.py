@@ -260,13 +260,20 @@ class ResourceLimit:
             max_output_size=_max_output_size,
         )
 
+    def __tuple(self):
+        return self.__max_stack, self.__max_memory, self.__max_cpu_time, \
+               self.__max_real_time, self.__max_process_number, self.__max_output_size
+
     def __eq__(self, other):
         if other is self:
             return True
         elif isinstance(other, self.__class__):
-            return other.json == self.json
+            return self.__tuple() == other.__tuple()
         else:
             return False
+
+    def __hash__(self):
+        return hash(self.__tuple())
 
     def __repr__(self):
         return get_repr_info(

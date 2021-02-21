@@ -96,6 +96,35 @@ class TestControlModelResource:
 
         assert not (rl == 1)
 
+    def test_hash(self):
+        h = {
+            ResourceLimit(
+                max_memory=2,
+                max_cpu_time=3,
+            ): 1,
+            ResourceLimit(
+                max_stack=1,
+                max_memory=2,
+                max_cpu_time=3,
+                max_real_time=4,
+                max_output_size=5,
+                max_process_number=6,
+            ): 2,
+        }
+
+        assert h[ResourceLimit(
+            max_memory=2,
+            max_cpu_time=3,
+        )] == 1
+        assert h[ResourceLimit(
+            max_stack=1,
+            max_memory=2,
+            max_cpu_time=3,
+            max_real_time=4,
+            max_output_size=5,
+            max_process_number=6,
+        )] == 2
+
     def test_merge(self):
         assert ResourceLimit.merge(
             ResourceLimit(max_memory=2),

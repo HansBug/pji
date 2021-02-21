@@ -34,6 +34,12 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
+        assert _ts.str_lines == [
+            (0.0, 'this is first line'),
+            (1.0, 'this is second line'),
+            (2.5, 'this is third line'),
+            (3.0, 'this is last line'),
+        ]
 
     def test_load_yaml(self):
         _text = """
@@ -59,6 +65,12 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
+        assert _ts.str_lines == [
+            (0.0, 'this is first line'),
+            (1.0, 'this is second line'),
+            (2.5, 'this is third line'),
+            (3.0, 'this is last line'),
+        ]
 
     def test_load_json(self):
         _text = """
@@ -79,6 +91,12 @@ class TestControlModelTiming:
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
+        ]
+        assert _ts.str_lines == [
+            (0.0, 'this is first line'),
+            (1.0, 'this is second line'),
+            (2.5, 'this is third line'),
+            (3.0, 'this is last line'),
         ]
 
     def test_load_invalid_1(self):
@@ -153,6 +171,12 @@ class TestControlModelTiming:
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
         ]
+        assert _ts.str_lines == [
+            (0.0, 'this is first line'),
+            (1.0, 'this is second line'),
+            (2.5, 'this is third line'),
+            (3.0, 'this is last line'),
+        ]
 
     def test_loads_str_2(self):
         _ts = TimingContent.loads([
@@ -168,6 +192,12 @@ class TestControlModelTiming:
             (1.0, b'this is second line'),
             (2.5, b'this is third line'),
             (3.0, b'this is last line'),
+        ]
+        assert _ts.str_lines == [
+            (0.0, 'this is first line'),
+            (1.0, 'this is second line'),
+            (2.5, 'this is third line'),
+            (3.0, 'this is last line'),
         ]
 
     def test_loads_str_3(self):
