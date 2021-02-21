@@ -1,4 +1,5 @@
 import os
+from abc import ABCMeta
 from typing import Optional, Mapping
 
 from pysystem import FileAuthority
@@ -19,7 +20,7 @@ def _check_tag(tag: str) -> str:
     return tag
 
 
-class _ITagFileInput:
+class _ITagFileInput(metaclass=ABCMeta):
     def __init__(self, tag: str, local: str, privilege):
         """
         :param tag: pool tag

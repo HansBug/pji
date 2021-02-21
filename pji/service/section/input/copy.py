@@ -1,24 +1,16 @@
 import os
+from abc import ABCMeta
 from typing import Optional, Mapping
 
 from pysystem import FileAuthority
 
 from .base import FileInputTemplate, FileInput, _load_privilege, _check_workdir_path, \
-    _apply_privilege_and_identification
+    _apply_privilege_and_identification, _check_os_path
 from ....control.model import Identification
 from ....utils import auto_copy_file, get_repr_info, env_template
 
 
-def _check_os_path(path: str) -> str:
-    """
-    check file valid or not, when valid, just process it
-    :param path: original file path
-    :return: normalized file path
-    """
-    return os.path.normpath(path)
-
-
-class _ICopyFileInput:
+class _ICopyFileInput(metaclass=ABCMeta):
     def __init__(self, file: str, local: str, privilege):
         """
         :param file: file path

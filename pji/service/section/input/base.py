@@ -9,6 +9,15 @@ from ....control.model import Identification
 from ....utils import is_inner_relative_path
 
 
+def _check_os_path(path: str) -> str:
+    """
+    check file valid or not, when valid, just process it
+    :param path: original file path
+    :return: normalized file path
+    """
+    return os.path.normpath(path)
+
+
 def _check_workdir_path(path: str) -> str:
     """
     check local path valid or not, when valid, just process it

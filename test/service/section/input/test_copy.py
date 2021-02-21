@@ -7,6 +7,7 @@ from pysystem import FileAuthority, SystemUser, SystemGroup
 from pji.service.section.input import CopyFileInputTemplate
 
 
+# noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestServiceSectionInputCopy:
     def test_template(self):
