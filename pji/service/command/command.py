@@ -11,6 +11,18 @@ class Command(_ICommandBase):
                  workdir: Optional[str], environ: Mapping[str, str],
                  identification: Identification, resources: ResourceLimit,
                  mode, stdin, stdout, stderr):
+        """
+        :param args: arguments
+        :param shell: use shell mode
+        :param workdir: work directory
+        :param environ: environment variables
+        :param identification: identification used
+        :param resources: resource limits
+        :param mode: command mode value
+        :param stdin: stdin file
+        :param stdout: stdout file
+        :param stderr: stderr file
+        """
         self.__args = args
         self.__shell = shell
 
@@ -75,6 +87,10 @@ class Command(_ICommandBase):
     }
 
     def __call__(self) -> RunResult:
+        """
+        run this command
+        :return: run result
+        """
         if isinstance(self.__stdin, str) and self.__mode != CommandMode.MUTUAL:
             stdin = open(self.__stdin, 'rb', 0)
             stdin_need_close = True

@@ -14,6 +14,11 @@ class CommandMode(IntEnum):
 
     @classmethod
     def loads(cls, value) -> 'CommandMode':
+        """
+        Load CommandMode from value
+        :param value: raw value
+        :return: CommandMode object
+        """
         if isinstance(value, cls):
             return value
         elif isinstance(value, str):
@@ -37,6 +42,14 @@ class CommandMode(IntEnum):
 class _ICommandBase:
     def __init__(self, args: Union[str, List[str]], shell: bool = True, workdir: Optional[str] = None,
                  identification=None, resources=None, mode=None):
+        """
+        :param args: arguments
+        :param shell: use shell mode
+        :param workdir: work directory
+        :param identification: identification used
+        :param resources: resource limits
+        :param mode: command mode value
+        """
         self.__args = args
         self.__shell = shell
         self.__workdir = workdir
@@ -45,6 +58,9 @@ class _ICommandBase:
         self.__mode = mode
 
     def __repr__(self):
+        """
+        :return: get representation string
+        """
         return get_repr_info(
             cls=self.__class__,
             args=[

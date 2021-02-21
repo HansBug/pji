@@ -14,6 +14,16 @@ class CommandTemplate(_ICommandBase):
     def __init__(self, args: Union[str, List[str]], shell: bool = True,
                  workdir: Optional[str] = None, resources=None,
                  mode=None, stdin=None, stdout=None, stderr=None):
+        """
+        :param args: arguments
+        :param shell: use shell mode
+        :param workdir: work directory
+        :param resources: resource limits
+        :param mode: command mode value
+        :param stdin: stdin file
+        :param stdout: stdout file
+        :param stderr: stderr file
+        """
         if not isinstance(args, (str, list)):
             raise TypeError('Args should be str or list but {actual} found.'.format(actual=repr(type(args).__name__)))
         if shell and not isinstance(args, str):
@@ -73,6 +83,11 @@ class CommandTemplate(_ICommandBase):
                self.__mode, self.__stdin, self.__stdout, self.__stdout
 
     def __eq__(self, other):
+        """
+        check equality
+        :param other: another command template object
+        :return:
+        """
         if other is self:
             return True
         elif isinstance(other, self.__class__):
@@ -81,9 +96,21 @@ class CommandTemplate(_ICommandBase):
             return False
 
     def __hash__(self):
+        """
+        get hash value of object
+        :return: hash value
+        """
         return hash(self.__tuple())
 
     def __call__(self, identification=None, resources=None, workdir=None, environ=None) -> Command:
+        """
+        get command object from template
+        :param identification: identification
+        :param resources: resource limits
+        :param workdir: work directory
+        :param environ: environment variables
+        :return: command object
+        """
         _identification = Identification.loads(identification or {})
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources or {}), self.__resources)
         _workdir = os.path.normpath(os.path.join(workdir or '.', self.__workdir))
