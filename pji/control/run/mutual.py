@@ -8,7 +8,7 @@ from threading import Thread
 from typing import Callable
 
 from .encoding import _auto_encode, _try_write
-from ..model import TimingContent
+from ..model import TimingContent, RunResult
 from ..process import interactive_process
 from ...utils import eclosing
 
@@ -50,7 +50,7 @@ def _load_func(func) -> _INTERACT_FUNC:
 
 
 def mutual_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
-               environ=None, cwd=None, resources=None, identification=None):
+               environ=None, cwd=None, resources=None, identification=None) -> RunResult:
     """
     Create an mutual process with stream
     :param args: arguments for execution

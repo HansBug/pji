@@ -7,5 +7,6 @@ from .test_iter import TestUtilsIter
 from .test_json import TestUtilsJson
 from .test_path import TestUtilsPath
 from .test_repr import TestUtilsRepr
+from .test_string import TestUtilsString
 from .test_units import TestUtilsUnits
 from .test_value import TestUtilsValue
