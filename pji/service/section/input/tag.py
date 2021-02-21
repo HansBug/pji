@@ -81,7 +81,8 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         """
         environ = environ or {}
         _tag = _check_tag(env_template(self.__tag, environ))
-        _local = os.path.normpath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ))))
+        _local = os.path.normpath(
+            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
         _identification = Identification.loads(identification)
 
         return TagFileInput(

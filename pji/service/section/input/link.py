@@ -59,8 +59,8 @@ class LinkFileInputTemplate(FileInputTemplate, _ILinkFileInput):
         environ = environ or {}
         _file = os.path.normpath(
             os.path.abspath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ)))))
-        _local = os.path.abspath(
-            os.path.normpath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
+        _local = os.path.normpath(
+            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
 
         return LinkFileInput(
             file=_file, local=_local,

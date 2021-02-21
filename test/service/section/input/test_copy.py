@@ -39,7 +39,7 @@ class TestServiceSectionInputCopy:
         with tempfile.TemporaryDirectory() as fd:
             c = cf(os.curdir, fd)
 
-            assert c.file == 'README.md'
+            assert c.file == os.path.abspath('README.md')
             assert c.local == os.path.normpath(os.path.join(fd, 'r.md'))
             assert c.privilege == FileAuthority.loads('r--------')
 
@@ -62,8 +62,8 @@ class TestServiceSectionInputCopy:
         with tempfile.TemporaryDirectory() as fd:
             c = cf(os.curdir, fd)
 
-            assert repr(c) == "<CopyFileInput file: 'README.md', " \
-                              "local: '{fd}/r.md', privilege: 'r--------'>".format(fd=fd)
+            assert repr(c) == "<CopyFileInput file: '{cur}/README.md', " \
+                              "local: '{fd}/r.md', privilege: 'r--------'>".format(cur=os.path.abspath('.'), fd=fd)
 
     def test_copy_call_with_short_privilege(self):
         cf = CopyFileInputTemplate(
