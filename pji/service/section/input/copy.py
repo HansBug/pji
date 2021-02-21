@@ -71,7 +71,7 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
         return self.__privilege
 
     def __call__(self, scriptdir: str, workdir: str, identification=None,
-                 environ: Optional[Mapping[str, str]] = None) -> 'CopyFileInput':
+                 environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'CopyFileInput':
         """
         generate copy file input object from extension information
         :param scriptdir: script directory

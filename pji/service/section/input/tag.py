@@ -70,7 +70,7 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         return self.__privilege
 
     def __call__(self, workdir: str, pool: FilePool, identification=None,
-                 environ: Optional[Mapping[str, str]] = None) -> 'TagFileInput':
+                 environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'TagFileInput':
         """
         get tag file input object
         :param workdir: local work directory
