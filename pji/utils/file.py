@@ -21,6 +21,8 @@ def auto_copy_file(from_file: str, to_file: str):
 
     if os.path.exists(to_file):
         _auto_delete(to_file)
+    _parent_path, _ = os.path.split(to_file)
+    os.makedirs(_parent_path, exist_ok=True)
     if os.path.isdir(from_file):
         shutil.copytree(from_file, to_file)
     else:
@@ -41,14 +43,14 @@ class FilePool:
     def __init_pool(self, init: Mapping[str, str]):
         try:
             for tag, fdir in init.items():
-                self.__check_tag_name(tag)
+                self.check_tag_name(tag)
                 self.__create_tag_file(tag, fdir)
         except Exception as err:
             self.__close()
             raise err
 
     @classmethod
-    def __check_tag_name(cls, tag: str):
+    def check_tag_name(cls, tag: str):
         if not re.fullmatch(cls.__TAG_NAME_REGEXP, tag):
             raise KeyError(
                 'Tag name should only contains a-z, A-Z, 0-9 and _, but {actual} found.'.format(actual=repr(tag)))
@@ -88,20 +90,20 @@ class FilePool:
 
     def __getitem__(self, tag: str):
         with self.__lock:
-            self.__check_tag_name(tag)
+            self.check_tag_name(tag)
             self.__check_tag_exist(tag)
             return self.__get_tag_file(tag)
 
     def __setitem__(self, tag, filename):
         with self.__lock:
-            self.__check_tag_name(tag)
+            self.check_tag_name(tag)
             if tag in self.__file_dirs.keys():
                 self.__remove_tag_file(tag)
             return self.__create_tag_file(tag, filename)
 
     def __delitem__(self, tag):
         with self.__lock:
-            self.__check_tag_name(tag)
+            self.check_tag_name(tag)
             self.__check_tag_exist(tag)
             return self.__remove_tag_file(tag)
 

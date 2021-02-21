@@ -17,7 +17,7 @@ class TestServiceSectionInputCopy:
         )
 
         assert cf.file == 'README.md'
-        assert cf.local == 'r.md'
+        assert cf.local == './r.md'
         assert cf.privilege == FileAuthority.loads('r--------')
 
     def test_template_repr(self):
@@ -27,7 +27,7 @@ class TestServiceSectionInputCopy:
             privilege='r--'
         )
 
-        assert repr(cf) == "<CopyFileInputTemplate file: 'README.md', local: 'r.md', privilege: 'r--------'>"
+        assert repr(cf) == "<CopyFileInputTemplate file: 'README.md', local: './r.md', privilege: 'r--------'>"
 
     def test_template_invalid(self):
         with pytest.raises(ValueError):
@@ -112,6 +112,23 @@ class TestServiceSectionInputCopy:
             c()
 
             _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
+            with open('README.md', 'rb') as of, \
+                    open(_target_file, 'rb') as tf:
+                assert of.read() == tf.read()
+
+    def test_copy_call_with_env(self):
+        cf = CopyFileInputTemplate(
+            file='README.md',
+            local='./${DIR}/r.md',
+            privilege='r--'
+        )
+        with tempfile.TemporaryDirectory() as fd:
+            c = cf(os.curdir, fd, dict(DIR='123'))
+            c()
+
+            _target_file = os.path.normpath(os.path.join(fd, '123', 'r.md'))
+            assert os.path.exists(_target_file)
+            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
             with open('README.md', 'rb') as of, \
                     open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()
