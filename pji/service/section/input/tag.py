@@ -1,0 +1,121 @@
+import os
+from typing import Optional, Mapping
+
+from pysystem import FileAuthority, chmod
+
+from .base import FileInput, FileInputTemplate, _load_privilege, _check_workdir_path
+from ....utils import get_repr_info, FilePool, env_template
+
+
+def _check_tag(tag: str) -> str:
+    """
+    check if tag is valid, if valid, just return it
+    :param tag: tag
+    :return: original tag
+    """
+    FilePool.check_tag_name(tag)
+    return tag
+
+
+class _ITagFileInput:
+    def __init__(self, tag: str, local: str, privilege):
+        """
+        :param tag: pool tag
+        :param local: local path
+        :param privilege: local path privilege
+        """
+        self.__tag = tag
+        self.__local = local
+        self.__privilege = privilege
+
+    def __repr__(self):
+        """
+        :return: representation string
+        """
+        return get_repr_info(
+            cls=self.__class__,
+            args=[
+                ('tag', lambda: repr(self.__tag)),
+                ('local', lambda: repr(self.__local)),
+                ('privilege', lambda: repr(self.__privilege.sign), lambda: self.__privilege is not None),
+            ]
+        )
+
+
+class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
+    def __init__(self, tag: str, local: str, privilege=None):
+        """
+        :param tag: pool tag
+        :param local: local path
+        :param privilege: local path privilege
+        """
+        self.__tag = tag
+        self.__local = local
+        self.__privilege = _load_privilege(privilege)
+
+        _ITagFileInput.__init__(self, self.__tag, self.__local, self.__privilege)
+
+    @property
+    def tag(self) -> str:
+        return self.__tag
+
+    @property
+    def local(self) -> str:
+        return self.__local
+
+    @property
+    def privilege(self) -> Optional[FileAuthority]:
+        return self.__privilege
+
+    def __call__(self, workdir: str, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagFileInput':
+        """
+        get tag file input object
+        :param workdir: local work directory
+        :param pool: file pool object
+        :param environ: environment variables
+        :return: tag file input object
+        """
+        environ = environ or {}
+        _tag = _check_tag(env_template(self.__tag, environ))
+        _local = os.path.normpath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ))))
+
+        return TagFileInput(
+            pool=pool, tag=_tag, local=_local,
+            privilege=self.__privilege,
+        )
+
+
+class TagFileInput(FileInput, _ITagFileInput):
+    def __init__(self, pool: FilePool, tag: str, local: str, privilege: Optional[FileAuthority] = None):
+        """
+        :param pool: file pool
+        :param tag: pool tag
+        :param local: local path
+        :param privilege: local path privilege
+        """
+        self.__pool = pool
+        self.__tag = tag
+        self.__local = local
+        self.__privilege = privilege
+
+        _ITagFileInput.__init__(self, self.__tag, self.__local, self.__privilege)
+
+    @property
+    def tag(self) -> str:
+        return self.__tag
+
+    @property
+    def local(self) -> str:
+        return self.__local
+
+    @property
+    def privilege(self) -> Optional[FileAuthority]:
+        return self.__privilege
+
+    def __call__(self):
+        """
+        execute this file input
+        """
+        self.__pool.export(self.__tag, self.__local)
+        if self.__privilege is not None:
+            chmod(self.__local, self.__privilege, recursive=True)
