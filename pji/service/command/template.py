@@ -11,8 +11,8 @@ class CommandTemplate(_ICommand):
     __DEFAULT_WORKDIR = '.'
     __DEFAULT_MODE = CommandMode.COMMON
 
-    def __init__(self, args: Union[str, List[str]], shell: bool = True, workdir: Optional[str] = None,
-                 identification=None, resources=None,
+    def __init__(self, args: Union[str, List[str]], shell: bool = True,
+                 workdir: Optional[str] = None, resources=None,
                  mode=None, stdin=None, stdout=None, stderr=None):
         if shell and not isinstance(args, str):
             raise ValueError(
@@ -26,8 +26,6 @@ class CommandTemplate(_ICommand):
         if not is_inner_relative_path(workdir):
             raise ValueError('Workdir should be inner relative path but {actual} found.'.format(actual=repr(workdir)))
         self.__workdir = workdir
-
-        self.__identification = Identification.loads(identification or {})
         self.__resources = ResourceLimit.loads(resources or {})
 
         self.__mode = CommandMode.loads(mode or self.__DEFAULT_MODE)
@@ -39,7 +37,7 @@ class CommandTemplate(_ICommand):
                            self.__identification, self.__resources, self.__mode)
 
     def __call__(self, identification=None, resources=None, workdir=None, environ=None) -> Command:
-        _identification = Identification.merge(Identification.loads(identification or []), self.__identification)
+        _identification = Identification.loads(identification or {})
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources or {}), self.__resources)
         _workdir = os.path.normpath(os.path.join(workdir or '.', self.__workdir))
         _environ = {key: str(value) for key, value in (environ or {}).items()}
