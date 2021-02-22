@@ -92,7 +92,6 @@ class LinkFileInput(FileInput, _ILinkFileInput):
         """
         execute this link event
         """
-        print(self.__file, self.__local)
         _parent_path, _ = os.path.split(self.__local)
         os.makedirs(_parent_path, exist_ok=True)
         os.symlink(self.__file, self.__local, target_is_directory=os.path.isdir(self.__file))
