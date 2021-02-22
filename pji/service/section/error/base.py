@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 
 
-class FileOutputTemplate(metaclass=ABCMeta):
+class ErrorInfoTemplate(metaclass=ABCMeta):
     @abstractmethod
-    def __call__(self, *args, **kwargs) -> 'FileOutput':
+    def __call__(self, *args, **kwargs) -> 'ErrorInfo':
         raise NotImplementedError
 
 
-class FileOutput(metaclass=ABCMeta):
+class ErrorInfo(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self):
         raise NotImplementedError

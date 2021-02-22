@@ -1,4 +1,3 @@
-import os
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
@@ -6,28 +5,6 @@ from pysystem import chown, chmod
 from pysystem.models.authority.full import FileUserAuthority, FileAuthority, FileGroupAuthority, FileOtherAuthority
 
 from ....control.model import Identification
-from ....utils import is_inner_relative_path
-
-
-def _check_os_path(path: str) -> str:
-    """
-    check file valid or not, when valid, just process it
-    :param path: original file path
-    :return: normalized file path
-    """
-    return os.path.normpath(path)
-
-
-def _check_workdir_path(path: str) -> str:
-    """
-    check local path valid or not, when valid, just process it
-    :param path: original local path
-    :return: normalized local path
-    """
-    if not is_inner_relative_path(path, allow_root=False):
-        raise ValueError(
-            'Inner relative file path expected for local but {actual} found.'.format(actual=repr(path)))
-    return os.path.normpath(path)
 
 
 def _load_privilege(privilege=None) -> Optional[FileAuthority]:

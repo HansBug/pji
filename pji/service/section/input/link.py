@@ -2,7 +2,8 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping
 
-from .base import FileInput, FileInputTemplate, _check_workdir_path, _check_os_path
+from .base import FileInput, FileInputTemplate
+from ..base import _check_workdir_path, _check_os_path
 from ....utils import get_repr_info, env_template
 
 

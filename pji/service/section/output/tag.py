@@ -2,18 +2,9 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping
 
-from .base import FileOutputTemplate, FileOutput, _check_workdir_path
+from .base import FileOutputTemplate, FileOutput
+from ..base import _check_workdir_path, _check_tag
 from ....utils import get_repr_info, FilePool, env_template
-
-
-def _check_tag(tag: str) -> str:
-    """
-    check if tag is valid, if valid, just return it
-    :param tag: tag
-    :return: original tag
-    """
-    FilePool.check_tag_name(tag)
-    return tag
 
 
 class _ITagFileOutput(metaclass=ABCMeta):

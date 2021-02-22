@@ -4,20 +4,10 @@ from typing import Optional, Mapping
 
 from pysystem import FileAuthority
 
-from .base import FileInput, FileInputTemplate, _load_privilege, _check_workdir_path, \
-    _apply_privilege_and_identification
+from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
+from ..base import _check_workdir_path, _check_tag
 from ....control.model import Identification
 from ....utils import get_repr_info, FilePool, env_template
-
-
-def _check_tag(tag: str) -> str:
-    """
-    check if tag is valid, if valid, just return it
-    :param tag: tag
-    :return: original tag
-    """
-    FilePool.check_tag_name(tag)
-    return tag
 
 
 class _ITagFileInput(metaclass=ABCMeta):
