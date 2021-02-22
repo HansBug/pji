@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pji.service.section import FileOutputType, autoload_output_template, TagFileOutputTemplate, CopyFileOutputTemplate
+from pji.service.section import FileOutputType, load_output_template, TagFileOutputTemplate, CopyFileOutputTemplate
 
 
 @pytest.mark.unittest
@@ -23,25 +23,31 @@ class TestServiceSectionOutputGeneral:
         with pytest.raises(TypeError):
             FileOutputType.loads([])
 
-    def test_autoload_template_copy(self):
-        ct = autoload_output_template(dict(type='copy', file='/this/is/file', local='./file'))
+    def test_load_template_copy(self):
+        ct = load_output_template(dict(type='copy', file='/this/is/file', local='./file'))
         assert isinstance(ct, CopyFileOutputTemplate)
         assert ct.file == '/this/is/file'
         assert ct.local == './file'
 
-    def test_autoload_template_tag(self):
-        tt = autoload_output_template(dict(type='tag', tag='djgfld', local='./file'))
+    def test_load_template_tag(self):
+        tt = load_output_template(dict(type='tag', tag='djgfld', local='./file'))
         assert isinstance(tt, TagFileOutputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'
 
-    def test_autoload_template_invalid(self):
+    def test_load_template_self(self):
+        ct = load_output_template(dict(type='copy', file='/this/is/file', local='./file'))
+        assert load_output_template(ct) is ct
+
+    def test_load_template_invalid(self):
         with pytest.raises(KeyError):
-            autoload_output_template(dict(type='tag_', tag='djgfld', local='./file'))
+            load_output_template(dict(type='tag_', tag='djgfld', local='./file'))
         with pytest.raises(KeyError):
-            autoload_output_template(dict(type_='tag', tag='djgfld', local='./file'))
+            load_output_template(dict(type_='tag', tag='djgfld', local='./file'))
         with pytest.raises(TypeError):
-            autoload_output_template(dict(type='tag', file='/this/is/file', local='./file'))
+            load_output_template(dict(type='tag', file='/this/is/file', local='./file'))
+        with pytest.raises(TypeError):
+            load_output_template([])
 
 
 if __name__ == "__main__":

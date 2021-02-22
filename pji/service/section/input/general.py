@@ -40,6 +40,7 @@ class FileInputType(IntEnum):
             ))
 
 
+# noinspection DuplicatedCode
 _TYPE_TO_TEMPLATE_CLASS = {
     FileInputType.COPY: CopyFileInputTemplate,
     FileInputType.LINK: LinkFileInputTemplate,
@@ -48,7 +49,7 @@ _TYPE_TO_TEMPLATE_CLASS = {
 
 
 # noinspection DuplicatedCode
-def autoload_input_template(json: Mapping[str, Any]) -> FileInputTemplate:
+def _load_input_template_from_json(json: Mapping[str, Any]) -> FileInputTemplate:
     """
     load template object from json data
     :param json: json data
@@ -63,3 +64,18 @@ def autoload_input_template(json: Mapping[str, Any]) -> FileInputTemplate:
     del _json['type']
 
     return _TYPE_TO_TEMPLATE_CLASS[_type](**_json)
+
+
+def load_input_template(data) -> FileInputTemplate:
+    """
+    load file input template object from data
+    :param data: raw data
+    :return: file input template object 
+    """
+    if isinstance(data, FileInputTemplate):
+        return data
+    elif isinstance(data, dict):
+        return _load_input_template_from_json(data)
+    else:
+        raise TypeError('Json or {type} expected but {actual} found.'.format(
+            type=FileInputTemplate.__name__, actual=repr(type(data).__name__)))

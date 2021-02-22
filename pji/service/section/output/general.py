@@ -45,7 +45,7 @@ _TYPE_TO_TEMPLATE_CLASS = {
 
 
 # noinspection DuplicatedCode
-def autoload_output_template(json: Mapping[str, Any]) -> FileOutputTemplate:
+def _load_output_template_from_json(json: Mapping[str, Any]) -> FileOutputTemplate:
     """
     load template object from json data
     :param json: json data
@@ -59,3 +59,18 @@ def autoload_output_template(json: Mapping[str, Any]) -> FileOutputTemplate:
     del _json['type']
 
     return _TYPE_TO_TEMPLATE_CLASS[_type](**_json)
+
+
+def load_output_template(data) -> FileOutputTemplate:
+    """
+    load file output template object from data
+    :param data: raw data
+    :return: file output template object
+    """
+    if isinstance(data, FileOutputTemplate):
+        return data
+    elif isinstance(data, dict):
+        return _load_output_template_from_json(data)
+    else:
+        raise TypeError('Json or {type} expected but {actual} found.'.format(
+            type=FileOutputTemplate.__name__, actual=repr(type(data).__name__)))

@@ -9,11 +9,11 @@ from ....utils import get_repr_info, env_template
 
 
 class _ILocalErrorInfo(metaclass=ABCMeta):
-    def __init__(self, local: str):
+    def __init__(self, file: str):
         """
-        :param local: local path
+        :param file: local path
         """
-        self.__local = local
+        self.__file = file
 
     def __repr__(self):
         """
@@ -22,23 +22,23 @@ class _ILocalErrorInfo(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('local', lambda: repr(self.__local)),
+                ('file', lambda: repr(self.__file)),
             ]
         )
 
 
 class LocalErrorInfoTemplate(ErrorInfoTemplate, _ILocalErrorInfo):
-    def __init__(self, local: str):
+    def __init__(self, file: str):
         """
-        :param local: local path
+        :param file: local path
         """
-        self.__local = local
+        self.__file = file
 
-        _ILocalErrorInfo.__init__(self, self.__local)
+        _ILocalErrorInfo.__init__(self, self.__file)
 
     @property
-    def local(self) -> str:
-        return self.__local
+    def file(self) -> str:
+        return self.__file
 
     def __call__(self, workdir: str, environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'LocalErrorInfo':
         """
@@ -49,29 +49,29 @@ class LocalErrorInfoTemplate(ErrorInfoTemplate, _ILocalErrorInfo):
         """
         environ = environ or {}
         _local = os.path.normpath(
-            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
+            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__file, environ)))))
 
-        return LocalErrorInfo(local=_local)
+        return LocalErrorInfo(file=_local)
 
 
 class LocalErrorInfo(ErrorInfo, _ILocalErrorInfo):
-    def __init__(self, local: str):
+    def __init__(self, file: str):
         """
-        :param local: local path
+        :param file: local path
         """
-        self.__local = local
+        self.__file = file
 
-        _ILocalErrorInfo.__init__(self, self.__local)
+        _ILocalErrorInfo.__init__(self, self.__file)
 
     @property
-    def local(self) -> str:
-        return self.__local
+    def file(self) -> str:
+        return self.__file
 
     def __call__(self) -> str:
         """
         execute this error info
         """
-        if os.path.isdir(self.__local):
-            raise IsADirectoryError('Path {path} is directory.'.format(path=repr(self.__local)))
-        with codecs.open(self.__local, 'r') as file:
+        if os.path.isdir(self.__file):
+            raise IsADirectoryError('Path {path} is directory.'.format(path=repr(self.__file)))
+        with codecs.open(self.__file, 'r') as file:
             return file.read()

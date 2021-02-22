@@ -3,7 +3,7 @@ import os
 import pytest
 from pysystem import FileAuthority
 
-from pji.service.section import FileInputType, autoload_input_template, CopyFileInputTemplate, LinkFileInputTemplate, \
+from pji.service.section import FileInputType, load_input_template, CopyFileInputTemplate, LinkFileInputTemplate, \
     TagFileInputTemplate
 
 
@@ -28,33 +28,39 @@ class TestServiceSectionInputGeneral:
         with pytest.raises(TypeError):
             FileInputType.loads([])
 
-    def test_autoload_template_copy(self):
-        ct = autoload_input_template(dict(type='copy', file='/this/is/file', local='./file', privilege='rw-'))
+    def test_load_template_copy(self):
+        ct = load_input_template(dict(type='copy', file='/this/is/file', local='./file', privilege='rw-'))
         assert isinstance(ct, CopyFileInputTemplate)
         assert ct.file == '/this/is/file'
         assert ct.local == './file'
         assert ct.privilege == FileAuthority.loads('rw-------')
 
-    def test_autoload_template_link(self):
-        lnt = autoload_input_template(dict(type='link', file='/this/is/file', local='./file'))
+    def test_load_template_link(self):
+        lnt = load_input_template(dict(type='link', file='/this/is/file', local='./file'))
         assert isinstance(lnt, LinkFileInputTemplate)
         assert lnt.file == '/this/is/file'
         assert lnt.local == './file'
 
-    def test_autoload_template_tag(self):
-        tt = autoload_input_template(dict(type='tag', tag='djgfld', local='./file', privilege='777'))
+    def test_load_template_tag(self):
+        tt = load_input_template(dict(type='tag', tag='djgfld', local='./file', privilege='777'))
         assert isinstance(tt, TagFileInputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'
         assert tt.privilege == FileAuthority.loads('rwxrwxrwx')
 
-    def test_autoload_template_invalid(self):
+    def test_load_template_self(self):
+        tt = load_input_template(dict(type='tag', tag='djgfld', local='./file', privilege='777'))
+        assert load_input_template(tt) is tt
+
+    def test_load_template_invalid(self):
         with pytest.raises(KeyError):
-            autoload_input_template(dict(type='tag_', tag='djgfld', local='./file', privilege='777'))
+            load_input_template(dict(type='tag_', tag='djgfld', local='./file', privilege='777'))
         with pytest.raises(KeyError):
-            autoload_input_template(dict(type_='tag', tag='djgfld', local='./file', privilege='777'))
+            load_input_template(dict(type_='tag', tag='djgfld', local='./file', privilege='777'))
         with pytest.raises(TypeError):
-            autoload_input_template(dict(type='link', file='/this/is/file', local='./file', privilege='777'))
+            load_input_template(dict(type='link', file='/this/is/file', local='./file', privilege='777'))
+        with pytest.raises(TypeError):
+            load_input_template([])
 
 
 if __name__ == "__main__":
