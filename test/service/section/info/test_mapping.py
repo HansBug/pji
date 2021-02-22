@@ -57,6 +57,23 @@ class TestServiceSectionInfoMapping:
                 'tag': _readme,
             }
 
+    def test_loads(self):
+        smt = SectionInfoMappingTemplate(
+            static=StaticSectionInfoTemplate(value='233${V}'),
+            local=LocalSectionInfoTemplate(file='./r${V}.md'),
+            tag=TagSectionInfoTemplate(tag='tag_${V}'),
+        )
+        assert SectionInfoMappingTemplate.loads(smt) == smt
+
+        assert sorted(SectionInfoMappingTemplate.loads(dict(
+            static=StaticSectionInfoTemplate(value='233${V}'),
+            local=LocalSectionInfoTemplate(file='./r${V}.md'),
+            tag=TagSectionInfoTemplate(tag='tag_${V}'),
+        )).mapping.keys()) == sorted(['static', 'local', 'tag'])
+
+        with pytest.raises(TypeError):
+            SectionInfoMappingTemplate.loads([])
+
 
 if __name__ == "__main__":
     pytest.main([os.path.abspath(__file__)])
