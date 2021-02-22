@@ -1,3 +1,4 @@
 from .test_copy import TestServiceSectionInputCopy
+from .test_general import TestServiceSectionInputGeneral
 from .test_link import TestServiceSectionInputLink
 from .test_tag import TestServiceSectionInputTag
