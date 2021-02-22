@@ -1,4 +1,4 @@
 from .base import CommandMode
+from .collection import CommandCollectionTemplate, CommandCollection
 from .command import Command
-from .general import CommandCollectionTemplate, CommandCollection
 from .template import CommandTemplate

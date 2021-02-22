@@ -4,12 +4,12 @@ import tempfile
 import pytest
 
 from pji.control.model import RunResultStatus
-from pji.service.command import *
+from pji.service.command import CommandCollectionTemplate, CommandTemplate
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
-class TestServiceCommandGeneral:
+class TestServiceCommandCollection:
     def test_template(self):
         cct = CommandCollectionTemplate(
             CommandTemplate(args='echo 233'),
