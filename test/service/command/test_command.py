@@ -42,9 +42,9 @@ class TestServiceCommandCommand:
         assert c.identification == Identification.loads('nobody')
         assert c.environ == {'PATH': '233'}
         assert c.mode == CommandMode.TIMING
-        assert c.stdin == 'stdin233.txt'
-        assert c.stdout == 'stdout233.txt'
-        assert c.stderr == 'stderr233.txt'
+        assert c.stdin == '123/123/stdin233.txt'
+        assert c.stdout == '123/123/stdout233.txt'
+        assert c.stderr == '123/123/stderr233.txt'
 
     def test_common_with_stream(self):
         with io.StringIO("echo 233\necho 2334 1>&2") as sin, \

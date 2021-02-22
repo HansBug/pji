@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 import pytest
 
@@ -81,6 +82,39 @@ class TestServiceCommandTemplate:
         ct = CommandTemplate(args='echo 233', workdir='/root/1/2/3')
         with pytest.raises(ValueError):
             ct()
+
+    def test_loads(self):
+        ct = CommandTemplate(args='echo 233')
+        assert CommandTemplate.loads(ct) == ct
+
+        ct = CommandTemplate.loads(dict(args='echo 233'))
+        assert ct.args == 'echo 233'
+
+    def test_loads_invalid(self):
+        with pytest.raises(TypeError):
+            CommandTemplate.loads([])
+
+    def test_run_with_stdout_stderr_1(self):
+        ct = CommandTemplate(args='echo 233', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt')
+        with tempfile.TemporaryDirectory() as wtd:
+            c = ct(identification='nobody', workdir=wtd, environ=dict(T='233'))
+            c()
+
+            with open(os.path.join(wtd, 'stdout_1_233.txt'), 'r') as ff:
+                assert ff.read().rstrip() == '233'
+            with open(os.path.join(wtd, 'stderr_1_233.txt'), 'r') as ff:
+                assert ff.read().rstrip() == ''
+
+    def test_run_with_stdout_stderr_2(self):
+        ct = CommandTemplate(args='echo 2334 1>&2 ', stdout='stdout_2_${T}.txt', stderr='stderr_2_${T}.txt')
+        with tempfile.TemporaryDirectory() as wtd:
+            c = ct(identification='nobody', workdir=wtd, environ=dict(T='233'))
+            c()
+
+            with open(os.path.join(wtd, 'stdout_2_233.txt'), 'r') as ff:
+                assert ff.read().rstrip() == ''
+            with open(os.path.join(wtd, 'stderr_2_233.txt'), 'r') as ff:
+                assert ff.read().rstrip() == '2334'
 
 
 if __name__ == "__main__":

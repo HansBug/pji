@@ -100,7 +100,7 @@ class CommandTemplate(_ICommandBase):
         """
         return hash(self.__tuple())
 
-    def __call__(self, identification=None, resources=None, workdir=None, environ=None) -> Command:
+    def __call__(self, identification=None, resources=None, workdir=None, environ=None, **kwargs) -> Command:
         """
         get command object from template
         :param identification: identification
@@ -114,9 +114,12 @@ class CommandTemplate(_ICommandBase):
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources or {}), self.__resources)
         _workdir = os.path.normpath(
             os.path.join(workdir or '.', _check_workdir_position(env_template(self.__workdir, environ))))
-        _stdin = env_template(self.__stdin, environ) if isinstance(self.__stdin, str) else self.__stdin
-        _stdout = env_template(self.__stdout, environ) if isinstance(self.__stdout, str) else self.__stdout
-        _stderr = env_template(self.__stderr, environ) if isinstance(self.__stderr, str) else self.__stderr
+        _stdin = os.path.normpath(os.path.join(_workdir, env_template(self.__stdin, environ))) \
+            if isinstance(self.__stdin, str) else self.__stdin
+        _stdout = os.path.normpath(os.path.join(_workdir, env_template(self.__stdout, environ))) \
+            if isinstance(self.__stdout, str) else self.__stdout
+        _stderr = os.path.normpath(os.path.join(_workdir, env_template(self.__stderr, environ))) \
+            if isinstance(self.__stderr, str) else self.__stderr
 
         return Command(
             args=self.__args, shell=self.__shell,
@@ -124,3 +127,19 @@ class CommandTemplate(_ICommandBase):
             identification=_identification, resources=_resources,
             mode=self.__mode, stdin=_stdin, stdout=_stdout, stderr=_stderr,
         )
+
+    @classmethod
+    def loads(cls, data) -> 'CommandTemplate':
+        """
+
+        load command template from data
+        :param data: raw data
+        :return: command template object
+        """
+        if isinstance(data, CommandTemplate):
+            return data
+        elif isinstance(data, dict):
+            return CommandTemplate(**data)
+        else:
+            raise TypeError('Json or {type} expected but {actual} found.'.format(
+                type=CommandTemplate.__name__, actual=repr(type(data).__name__)))
