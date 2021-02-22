@@ -97,4 +97,7 @@ class CopyFileOutput(FileOutput, _ICopyFileOutput):
         return self.__local
 
     def __call__(self, *args, **kwargs):
+        """
+        execute this file output
+        """
         auto_copy_file(self.__local, self.__file)
