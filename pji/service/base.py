@@ -1,6 +1,6 @@
 import os
 
-from ...utils import is_inner_relative_path, FilePool
+from ..utils import is_inner_relative_path, FilePool
 
 
 def _check_os_path(path: str) -> str:
@@ -24,7 +24,7 @@ def _check_workdir_path(path: str) -> str:
     return os.path.normpath(path)
 
 
-def _check_tag(tag: str) -> str:
+def _check_pool_tag(tag: str) -> str:
     """
     check if tag is valid, if valid, just return it
     :param tag: tag

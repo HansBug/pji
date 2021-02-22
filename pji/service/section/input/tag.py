@@ -5,7 +5,7 @@ from typing import Optional, Mapping
 from pysystem import FileAuthority
 
 from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
-from ..base import _check_workdir_path, _check_tag
+from ...base import _check_workdir_path, _check_pool_tag
 from ....control.model import Identification
 from ....utils import get_repr_info, FilePool, env_template
 
@@ -70,7 +70,7 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         :return: tag file input object
         """
         environ = environ or {}
-        _tag = _check_tag(env_template(self.__tag, environ))
+        _tag = _check_pool_tag(env_template(self.__tag, environ))
         _local = os.path.normpath(
             os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
         _identification = Identification.loads(identification)

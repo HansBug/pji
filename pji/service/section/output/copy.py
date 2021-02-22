@@ -3,7 +3,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileOutputTemplate, FileOutput
-from ..base import _check_workdir_path
+from ...base import _check_workdir_path
 from ....utils import get_repr_info, auto_copy_file, env_template
 
 

@@ -4,7 +4,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import ErrorInfoTemplate, ErrorInfo
-from ..base import _check_workdir_path
+from ...base import _check_workdir_path
 from ....utils import get_repr_info, env_template
 
 
