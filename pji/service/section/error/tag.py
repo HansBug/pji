@@ -5,7 +5,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import ErrorInfoTemplate, ErrorInfo
-from ...base import _check_pool_tag, _check_workdir_path
+from ...base import _check_pool_tag, _check_workdir_file
 from ....utils import get_repr_info, FilePool, env_template
 
 
@@ -60,7 +60,7 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
         environ = environ or {}
         _tag = _check_pool_tag(env_template(self.__tag, environ))
         if self.__file is not None:
-            _file = os.path.normpath(_check_workdir_path(env_template(self.__file, environ)))
+            _file = os.path.normpath(_check_workdir_file(env_template(self.__file, environ)))
         else:
             _file = None
 

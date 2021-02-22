@@ -26,9 +26,9 @@ class TestServiceCommandCommand:
             workdir='./123',
             resources=dict(max_real_time='2.0s', max_cpu_time='1.0s'),
             mode='timing',
-            stdin='stdin.txt',
-            stdout='stdout.txt',
-            stderr='stderr.txt',
+            stdin='stdin${PATH}.txt',
+            stdout='stdout${PATH}.txt',
+            stderr='stderr${PATH}.txt',
         ))
 
         c = ct(identification='nobody', resources=dict(max_real_time='1.0s', max_cpu_time='2.0s'), workdir='./123',
@@ -42,9 +42,9 @@ class TestServiceCommandCommand:
         assert c.identification == Identification.loads('nobody')
         assert c.environ == {'PATH': '233'}
         assert c.mode == CommandMode.TIMING
-        assert c.stdin == 'stdin.txt'
-        assert c.stdout == 'stdout.txt'
-        assert c.stderr == 'stderr.txt'
+        assert c.stdin == 'stdin233.txt'
+        assert c.stdout == 'stdout233.txt'
+        assert c.stderr == 'stderr233.txt'
 
     def test_common_with_stream(self):
         with io.StringIO("echo 233\necho 2334 1>&2") as sin, \

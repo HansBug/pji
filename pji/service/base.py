@@ -12,7 +12,19 @@ def _check_os_path(path: str) -> str:
     return os.path.normpath(path)
 
 
-def _check_workdir_path(path: str) -> str:
+def _check_workdir_position(path: str) -> str:
+    """
+    check local path valid or not, when valid, just process it
+    :param path: original local path
+    :return: normalized local path
+    """
+    if not is_inner_relative_path(path):
+        raise ValueError(
+            'Inner relative position expected for local but {actual} found.'.format(actual=repr(path)))
+    return os.path.normpath(path)
+
+
+def _check_workdir_file(path: str) -> str:
     """
     check local path valid or not, when valid, just process it
     :param path: original local path

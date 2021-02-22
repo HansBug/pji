@@ -3,7 +3,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileOutputTemplate, FileOutput
-from ...base import _check_workdir_path
+from ...base import _check_workdir_file
 from ....utils import get_repr_info, auto_copy_file, env_template
 
 
@@ -71,7 +71,7 @@ class CopyFileOutputTemplate(FileOutputTemplate, _ICopyFileOutput):
 
         environ = environ or {}
         _local = os.path.normpath(
-            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
+            os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__local, environ)))))
         _file = os.path.normpath(
             os.path.abspath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ)))))
 

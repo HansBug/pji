@@ -3,7 +3,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileOutputTemplate, FileOutput
-from ...base import _check_workdir_path, _check_pool_tag
+from ...base import _check_workdir_file, _check_pool_tag
 from ....utils import get_repr_info, FilePool, env_template
 
 
@@ -60,7 +60,7 @@ class TagFileOutputTemplate(FileOutputTemplate, _ITagFileOutput):
         environ = environ or {}
         _tag = _check_pool_tag(env_template(self.__tag, environ))
         _local = os.path.normpath(
-            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__local, environ)))))
+            os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__local, environ)))))
 
         return TagFileOutput(
             pool=pool, local=_local, tag=_tag,

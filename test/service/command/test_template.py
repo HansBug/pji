@@ -36,7 +36,7 @@ class TestServiceCommandTemplate:
 
         assert ct.args == 'echo 233'
         assert not ct.shell
-        assert ct.workdir == '123'
+        assert ct.workdir == './123'
         assert ct.resources == ResourceLimit.loads(dict(max_real_time='2.0s'))
         assert ct.mode == CommandMode.TIMING
         assert ct.stdin == 'stdin.txt'
@@ -74,10 +74,13 @@ class TestServiceCommandTemplate:
             CommandTemplate(args=(1, 2, 3,))
 
     def test_workdir_invalid(self):
+        ct = CommandTemplate(args='echo 233', workdir='..')
         with pytest.raises(ValueError):
-            CommandTemplate(args='echo 233', workdir='..')
+            ct()
+
+        ct = CommandTemplate(args='echo 233', workdir='/root/1/2/3')
         with pytest.raises(ValueError):
-            CommandTemplate(args='echo 233', workdir='/root/1/2/3')
+            ct()
 
 
 if __name__ == "__main__":

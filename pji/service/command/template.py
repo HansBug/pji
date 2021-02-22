@@ -3,8 +3,9 @@ from typing import Union, List, Optional
 
 from .base import _ICommandBase, CommandMode
 from .command import Command
+from ..base import _check_workdir_position
 from ...control.model import ResourceLimit, Identification
-from ...utils import is_inner_relative_path
+from ...utils import env_template
 
 
 class CommandTemplate(_ICommandBase):
@@ -32,10 +33,7 @@ class CommandTemplate(_ICommandBase):
         self.__args = args
         self.__shell = shell
 
-        workdir = os.path.normpath(str(workdir or self.__DEFAULT_WORKDIR))
-        if not is_inner_relative_path(workdir):
-            raise ValueError('Workdir should be inner relative path but {actual} found.'.format(actual=repr(workdir)))
-        self.__workdir = workdir
+        self.__workdir = str(workdir or self.__DEFAULT_WORKDIR)
         self.__resources = ResourceLimit.loads(resources or {})
 
         self.__mode = CommandMode.loads(mode or self.__DEFAULT_MODE)
@@ -111,15 +109,18 @@ class CommandTemplate(_ICommandBase):
         :param environ: environment variables
         :return: command object
         """
+        environ = {key: str(value) for key, value in (environ or {}).items()}
         _identification = Identification.loads(identification or {})
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources or {}), self.__resources)
-        _workdir = os.path.normpath(os.path.join(workdir or '.', self.__workdir))
-        _environ = {key: str(value) for key, value in (environ or {}).items()}
+        _workdir = os.path.normpath(
+            os.path.join(workdir or '.', _check_workdir_position(env_template(self.__workdir, environ))))
+        _stdin = env_template(self.__stdin, environ) if isinstance(self.__stdin, str) else self.__stdin
+        _stdout = env_template(self.__stdout, environ) if isinstance(self.__stdout, str) else self.__stdout
+        _stderr = env_template(self.__stderr, environ) if isinstance(self.__stderr, str) else self.__stderr
 
         return Command(
             args=self.__args, shell=self.__shell,
-            workdir=_workdir, environ=_environ,
+            workdir=_workdir, environ=environ,
             identification=_identification, resources=_resources,
-            mode=self.__mode, stdin=self.__stdin,
-            stdout=self.__stdout, stderr=self.__stderr,
+            mode=self.__mode, stdin=_stdin, stdout=_stdout, stderr=_stderr,
         )

@@ -4,7 +4,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import ErrorInfoTemplate, ErrorInfo
-from ...base import _check_workdir_path
+from ...base import _check_workdir_file
 from ....utils import get_repr_info, env_template
 
 
@@ -49,7 +49,7 @@ class LocalErrorInfoTemplate(ErrorInfoTemplate, _ILocalErrorInfo):
         """
         environ = environ or {}
         _local = os.path.normpath(
-            os.path.abspath(os.path.join(workdir, _check_workdir_path(env_template(self.__file, environ)))))
+            os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__file, environ)))))
 
         return LocalErrorInfo(file=_local)
 
