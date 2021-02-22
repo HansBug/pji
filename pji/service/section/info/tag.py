@@ -50,7 +50,7 @@ class TagSectionInfoTemplate(SectionInfoTemplate, _ITagSectionInfo):
     def file(self) -> str:
         return self.__file
 
-    def __call__(self, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagSectionInfo':
+    def __call__(self, pool: FilePool, environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'TagSectionInfo':
         """
         get tag info info object
         :param pool: file pool object

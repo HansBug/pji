@@ -35,7 +35,7 @@ class StaticSectionInfoTemplate(SectionInfoTemplate, _IStaticSectionInfo):
     def value(self):
         return self.__value
 
-    def __call__(self, environ: Optional[Mapping[str, str]] = None) -> 'StaticSectionInfo':
+    def __call__(self, environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'StaticSectionInfo':
         """
         get static info info object
         :param environ: environment variables
