@@ -1,4 +1,5 @@
 import os
+from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileOutputTemplate, FileOutput, _check_workdir_path
@@ -14,7 +15,7 @@ def _check_os_path(path: str) -> str:
     return os.path.normpath(path)
 
 
-class _ICopyFileOutput:
+class _ICopyFileOutput(metaclass=ABCMeta):
     def __init__(self, local: str, file: str):
         """
         :param local: local path
