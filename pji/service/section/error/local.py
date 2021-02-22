@@ -63,9 +63,15 @@ class LocalErrorInfo(ErrorInfo, _ILocalErrorInfo):
 
         _ILocalErrorInfo.__init__(self, self.__local)
 
+    @property
+    def local(self) -> str:
+        return self.__local
+
     def __call__(self) -> str:
         """
         execute this error info
         """
+        if os.path.isdir(self.__local):
+            raise IsADirectoryError('Path {path} is directory.'.format(path=repr(self.__local)))
         with codecs.open(self.__local, 'r') as file:
             return file.read()

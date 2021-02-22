@@ -42,6 +42,14 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
 
         _ITagErrorInfo.__init__(self, self.__tag, self.__file)
 
+    @property
+    def tag(self) -> str:
+        return self.__tag
+
+    @property
+    def file(self) -> str:
+        return self.__file
+
     def __call__(self, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagErrorInfo':
         """
         get tag error info object
@@ -52,7 +60,7 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
         environ = environ or {}
         _tag = _check_tag(env_template(self.__tag, environ))
         if self.__file is not None:
-            _file = os.path.abspath(os.path.join(_check_workdir_path(env_template(self.__file, environ))))
+            _file = os.path.normpath(_check_workdir_path(env_template(self.__file, environ)))
         else:
             _file = None
 
@@ -71,6 +79,14 @@ class TagErrorInfo(ErrorInfo, _ITagErrorInfo):
         self.__file = file
 
         _ITagErrorInfo.__init__(self, self.__tag, self.__file)
+
+    @property
+    def tag(self) -> str:
+        return self.__tag
+
+    @property
+    def file(self) -> str:
+        return self.__file
 
     def __call__(self):
         """
