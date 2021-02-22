@@ -1,24 +1,22 @@
 from enum import IntEnum, unique
 from typing import Mapping, Any
 
-from .base import FileInputTemplate
-from .copy import CopyFileInputTemplate
-from .link import LinkFileInputTemplate
-from .tag import TagFileInputTemplate
+from .base import FileOutputTemplate
+from .copy import CopyFileOutputTemplate
+from .tag import TagFileOutputTemplate
 
 
 @unique
-class FileInputType(IntEnum):
+class FileOutputType(IntEnum):
     COPY = 1
-    LINK = 2
-    TAG = 3
+    TAG = 2
 
     @classmethod
-    def loads(cls, value) -> 'FileInputType':
+    def loads(cls, value) -> 'FileOutputType':
         """
-        Load FileInputType from value
+        Load FileOutputType from value
         :param value: raw value
-        :return: file input type object
+        :return: file output type object
         """
         if isinstance(value, cls):
             return value
@@ -26,13 +24,13 @@ class FileInputType(IntEnum):
             if value.upper() in cls.__members__.keys():
                 return cls.__members__[value.upper()]
             else:
-                raise KeyError('Unknown file input type - {actual}.'.format(actual=repr(value)))
+                raise KeyError('Unknown file output type - {actual}.'.format(actual=repr(value)))
         elif isinstance(value, int):
             _mapping = {v.value: v for k, v in cls.__members__.items()}
             if value in _mapping.keys():
                 return _mapping[value]
             else:
-                raise ValueError('Unknown file input type value - {actual}'.format(actual=repr(value)))
+                raise ValueError('Unknown file output type value - {actual}'.format(actual=repr(value)))
         else:
             raise TypeError('Int, str or {cls} expected but {actual} found.'.format(
                 cls=cls.__name__,
@@ -41,24 +39,22 @@ class FileInputType(IntEnum):
 
 
 _TYPE_TO_TEMPLATE_CLASS = {
-    FileInputType.COPY: CopyFileInputTemplate,
-    FileInputType.LINK: LinkFileInputTemplate,
-    FileInputType.TAG: TagFileInputTemplate,
+    FileOutputType.COPY: CopyFileOutputTemplate,
+    FileOutputType.TAG: TagFileOutputTemplate,
 }
 
 
 # noinspection DuplicatedCode
-def autoload_input_template(json: Mapping[str, Any]) -> FileInputTemplate:
+def autoload_output_template(json: Mapping[str, Any]) -> FileOutputTemplate:
     """
     load template object from json data
     :param json: json data
-    :return: file input template object
+    :return: file output template object
     """
-
     if 'type' not in json.keys():
         raise KeyError('Key {type} not found.'.format(type=repr('type')))
 
-    _type = FileInputType.loads(json['type'])
+    _type = FileOutputType.loads(json['type'])
     _json = dict(json)
     del _json['type']
 
