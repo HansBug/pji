@@ -47,6 +47,7 @@ class LinkFileInputTemplate(FileInputTemplate, _ILinkFileInput):
     def local(self) -> str:
         return self.__local
 
+    # noinspection DuplicatedCode
     def __call__(self, scriptdir: str, workdir: str,
                  environ: Optional[Mapping[str, str]] = None, **kwargs) -> 'LinkFileInput':
         """
