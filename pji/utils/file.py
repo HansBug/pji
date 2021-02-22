@@ -13,20 +13,33 @@ def _auto_delete(filename: str):
         os.remove(filename)
 
 
-def auto_copy_file(from_file: str, to_file: str):
+def _check_from_file(from_file: str):
     if not os.path.exists(from_file):
         raise FileNotFoundError('File {filename} not found.'.format(filename=repr(from_file)))
     if not os.access(from_file, os.R_OK):
         raise PermissionError('File {filename} unreadable.'.format(filename=repr(from_file)))
 
+
+def _prepare_for_to_file(to_file: str):
     if os.path.exists(to_file):
         _auto_delete(to_file)
     _parent_path, _ = os.path.split(to_file)
     os.makedirs(_parent_path, exist_ok=True)
+
+
+def auto_copy_file(from_file: str, to_file: str):
+    _check_from_file(from_file)
+    _prepare_for_to_file(to_file)
     if os.path.isdir(from_file):
         shutil.copytree(from_file, to_file)
     else:
         shutil.copyfile(from_file, to_file, follow_symlinks=True)
+
+
+def auto_link_file(from_file: str, to_file: str):
+    _check_from_file(from_file)
+    _prepare_for_to_file(to_file)
+    os.symlink(from_file, to_file)
 
 
 class FilePool:
@@ -73,6 +86,9 @@ class FilePool:
     def __export_tag_file(self, tag: str, filename: str):
         auto_copy_file(self.__get_tag_file(tag), filename)
 
+    def __link_tag_file(self, tag: str, filename: str):
+        auto_link_file(self.__get_tag_file(tag), filename)
+
     def __clear(self):
         try:
             for tag, fdir in self.__file_dirs.items():
@@ -114,6 +130,10 @@ class FilePool:
     def export(self, tag: str, filename: str):
         with self.__lock:
             return self.__export_tag_file(tag, filename)
+
+    def link(self, tag: str, filename: str):
+        with self.__lock:
+            return self.__link_tag_file(tag, filename)
 
     def clear(self):
         with self.__lock:

@@ -134,6 +134,8 @@ class TestUtilsFile:
             _root_dir = os.path.normpath(os.path.join(pool['readme'], '..', '..'))
             with tempfile.NamedTemporaryFile() as f:
                 pool.export('readme', f.name)
+                assert os.path.exists(f.name)
+                assert os.path.isfile(f.name)
                 with open(f.name, 'rb') as ef, \
                         open('README.md', 'rb') as of:
                     assert ef.read() == of.read()
@@ -148,9 +150,46 @@ class TestUtilsFile:
 
             _root_dir = os.path.normpath(os.path.join(pool['source'], '..', '..'))
             with tempfile.TemporaryDirectory() as td:
-                pool.export('source', td)
+                _target_dir = os.path.join(td, 'target')
+                pool.export('source', _target_dir)
+                assert os.path.exists(_target_dir)
+                assert os.path.isdir(_target_dir)
                 with open(os.path.join('pji', '__init__.py'), 'rb') as of, \
-                        open(os.path.join(td, '__init__.py'), 'rb') as ef:
+                        open(os.path.join(_target_dir, '__init__.py'), 'rb') as ef:
+                    assert of.read() == ef.read()
+
+    def test_export_link_file(self):
+        with FilePool({'readme': 'README.md'}) as pool:
+            assert isinstance(pool, FilePool)
+            assert 'readme' in pool
+
+            _root_dir = os.path.normpath(os.path.join(pool['readme'], '..', '..'))
+            with tempfile.NamedTemporaryFile() as f:
+                pool.link('readme', f.name)
+                assert os.path.exists(f.name)
+                assert os.path.isfile(f.name)
+                assert os.path.islink(f.name)
+                with open(f.name, 'rb') as ef, \
+                        open('README.md', 'rb') as of:
+                    assert ef.read() == of.read()
+
+        assert not os.path.exists(_root_dir)
+
+    def test_export_link_dir(self):
+        with FilePool({'source': 'pji', 'test': 'test'}) as pool:
+            assert isinstance(pool, FilePool)
+            assert 'source' in pool
+            assert 'test' in pool
+
+            _root_dir = os.path.normpath(os.path.join(pool['source'], '..', '..'))
+            with tempfile.TemporaryDirectory() as td:
+                _target_dir = os.path.join(td, 'target')
+                pool.link('source', _target_dir)
+                assert os.path.exists(_target_dir)
+                assert os.path.isdir(_target_dir)
+                assert os.path.islink(_target_dir)
+                with open(os.path.join('pji', '__init__.py'), 'rb') as of, \
+                        open(os.path.join(_target_dir, '__init__.py'), 'rb') as ef:
                     assert of.read() == ef.read()
 
     def test_clear(self):
