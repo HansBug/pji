@@ -1,10 +1,10 @@
 from typing import Optional, Mapping
 
-from .base import ErrorInfoTemplate, ErrorInfo
+from .base import SectionInfoTemplate, SectionInfo
 from ....utils import get_repr_info, env_template
 
 
-class _IStaticErrorInfo:
+class _IStaticSectionInfo:
     def __init__(self, value: str):
         """
         :param value: static value 
@@ -23,23 +23,23 @@ class _IStaticErrorInfo:
         )
 
 
-class StaticErrorInfoTemplate(ErrorInfoTemplate, _IStaticErrorInfo):
+class StaticSectionInfoTemplate(SectionInfoTemplate, _IStaticSectionInfo):
     def __init__(self, value: str):
         """
         :param value: static value 
         """
         self.__value = value
-        _IStaticErrorInfo.__init__(self, self.__value)
+        _IStaticSectionInfo.__init__(self, self.__value)
 
     @property
     def value(self):
         return self.__value
 
-    def __call__(self, environ: Optional[Mapping[str, str]] = None) -> 'StaticErrorInfo':
+    def __call__(self, environ: Optional[Mapping[str, str]] = None) -> 'StaticSectionInfo':
         """
-        get static error info object
+        get static info info object
         :param environ: environment variables
-        :return: static error info object
+        :return: static info info object
         """
         environ = environ or {}
         if isinstance(self.__value, str):
@@ -47,16 +47,16 @@ class StaticErrorInfoTemplate(ErrorInfoTemplate, _IStaticErrorInfo):
         else:
             _value = self.__value
 
-        return StaticErrorInfo(value=_value)
+        return StaticSectionInfo(value=_value)
 
 
-class StaticErrorInfo(ErrorInfo, _IStaticErrorInfo):
+class StaticSectionInfo(SectionInfo, _IStaticSectionInfo):
     def __init__(self, value: str):
         """
         :param value: static value 
         """
         self.__value = value
-        _IStaticErrorInfo.__init__(self, self.__value)
+        _IStaticSectionInfo.__init__(self, self.__value)
 
     @property
     def value(self):
@@ -64,6 +64,6 @@ class StaticErrorInfo(ErrorInfo, _IStaticErrorInfo):
 
     def __call__(self):
         """
-        execute this error info
+        execute this info info
         """
         return self.__value

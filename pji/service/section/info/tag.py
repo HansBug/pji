@@ -4,12 +4,12 @@ import warnings
 from abc import ABCMeta
 from typing import Optional, Mapping
 
-from .base import ErrorInfoTemplate, ErrorInfo
+from .base import SectionInfoTemplate, SectionInfo
 from ...base import _check_pool_tag, _check_workdir_file
 from ....utils import get_repr_info, FilePool, env_template
 
 
-class _ITagErrorInfo(metaclass=ABCMeta):
+class _ITagSectionInfo(metaclass=ABCMeta):
     def __init__(self, tag: str, file: Optional[str]):
         """        
         :param tag: file pool tag 
@@ -31,7 +31,7 @@ class _ITagErrorInfo(metaclass=ABCMeta):
         )
 
 
-class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
+class TagSectionInfoTemplate(SectionInfoTemplate, _ITagSectionInfo):
     def __init__(self, tag: str, file: Optional[str] = None):
         """        
         :param tag: file pool tag 
@@ -40,7 +40,7 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
         self.__tag = tag
         self.__file = file
 
-        _ITagErrorInfo.__init__(self, self.__tag, self.__file)
+        _ITagSectionInfo.__init__(self, self.__tag, self.__file)
 
     @property
     def tag(self) -> str:
@@ -50,12 +50,12 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
     def file(self) -> str:
         return self.__file
 
-    def __call__(self, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagErrorInfo':
+    def __call__(self, pool: FilePool, environ: Optional[Mapping[str, str]] = None) -> 'TagSectionInfo':
         """
-        get tag error info object
+        get tag info info object
         :param pool: file pool object
         :param environ: environment variables
-        :return: tag error info object
+        :return: tag info info object
         """
         environ = environ or {}
         _tag = _check_pool_tag(env_template(self.__tag, environ))
@@ -64,10 +64,10 @@ class TagErrorInfoTemplate(ErrorInfoTemplate, _ITagErrorInfo):
         else:
             _file = None
 
-        return TagErrorInfo(pool=pool, tag=_tag, file=_file)
+        return TagSectionInfo(pool=pool, tag=_tag, file=_file)
 
 
-class TagErrorInfo(ErrorInfo, _ITagErrorInfo):
+class TagSectionInfo(SectionInfo, _ITagSectionInfo):
     def __init__(self, pool: FilePool, tag: str, file: Optional[str] = None):
         """
         :param pool: file pool
@@ -78,7 +78,7 @@ class TagErrorInfo(ErrorInfo, _ITagErrorInfo):
         self.__tag = tag
         self.__file = file
 
-        _ITagErrorInfo.__init__(self, self.__tag, self.__file)
+        _ITagSectionInfo.__init__(self, self.__tag, self.__file)
 
     @property
     def tag(self) -> str:
@@ -90,7 +90,7 @@ class TagErrorInfo(ErrorInfo, _ITagErrorInfo):
 
     def __call__(self):
         """
-        execute this error info
+        execute this info info
         """
         _tagged_file = self.__pool[self.__tag]
         if os.path.isdir(_tagged_file):
