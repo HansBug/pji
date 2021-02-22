@@ -50,7 +50,7 @@ unit_test_in_3.6.3:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
   variables:
-    MIN_COVERAGE: 50
+    MIN_COVERAGE: 90
   script:
     - pip3 install -e .
     - pytest --version
@@ -60,7 +60,7 @@ unit_test_in_3.7.6:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
   variables:
-    MIN_COVERAGE: 50
+    MIN_COVERAGE: 90
   script:
     - pip3 install -e .
     - pytest --version
@@ -70,7 +70,7 @@ unit_test_in_3.8.1:
   stage: unit_test
   image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
   variables:
-    MIN_COVERAGE: 50
+    MIN_COVERAGE: 90
   script:
     - pip3 install -e .
     - pytest --version
