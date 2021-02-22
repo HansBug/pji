@@ -27,7 +27,7 @@ class CommandMode(IntEnum):
             else:
                 raise KeyError('Unknown command mode - {actual}.'.format(actual=repr(value)))
         elif isinstance(value, int):
-            _mapping = {v.value: v for k, v in CommandMode.__members__.items()}
+            _mapping = {v.value: v for k, v in cls.__members__.items()}
             if value in _mapping.keys():
                 return _mapping[value]
             else:
