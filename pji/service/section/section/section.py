@@ -1,6 +1,8 @@
 import tempfile
 from typing import List, Mapping, Tuple, Any, Callable
 
+from pysystem import chown, chmod
+
 from .base import _ISection
 from ..info import SectionInfoMapping
 from ..input import FileInputCollection
@@ -82,6 +84,10 @@ class Section(_ISection):
         :return: success or not, result list, information
         """
         with tempfile.TemporaryDirectory() as workdir:
+            chmod(workdir, 'r--------')
+            if self.__identification:
+                chown(workdir, user=self.__identification.user, group=self.__identification.group)
+
             self.__inputs(workdir=workdir)()
             _success, _results = self.__commands(workdir=workdir)()
             if _success:
