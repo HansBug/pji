@@ -1,7 +1,7 @@
 import os
 from typing import Mapping, Optional, Any
 
-from ..utils import is_inner_relative_path, FilePool
+from ..utils import is_inner_relative_path, FilePool, env_template
 
 
 def _check_os_path(path: str) -> str:
@@ -47,10 +47,23 @@ def _check_pool_tag(tag: str) -> str:
     return tag
 
 
-def _process_environ(environ: Optional[Mapping[str, Any]] = None) -> Mapping[str, str]:
+def _process_environ(environ: Optional[Mapping[str, Any]] = None,
+                     ext_environ: Optional[Mapping[str, Any]] = None) -> Mapping[str, str]:
     """
     process environment variables
     :param environ: environment variables
+    :param ext_environ: external environment variables
     :return: string environment variables
     """
-    return {key: str(value) for key, value in (environ or {}).items()}
+
+    def _penv(env):
+        return {key: str(value) for key, value in (env or {}).items()}
+
+    _curenv = _penv(environ)
+    _extenv = _penv(ext_environ)
+    _curenv = {key: env_template(value, _extenv) for key, value in _curenv.items()}
+
+    _result = dict(_extenv)
+    _result.update(**_curenv)
+
+    return _result
