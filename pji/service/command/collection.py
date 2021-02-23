@@ -1,8 +1,10 @@
 from abc import ABCMeta
 from typing import List, Tuple
 
+from .base import ENV_PJI_COMMAND
 from .command import Command
 from .template import CommandTemplate
+from ..base import _process_environ
 from ...control.model import RunResult
 from ...utils import get_repr_info
 
@@ -49,9 +51,16 @@ class CommandCollectionTemplate(_ICommandCollection):
         :param environ: environment variables
         :return: command collection
         """
+        environ = _process_environ(environ)
+
+        def _env_with_id(index_):
+            _env = dict(environ)
+            _env[ENV_PJI_COMMAND] = str(index_)
+            return _env
+
         return CommandCollection(*[item(
-            identification, resources, workdir, environ, **kwargs
-        ) for item in self.__commands])
+            identification, resources, workdir, _env_with_id(index), **kwargs
+        ) for index, item in enumerate(self.__commands)])
 
     @classmethod
     def loads(cls, data) -> 'CommandCollectionTemplate':

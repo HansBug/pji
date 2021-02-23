@@ -39,6 +39,9 @@ class CommandMode(IntEnum):
             ))
 
 
+ENV_PJI_COMMAND = 'PJI_COMMAND'
+
+
 class _ICommandBase:
     def __init__(self, args: Union[str, List[str]], shell: bool = True, workdir: Optional[str] = None,
                  identification=None, resources=None, mode=None):
