@@ -6,11 +6,11 @@ from ....utils import get_repr_info
 
 
 class _IFileOutputCollection:
-    def __init__(self, outputs):
+    def __init__(self, items):
         """
-        :param outputs: file outputs
+        :param items: file outputs
         """
-        self.__outputs = outputs
+        self.__items = items
 
     def __repr__(self):
         """
@@ -19,22 +19,25 @@ class _IFileOutputCollection:
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('outputs', lambda: len(self.__outputs)),
+                ('outputs', lambda: len(self.__items)),
             ]
         )
 
 
 class FileOutputCollectionTemplate(_IFileOutputCollection):
-    def __init__(self, *outputs):
+    def __init__(self, *items):
         """
-        :param outputs: file output templates
+        :param items: file output templates
         """
-        self.__outputs = [load_output_template(item) for item in outputs]
-        _IFileOutputCollection.__init__(self, self.__outputs)
+        self.__items = [load_output_template(item) for item in items]
+        _IFileOutputCollection.__init__(self, self.__items)
 
     @property
-    def outputs(self) -> List[FileOutputTemplate]:
-        return list(self.__outputs)
+    def items(self) -> List[FileOutputTemplate]:
+        return list(self.__items)
+
+    def __iter__(self):
+        return self.items.__iter__()
 
     def __call__(self, **kwargs):
         """
@@ -42,7 +45,7 @@ class FileOutputCollectionTemplate(_IFileOutputCollection):
         :param kwargs: plenty of arguments
         :return: file output collection
         """
-        return FileOutputCollection(*[item(**kwargs) for item in self.__outputs])
+        return FileOutputCollection(*[item(**kwargs) for item in self.__items])
 
     @classmethod
     def loads(cls, data) -> 'FileOutputCollectionTemplate':
@@ -65,20 +68,23 @@ class FileOutputCollectionTemplate(_IFileOutputCollection):
 
 
 class FileOutputCollection(_IFileOutputCollection):
-    def __init__(self, *outputs):
+    def __init__(self, *items):
         """
-        :param outputs: file outputs
+        :param items: file outputs
         """
-        self.__outputs = list(outputs)
-        _IFileOutputCollection.__init__(self, self.__outputs)
+        self.__items = list(items)
+        _IFileOutputCollection.__init__(self, self.__items)
 
     @property
-    def outputs(self) -> List[FileOutput]:
-        return list(self.__outputs)
+    def items(self) -> List[FileOutput]:
+        return list(self.__items)
+
+    def __iter__(self):
+        return self.items.__iter__()
 
     def __call__(self):
         """
         execute this file output setting
         """
-        for item in self.__outputs:
+        for item in self.__items:
             item()

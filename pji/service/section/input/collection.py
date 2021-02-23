@@ -7,11 +7,11 @@ from ....utils import get_repr_info
 
 
 class _IFileInputCollection(metaclass=ABCMeta):
-    def __init__(self, inputs):
+    def __init__(self, items):
         """
-        :param inputs: file inputs
+        :param items: file inputs
         """
-        self.__inputs = inputs
+        self.__items = items
 
     def __repr__(self):
         """
@@ -20,22 +20,25 @@ class _IFileInputCollection(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('inputs', lambda: len(self.__inputs)),
+                ('inputs', lambda: len(self.__items)),
             ]
         )
 
 
 class FileInputCollectionTemplate(_IFileInputCollection):
-    def __init__(self, *inputs):
+    def __init__(self, *items):
         """
-        :param inputs: file input templates
+        :param items: file input templates
         """
-        self.__inputs = [load_input_template(item) for item in inputs]
-        _IFileInputCollection.__init__(self, self.__inputs)
+        self.__items = [load_input_template(item) for item in items]
+        _IFileInputCollection.__init__(self, self.__items)
 
     @property
-    def inputs(self) -> List[FileInputTemplate]:
-        return list(self.__inputs)
+    def items(self) -> List[FileInputTemplate]:
+        return list(self.__items)
+
+    def __iter__(self):
+        return self.items.__iter__()
 
     def __call__(self, **kwargs) -> 'FileInputCollection':
         """
@@ -43,7 +46,7 @@ class FileInputCollectionTemplate(_IFileInputCollection):
         :param kwargs: plenty of arguments
         :return: file input collection
         """
-        return FileInputCollection(*[item(**kwargs) for item in self.__inputs])
+        return FileInputCollection(*[item(**kwargs) for item in self.__items])
 
     @classmethod
     def loads(cls, data) -> 'FileInputCollectionTemplate':
@@ -66,20 +69,23 @@ class FileInputCollectionTemplate(_IFileInputCollection):
 
 
 class FileInputCollection(_IFileInputCollection):
-    def __init__(self, *inputs):
+    def __init__(self, *items):
         """
-        :param inputs: file inputs
+        :param items: file inputs
         """
-        self.__inputs = inputs
-        _IFileInputCollection.__init__(self, self.__inputs)
+        self.__items = items
+        _IFileInputCollection.__init__(self, self.__items)
 
     @property
-    def inputs(self) -> List[FileInput]:
-        return list(self.__inputs)
+    def items(self) -> List[FileInput]:
+        return list(self.__items)
+
+    def __iter__(self):
+        return self.items.__iter__()
 
     def __call__(self):
         """
         execute this file input setting
         """
-        for item in self.__inputs:
+        for item in self.__items:
             item()

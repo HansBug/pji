@@ -7,11 +7,11 @@ from ....utils import get_repr_info
 
 
 class _ISectionInfoMapping(metaclass=ABCMeta):
-    def __init__(self, mapping: Mapping[str, Any]):
+    def __init__(self, items: Mapping[str, Any]):
         """
-        :param mapping: mapping of section info objects
+        :param items: mapping of section info objects
         """
-        self.__mapping = mapping
+        self.__items = items
 
     def __repr__(self):
         """
@@ -20,7 +20,7 @@ class _ISectionInfoMapping(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('keys', lambda: repr(tuple(sorted(self.__mapping.keys())))),
+                ('keys', lambda: repr(tuple(sorted(self.__items.keys())))),
             ]
         )
 
@@ -30,13 +30,16 @@ class SectionInfoMappingTemplate(_ISectionInfoMapping):
         """
         :param kwargs: mapping of section info template objects
         """
-        self.__mapping = {key: load_error_template(data) for key, data in kwargs.items()}
+        self.__items = {key: load_error_template(data) for key, data in kwargs.items()}
 
-        _ISectionInfoMapping.__init__(self, self.__mapping)
+        _ISectionInfoMapping.__init__(self, self.__items)
 
     @property
-    def mapping(self) -> Mapping[str, SectionInfoTemplate]:
-        return dict(self.__mapping)
+    def items(self) -> Mapping[str, SectionInfoTemplate]:
+        return dict(self.__items)
+
+    def __iter__(self):
+        return self.items.items().__iter__()
 
     def __call__(self, **kwargs) -> 'SectionInfoMapping':
         """
@@ -45,7 +48,7 @@ class SectionInfoMappingTemplate(_ISectionInfoMapping):
         :return: section info info mapping object
         """
         return SectionInfoMapping(**{
-            key: template(**kwargs) for key, template in self.__mapping.items()
+            key: template(**kwargs) for key, template in self.__items.items()
         })
 
     @classmethod
@@ -69,16 +72,19 @@ class SectionInfoMapping(_ISectionInfoMapping):
         """
         :param kwargs: mapping of section info objects
         """
-        self.__mapping = kwargs
+        self.__items = kwargs
 
-        _ISectionInfoMapping.__init__(self, self.__mapping)
+        _ISectionInfoMapping.__init__(self, self.__items)
 
     @property
-    def mapping(self) -> Mapping[str, SectionInfo]:
-        return dict(self.__mapping)
+    def items(self) -> Mapping[str, SectionInfo]:
+        return dict(self.__items)
+
+    def __iter__(self):
+        return self.items.items().__iter__()
 
     def __call__(self) -> Mapping[str, Any]:
         """
         execute this info info
         """
-        return {key: info() for key, info in self.__mapping.items()}
+        return {key: info() for key, info in self.__items.items()}

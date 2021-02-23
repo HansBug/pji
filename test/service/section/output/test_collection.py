@@ -17,10 +17,15 @@ class TestServiceSectionOutputCollection:
             TagFileOutputTemplate(local='./${DIR}/r.md', tag='tag_${V}_x'),
         )
 
-        assert len(fct.outputs) == 2
-        assert isinstance(fct.outputs[0], CopyFileOutputTemplate)
-        assert isinstance(fct.outputs[1], TagFileOutputTemplate)
+        assert len(fct.items) == 2
+        assert isinstance(fct.items[0], CopyFileOutputTemplate)
+        assert isinstance(fct.items[1], TagFileOutputTemplate)
         assert repr(fct) == "<FileOutputCollectionTemplate outputs: 2>"
+
+        list_data = list(fct.__iter__())
+        assert len(list_data) == 2
+        assert isinstance(list_data[0], CopyFileOutputTemplate)
+        assert isinstance(list_data[1], TagFileOutputTemplate)
 
     def test_template_call(self):
         fct = FileOutputCollectionTemplate(
@@ -33,10 +38,15 @@ class TestServiceSectionOutputCollection:
                 FilePool()as pool:
             fc = fct(scriptdir=ttd, workdir=wtd, pool=pool, environ=dict(V='233', DIR='123'))
 
-            assert len(fc.outputs)
-            assert isinstance(fc.outputs[0], CopyFileOutput)
-            assert isinstance(fc.outputs[1], TagFileOutput)
+            assert len(fc.items) == 2
+            assert isinstance(fc.items[0], CopyFileOutput)
+            assert isinstance(fc.items[1], TagFileOutput)
             assert repr(fc) == "<FileOutputCollection outputs: 2>"
+
+            list_data = list(fc.__iter__())
+            assert len(list_data) == 2
+            assert isinstance(list_data[0], CopyFileOutput)
+            assert isinstance(list_data[1], TagFileOutput)
 
     def test_template_execute(self):
         fct = FileOutputCollectionTemplate(
@@ -76,14 +86,14 @@ class TestServiceSectionOutputCollection:
 
         assert len(FileOutputCollectionTemplate.loads(
             CopyFileOutputTemplate(local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
-        ).outputs) == 1
+        ).items) == 1
         assert len(FileOutputCollectionTemplate.loads([
             CopyFileOutputTemplate(local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
             TagFileOutputTemplate(local='./${DIR}/r.md', tag='tag_${V}_x'),
-        ]).outputs) == 2
+        ]).items) == 2
         assert len(FileOutputCollectionTemplate.loads(
             dict(type='copy', local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
-        ).outputs) == 1
+        ).items) == 1
         with pytest.raises(TypeError):
             FileOutputCollectionTemplate.loads(123)
 

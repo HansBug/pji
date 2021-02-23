@@ -6,7 +6,7 @@ import tempfile
 import pytest
 
 from pji.service.section.info import SectionInfoMappingTemplate, StaticSectionInfoTemplate, LocalSectionInfoTemplate, \
-    TagSectionInfoTemplate
+    TagSectionInfoTemplate, StaticSectionInfo, LocalSectionInfo, TagSectionInfo
 from pji.utils import FilePool
 
 
@@ -19,8 +19,14 @@ class TestServiceSectionInfoMapping:
             tag=TagSectionInfoTemplate(tag='tag_${V}'),
         )
 
-        assert len(smt.mapping.keys()) == 3
+        assert len(smt.items.keys()) == 3
         assert repr(smt) == "<SectionInfoMappingTemplate keys: ('local', 'static', 'tag')>"
+
+        dict_data = dict(smt.__iter__())
+        assert len(dict_data) == 3
+        assert isinstance(dict_data['static'], StaticSectionInfoTemplate)
+        assert isinstance(dict_data['local'], LocalSectionInfoTemplate)
+        assert isinstance(dict_data['tag'], TagSectionInfoTemplate)
 
     def test_template_call(self):
         smt = SectionInfoMappingTemplate(
@@ -32,8 +38,15 @@ class TestServiceSectionInfoMapping:
         with tempfile.TemporaryDirectory() as wtd, \
                 FilePool({'tag_233': 'README.md'}) as pool:
             sm = smt(pool=pool, workdir=wtd, environ=dict(V='233'))
-            assert len(sm.mapping.keys()) == 3
+
+            assert len(sm.items.keys()) == 3
             assert repr(sm) == "<SectionInfoMapping keys: ('local', 'static', 'tag')>"
+
+            dict_data = dict(sm.__iter__())
+            assert len(dict_data) == 3
+            assert isinstance(dict_data['static'], StaticSectionInfo)
+            assert isinstance(dict_data['local'], LocalSectionInfo)
+            assert isinstance(dict_data['tag'], TagSectionInfo)
 
     def test_template_execute(self):
         smt = SectionInfoMappingTemplate(
@@ -69,7 +82,7 @@ class TestServiceSectionInfoMapping:
             static=StaticSectionInfoTemplate(value='233${V}'),
             local=LocalSectionInfoTemplate(file='./r${V}.md'),
             tag=TagSectionInfoTemplate(tag='tag_${V}'),
-        )).mapping.keys()) == sorted(['static', 'local', 'tag'])
+        )).items.keys()) == sorted(['static', 'local', 'tag'])
 
         with pytest.raises(TypeError):
             SectionInfoMappingTemplate.loads([])

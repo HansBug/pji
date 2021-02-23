@@ -47,11 +47,11 @@ class TestServiceSectionSectionTemplate:
         assert isinstance(st.commands, CommandCollectionTemplate)
         assert len(st.commands.commands) == 4
         assert isinstance(st.inputs, FileInputCollectionTemplate)
-        assert len(st.inputs.inputs) == 1
+        assert len(st.inputs.items) == 1
         assert isinstance(st.outputs, FileOutputCollectionTemplate)
-        assert len(st.outputs.outputs) == 4
+        assert len(st.outputs.items) == 4
         assert isinstance(st.infos, SectionInfoMappingTemplate)
-        assert len(st.infos.mapping.keys()) == 4
+        assert len(st.infos.items.keys()) == 4
 
         assert repr(st) == "<SectionTemplate name: 'name_${V}', identification: <Identification user: nobody, " \
                            "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
