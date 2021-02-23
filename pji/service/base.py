@@ -48,11 +48,13 @@ def _check_pool_tag(tag: str) -> str:
 
 
 def _process_environ(environ: Optional[Mapping[str, Any]] = None,
-                     ext_environ: Optional[Mapping[str, Any]] = None) -> Mapping[str, str]:
+                     ext_environ: Optional[Mapping[str, Any]] = None,
+                     enable_ext: bool = False) -> Mapping[str, str]:
     """
     process environment variables
     :param environ: environment variables
     :param ext_environ: external environment variables
+    :param enable_ext: enable external
     :return: string environment variables
     """
 
@@ -61,7 +63,8 @@ def _process_environ(environ: Optional[Mapping[str, Any]] = None,
 
     _curenv = _penv(environ)
     _extenv = _penv(ext_environ)
-    _curenv = {key: env_template(value, _extenv) for key, value in _curenv.items()}
+    if enable_ext:
+        _curenv = {key: env_template(value, _extenv) for key, value in _curenv.items()}
 
     _result = dict(_extenv)
     _result.update(**_curenv)

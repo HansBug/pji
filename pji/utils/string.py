@@ -3,8 +3,10 @@ from textwrap import shorten as _shorten
 from typing import Optional, Mapping
 
 
-def env_template(template: str, environ: Optional[Mapping[str, str]] = None) -> str:
-    return Template(template).substitute(**(environ or {}))
+def env_template(template: str, environ: Optional[Mapping[str, str]] = None, safe: bool = False) -> str:
+    _template = Template(template)
+    _func = _template.safe_substitute if safe else _template.substitute
+    return _func(**(environ or {}))
 
 
 def truncate(text: str, width: int = 70, tail_length: int = 0, show_length: bool = False):

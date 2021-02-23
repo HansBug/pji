@@ -131,15 +131,14 @@ class CommandTemplate(_ICommandBase):
     @classmethod
     def loads(cls, data) -> 'CommandTemplate':
         """
-
         load command template from data
         :param data: raw data
         :return: command template object
         """
-        if isinstance(data, CommandTemplate):
+        if isinstance(data, cls):
             return data
         elif isinstance(data, dict):
-            return CommandTemplate(**data)
+            return cls(**data)
         else:
             raise TypeError('Json or {type} expected but {actual} found.'.format(
-                type=CommandTemplate.__name__, actual=repr(type(data).__name__)))
+                type=cls.__name__, actual=repr(type(data).__name__)))
