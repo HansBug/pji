@@ -54,8 +54,12 @@ class FileInputCollectionTemplate(_IFileInputCollection):
         """
         if isinstance(data, cls):
             return data
+        elif isinstance(data, FileInputTemplate):
+            return cls(data)
         elif isinstance(data, (list, tuple)):
             return cls(*data)
+        elif isinstance(data, dict):
+            return cls(load_input_template(data))
         else:
             raise TypeError('Array or {type} expected but {actual} found.'.format(
                 type=cls.__name__, actual=repr(type(data).__name__)))

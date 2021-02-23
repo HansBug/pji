@@ -120,8 +120,11 @@ class TestServiceCommandCollection:
             CommandTemplate(args='echo 2334 1>&2 ', stdout='stdout_2_${T}.txt', stderr='stderr_2_${T}.txt'),
             CommandTemplate(args='false'),
         ]).commands) == 3
+        assert len(CommandCollectionTemplate.loads(
+            dict(args='echo 233', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt'),
+        ).commands) == 1
         with pytest.raises(TypeError):
-            CommandCollectionTemplate.loads({})
+            CommandCollectionTemplate.loads(123)
 
 
 if __name__ == "__main__":

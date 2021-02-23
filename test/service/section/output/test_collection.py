@@ -74,12 +74,18 @@ class TestServiceSectionOutputCollection:
         )
         assert FileOutputCollectionTemplate.loads(fct) == fct
 
+        assert len(FileOutputCollectionTemplate.loads(
+            CopyFileOutputTemplate(local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
+        ).outputs) == 1
         assert len(FileOutputCollectionTemplate.loads([
             CopyFileOutputTemplate(local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
             TagFileOutputTemplate(local='./${DIR}/r.md', tag='tag_${V}_x'),
         ]).outputs) == 2
+        assert len(FileOutputCollectionTemplate.loads(
+            dict(type='copy', local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
+        ).outputs) == 1
         with pytest.raises(TypeError):
-            FileOutputCollectionTemplate.loads({})
+            FileOutputCollectionTemplate.loads(123)
 
 
 if __name__ == "__main__":

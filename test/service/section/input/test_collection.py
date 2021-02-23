@@ -91,13 +91,19 @@ class TestServiceSectionInputCollection:
         )
         assert FileInputCollectionTemplate.loads(ict) == ict
 
+        assert len(FileInputCollectionTemplate.loads(
+            LinkFileInputTemplate(file='README.md', local='./${DIR}/rl.md'),
+        ).inputs) == 1
         assert len(FileInputCollectionTemplate.loads([
             CopyFileInputTemplate(file='README.md', local='./${DIR}/rc.md', privilege='r--'),
             TagFileInputTemplate(tag='tag_${V}_r', local='./${DIR}/rt.md', privilege='rw-'),
             LinkFileInputTemplate(file='README.md', local='./${DIR}/rl.md'),
         ]).inputs) == 3
+        assert len(FileInputCollectionTemplate.loads(
+            dict(type='link', file='README.md', local='./${DIR}/rl.md')
+        ).inputs) == 1
         with pytest.raises(TypeError):
-            FileInputCollectionTemplate.loads({})
+            FileInputCollectionTemplate.loads(123)
 
 
 if __name__ == "__main__":

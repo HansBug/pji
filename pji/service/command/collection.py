@@ -60,15 +60,17 @@ class CommandCollectionTemplate(_ICommandCollection):
         :param data: raw data
         :return: command collection template object
         """
-        if isinstance(data, CommandCollectionTemplate):
+        if isinstance(data, cls):
             return data
         elif isinstance(data, CommandTemplate):
-            return CommandCollectionTemplate(data)
+            return cls(data)
         elif isinstance(data, (list, tuple)):
-            return CommandCollectionTemplate(*data)
+            return cls(*data)
+        elif isinstance(data, dict):
+            return cls(CommandTemplate.loads(data))
         else:
             raise TypeError('List or {type} expected but {actual} found.'.format(
-                type=CommandCollectionTemplate.__name__, actual=repr(type(data).__name__)))
+                type=cls.__name__, actual=repr(type(data).__name__)))
 
 
 class CommandCollection(_ICommandCollection):
