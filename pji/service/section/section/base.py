@@ -62,8 +62,8 @@ class _ISection(metaclass=ABCMeta):
                  lambda: self.__inputs and len(self.__inputs.inputs) > 0),
                 ('outputs', lambda: repr(len(self.__outputs.outputs)),
                  lambda: self.__outputs and len(self.__outputs.outputs) > 0),
-                ('infos', lambda: repr(len(self.__infos.infos)),
-                 lambda: self.__infos and len(self.__infos.infos) > 0),
+                ('infos', lambda: repr(len(self.__infos.mapping)),
+                 lambda: self.__infos and len(self.__infos.mapping.keys()) > 0),
                 ('commands', lambda: repr(len(self.__commands.commands)),
                  lambda: self.__commands and len(self.__commands.commands) > 0),
             ]

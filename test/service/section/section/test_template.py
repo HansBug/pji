@@ -53,6 +53,10 @@ class TestServiceSectionSectionTemplate:
         assert isinstance(st.infos, SectionInfoMappingTemplate)
         assert len(st.infos.mapping.keys()) == 4
 
+        assert repr(st) == "<SectionTemplate name: 'name_${V}', identification: <Identification user: nobody, " \
+                           "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
+                           "inputs: 1, outputs: 4, infos: 4, commands: 4>"
+
 
 if __name__ == "__main__":
     pytest.main([os.path.abspath(__file__)])
