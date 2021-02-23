@@ -16,43 +16,46 @@ _DEFAULT_WORKDIR = '.'
 
 class Section(_ISection):
     def __init__(self, name: str,
-                 commands: Callable[..., CommandCollection],
+                 commands_getter: Callable[..., CommandCollection],
                  identification: Identification, resources: ResourceLimit, environ,
-                 inputs: Callable[..., FileInputCollection],
-                 outputs: Callable[..., FileOutputCollection],
-                 infos: Callable[..., SectionInfoMapping]):
+                 inputs_getter: Callable[..., FileInputCollection],
+                 outputs_getter: Callable[..., FileOutputCollection],
+                 infos_getter: Callable[..., SectionInfoMapping]):
         """
         :param name: name of section
-        :param commands: command collection
+        :param commands_getter: command collection getter
         :param identification: identification
         :param resources: resource limits
         :param environ: environment variables
-        :param inputs: input collection
-        :param outputs: output collection
-        :param infos: information collection
+        :param inputs_getter: input collection getter
+        :param outputs_getter: output collection getter
+        :param infos_getter: information collection getter
         """
         self.__name = name
-        self.__commands = commands
+        self.__commands_getter = commands_getter
 
         self.__identification = identification
         self.__resources = resources
         self.__environ = _process_environ(environ)
 
-        self.__inputs = inputs
-        self.__outputs = outputs
-        self.__infos = infos
+        self.__inputs_getter = inputs_getter
+        self.__outputs_getter = outputs_getter
+        self.__infos_getter = infos_getter
 
-        _ISection.__init__(self, self.__name, self.__identification, self.__resources, self.__environ,
-                           self.__inputs(workdir=_DEFAULT_WORKDIR), self.__outputs(workdir=_DEFAULT_WORKDIR),
-                           self.__infos(workdir=_DEFAULT_WORKDIR), self.__commands(workdir=_DEFAULT_WORKDIR))
+        _ISection.__init__(self, self.__name, self.__identification,
+                           self.__resources, self.__environ,
+                           self.__inputs_getter(workdir=_DEFAULT_WORKDIR),
+                           self.__outputs_getter(workdir=_DEFAULT_WORKDIR),
+                           self.__infos_getter(workdir=_DEFAULT_WORKDIR),
+                           self.__commands_getter(workdir=_DEFAULT_WORKDIR))
 
     @property
     def name(self) -> str:
         return self.__name
 
     @property
-    def commands(self) -> Callable[..., CommandCollection]:
-        return self.__commands
+    def commands_getter(self) -> Callable[..., CommandCollection]:
+        return self.__commands_getter
 
     @property
     def identification(self) -> Identification:
@@ -67,16 +70,16 @@ class Section(_ISection):
         return self.__environ
 
     @property
-    def inputs(self) -> Callable[..., FileInputCollection]:
-        return self.__inputs
+    def inputs_getter(self) -> Callable[..., FileInputCollection]:
+        return self.__inputs_getter
 
     @property
-    def outputs(self) -> Callable[..., FileOutputCollection]:
-        return self.__outputs
+    def outputs_getter(self) -> Callable[..., FileOutputCollection]:
+        return self.__outputs_getter
 
     @property
-    def infos(self) -> Callable[..., SectionInfoMapping]:
-        return self.__infos
+    def infos_getter(self) -> Callable[..., SectionInfoMapping]:
+        return self.__infos_getter
 
     def __call__(self) -> Tuple[bool, List[RunResult], Mapping[str, Any]]:
         """
@@ -88,10 +91,10 @@ class Section(_ISection):
             if self.__identification:
                 chown(workdir, user=self.__identification.user, group=self.__identification.group)
 
-            self.__inputs(workdir=workdir)()
-            _success, _results = self.__commands(workdir=workdir)()
+            self.__inputs_getter(workdir=workdir)()
+            _success, _results = self.__commands_getter(workdir=workdir)()
             if _success:
-                self.__outputs(workdir=workdir)()
-            _info = self.__infos(workdir=workdir)()
+                self.__outputs_getter(workdir=workdir)()
+            _info = self.__infos_getter(workdir=workdir)()
 
             return _success, _results, _info

@@ -101,10 +101,10 @@ class SectionTemplate(_ISection):
         return Section(
             name=_check_section_name(env_template(self.__name, environ)),
             identification=_identification, resources=_resources, environ=environ,
-            commands=partial(self.__commands, **arguments),
-            inputs=partial(self.__inputs, **arguments),
-            outputs=partial(self.__outputs, **arguments),
-            infos=partial(self.__infos, **arguments),
+            commands_getter=partial(self.__commands, **arguments),
+            inputs_getter=partial(self.__inputs, **arguments),
+            outputs_getter=partial(self.__outputs, **arguments),
+            infos_getter=partial(self.__infos, **arguments),
         )
 
     @classmethod
