@@ -30,6 +30,15 @@ class TestUtilsPath:
         assert not is_inner_relative_path('..')
         assert not is_inner_relative_path('../1/..')
 
+    def test_makedirs_without_privilege_and_user(self):
+        with tempfile.TemporaryDirectory() as td:
+            _target_dir = os.path.join(td, '1', '2', '..', '3', '4')
+            makedirs(_target_dir)
+
+            _target_dir = os.path.normpath(_target_dir)
+            assert os.path.exists(_target_dir)
+            assert os.path.isdir(_target_dir)
+
     def test_makedirs(self):
         with tempfile.TemporaryDirectory() as td:
             _target_dir = os.path.join(td, '1', '2', '..', '3', '4')
@@ -37,6 +46,7 @@ class TestUtilsPath:
 
             _target_dir = os.path.normpath(_target_dir)
             assert os.path.exists(_target_dir)
+            assert os.path.isdir(_target_dir)
             assert FileAuthority.load_from_file(_target_dir) == FileAuthority.loads('-wxr-xrw-')
             assert SystemUser.load_from_file(_target_dir) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_target_dir) == SystemGroup.loads('nogroup')

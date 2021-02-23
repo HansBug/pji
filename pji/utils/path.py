@@ -51,7 +51,6 @@ def makedirs(path: str, privilege=None, user=None, group=None):
     user = SystemUser.loads(user) if user else None
     group = SystemGroup.loads(group) if group else None
 
-    print(path)
     if not os.path.exists(path):
         _upper_path, _file = os.path.split(path)
         if _file:
@@ -60,8 +59,10 @@ def makedirs(path: str, privilege=None, user=None, group=None):
             raise FileNotFoundError('Base dir {dir} not found.'.format(dir=repr(_upper_path or _file)))
 
         os.makedirs(path, exist_ok=True)
-        chmod(path, privilege)
-        chown(path, user, group)
+        if privilege:
+            chmod(path, privilege)
+        if user or group:
+            chown(path, user, group)
     else:
         if not os.path.isdir(path):
             raise NotADirectoryError('File {file} is not a directory.'.format(file=repr(path)))

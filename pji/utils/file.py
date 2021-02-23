@@ -5,6 +5,10 @@ import tempfile
 from multiprocessing import Lock
 from typing import Mapping, Optional
 
+from pysystem import FileAuthority, SystemUser, SystemGroup, chown, chmod
+
+from .path import makedirs
+
 
 def _auto_delete(filename: str):
     if os.path.isdir(filename):
@@ -20,20 +24,29 @@ def _check_from_file(from_file: str):
         raise PermissionError('File {filename} unreadable.'.format(filename=repr(from_file)))
 
 
-def _prepare_for_to_file(to_file: str):
+def _prepare_for_to_file(to_file: str, privilege=None, user=None, group=None):
     if os.path.exists(to_file):
         _auto_delete(to_file)
     _parent_path, _ = os.path.split(to_file)
-    os.makedirs(_parent_path, exist_ok=True)
+    makedirs(_parent_path, privilege, user, group)
 
 
-def auto_copy_file(from_file: str, to_file: str):
+def auto_copy_file(from_file: str, to_file: str, privilege=None, user=None, group=None):
+    privilege = FileAuthority.loads(privilege) if privilege else None
+    user = SystemUser.loads(user) if user else None
+    group = SystemGroup.loads(group) if group else None
+
     _check_from_file(from_file)
-    _prepare_for_to_file(to_file)
+    _prepare_for_to_file(to_file, privilege, user, group)
     if os.path.isdir(from_file):
         shutil.copytree(from_file, to_file)
     else:
         shutil.copyfile(from_file, to_file, follow_symlinks=True)
+
+    if privilege:
+        chmod(to_file, privilege, recursive=True)
+    if user or group:
+        chown(to_file, user, group, recursive=True)
 
 
 def auto_link_file(from_file: str, to_file: str):
@@ -83,8 +96,8 @@ class FilePool:
         self.__file_dirs[tag].cleanup()
         del self.__file_dirs[tag]
 
-    def __export_tag_file(self, tag: str, filename: str):
-        auto_copy_file(self.__get_tag_file(tag), filename)
+    def __export_tag_file(self, tag: str, filename: str, privilege=None, user=None, group=None):
+        auto_copy_file(self.__get_tag_file(tag), filename, privilege, user, group)
 
     def __link_tag_file(self, tag: str, filename: str):
         auto_link_file(self.__get_tag_file(tag), filename)
@@ -127,9 +140,9 @@ class FilePool:
         with self.__lock:
             return tag in self.__file_dirs
 
-    def export(self, tag: str, filename: str):
+    def export(self, tag: str, filename: str, privilege=None, user=None, group=None):
         with self.__lock:
-            return self.__export_tag_file(tag, filename)
+            return self.__export_tag_file(tag, filename, privilege, user, group)
 
     def link(self, tag: str, filename: str):
         with self.__lock:

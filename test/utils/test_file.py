@@ -3,7 +3,7 @@ import tempfile
 import warnings
 
 import pytest
-from pysystem import chmod, SystemUser
+from pysystem import chmod, SystemUser, FileAuthority, SystemGroup
 
 from pji.utils.file import FilePool
 
@@ -157,6 +157,26 @@ class TestUtilsFile:
                 with open(os.path.join('pji', '__init__.py'), 'rb') as of, \
                         open(os.path.join(_target_dir, '__init__.py'), 'rb') as ef:
                     assert of.read() == ef.read()
+
+    def test_export_file_with_privilege_and_user(self):
+        with FilePool({'readme': 'README.md'}) as pool:
+            assert isinstance(pool, FilePool)
+            assert 'readme' in pool
+
+            _root_dir = os.path.normpath(os.path.join(pool['readme'], '..', '..'))
+            with tempfile.NamedTemporaryFile() as f:
+                pool.export('readme', f.name, '356', 'nobody', 'nogroup')
+                assert os.path.exists(f.name)
+                assert os.path.isfile(f.name)
+                with open(f.name, 'rb') as ef, \
+                        open('README.md', 'rb') as of:
+                    assert ef.read() == of.read()
+
+                assert FileAuthority.load_from_file(f.name) == FileAuthority.loads('-wxr-xrw-')
+                assert SystemUser.load_from_file(f.name) == SystemUser.loads('nobody')
+                assert SystemGroup.load_from_file(f.name) == SystemGroup.loads("nogroup")
+
+        assert not os.path.exists(_root_dir)
 
     def test_export_link_file(self):
         with FilePool({'readme': 'README.md'}) as pool:
