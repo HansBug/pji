@@ -124,5 +124,6 @@ class TagFileInput(FileInput, _ITagFileInput):
         """
         execute this file input
         """
-        self.__pool.export(self.__tag, self.__local)
+        self.__pool.export(self.__tag, self.__local, self.__privilege, self.__identification.user,
+                           self.__identification.group)
         _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)

@@ -4,7 +4,7 @@ from typing import Optional, Mapping
 
 from .base import FileInput, FileInputTemplate
 from ...base import _check_workdir_file, _check_os_path, _process_environ
-from ....utils import get_repr_info, env_template
+from ....utils import get_repr_info, env_template, makedirs
 
 
 class _ILinkFileInput(metaclass=ABCMeta):
@@ -93,5 +93,5 @@ class LinkFileInput(FileInput, _ILinkFileInput):
         execute this link event
         """
         _parent_path, _ = os.path.split(self.__local)
-        os.makedirs(_parent_path, exist_ok=True)
+        makedirs(_parent_path)
         os.symlink(self.__file, self.__local, target_is_directory=os.path.isdir(self.__file))

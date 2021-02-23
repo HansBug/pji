@@ -125,5 +125,6 @@ class CopyFileInput(FileInput, _ICopyFileInput):
         """
         execute this copy event
         """
-        auto_copy_file(self.__file, self.__local)
+        auto_copy_file(self.__file, self.__local, self.__privilege, self.__identification.user,
+                       self.__identification.group)
         _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)
