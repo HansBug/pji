@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from pysystem import FileAuthority
+from pysystem import FileAuthority, SystemUser, SystemGroup
 
 from pji.service.section.input.tag import TagFileInputTemplate
 from pji.utils import FilePool
@@ -89,6 +89,28 @@ class TestServiceSectionInputTag:
             _target_path = os.path.normpath(os.path.join(td, 'r.md'))
             assert os.path.exists(_target_path)
             assert FileAuthority.load_from_file(_target_path) == FileAuthority.loads('400')
+            with open('README.md', 'rb') as of, \
+                    open(_target_path, 'rb') as tf:
+                assert of.read() == tf.read()
+
+    def test_call_execute_with_identification(self):
+        tt = TagFileInputTemplate(
+            tag='tag_x',
+            local='./r.md',
+            privilege='r--',
+            identification='nobody',
+        )
+
+        with FilePool({'tag_x': 'README.md'}) as pool, \
+                tempfile.TemporaryDirectory() as td:
+            fi = tt(workdir=td, pool=pool)
+            fi()
+
+            _target_path = os.path.normpath(os.path.join(td, 'r.md'))
+            assert os.path.exists(_target_path)
+            assert FileAuthority.load_from_file(_target_path) == FileAuthority.loads('400')
+            assert SystemUser.load_from_file(_target_path) == SystemUser.loads('nobody')
+            assert SystemGroup.load_from_file(_target_path) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
                     open(_target_path, 'rb') as tf:
                 assert of.read() == tf.read()

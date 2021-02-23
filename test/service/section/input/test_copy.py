@@ -99,6 +99,26 @@ class TestServiceSectionInputCopy:
                     open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()
 
+    def test_copy_call_with_identification(self):
+        cf = CopyFileInputTemplate(
+            file='README.md',
+            local='./r.md',
+            privilege='r--',
+            identification='nobody',
+        )
+        with tempfile.TemporaryDirectory() as fd:
+            c = cf(os.curdir, fd)
+            c()
+
+            _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
+            assert os.path.exists(_target_file)
+            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
+            assert SystemUser.load_from_file(_target_file) == SystemUser.loads('nobody')
+            assert SystemGroup.load_from_file(_target_file) == SystemGroup.loads('nogroup')
+            with open('README.md', 'rb') as of, \
+                    open(_target_file, 'rb') as tf:
+                assert of.read() == tf.read()
+
     def test_copy_call_without_privilege(self):
         cf = CopyFileInputTemplate(
             file='README.md',
