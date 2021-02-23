@@ -43,8 +43,9 @@ class TestServiceCommandCollection:
 
     def test_collection_with_output(self):
         cct = CommandCollectionTemplate(
-            CommandTemplate(args='echo 233', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt'),
-            CommandTemplate(args='echo 2334 1>&2 ', stdout='stdout_2_${T}.txt', stderr='stderr_2_${T}.txt'),
+            CommandTemplate(args='echo 233 ${PJI_COMMAND}', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt'),
+            CommandTemplate(args='echo 2334 ${PJI_COMMAND} 1>&2 ', stdout='stdout_2_${T}.txt',
+                            stderr='stderr_2_${T}.txt'),
         )
 
         with tempfile.TemporaryDirectory() as wtd:
@@ -63,13 +64,13 @@ class TestServiceCommandCollection:
             assert _results[1].ok
 
             with open(os.path.join(wtd, 'stdout_1_233.txt'), 'r') as ff:
-                assert ff.read().rstrip() == '233'
+                assert ff.read().rstrip() == '233 0'
             with open(os.path.join(wtd, 'stderr_1_233.txt'), 'r') as ff:
                 assert ff.read().rstrip() == ''
             with open(os.path.join(wtd, 'stdout_2_233.txt'), 'r') as ff:
                 assert ff.read().rstrip() == ''
             with open(os.path.join(wtd, 'stderr_2_233.txt'), 'r') as ff:
-                assert ff.read().rstrip() == '2334'
+                assert ff.read().rstrip() == '2334 1'
 
     def test_collection_with_failure(self):
         cct = CommandCollectionTemplate(
