@@ -3,7 +3,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileOutputTemplate, FileOutput
-from ...base import _check_workdir_file
+from ...base import _check_workdir_file, _process_environ
 from ....utils import get_repr_info, auto_copy_file, env_template
 
 
@@ -68,8 +68,7 @@ class CopyFileOutputTemplate(FileOutputTemplate, _ICopyFileOutput):
         :param environ: environment variable
         :return: copy file output object
         """
-
-        environ = environ or {}
+        environ = _process_environ(environ)
         _local = os.path.normpath(
             os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__local, environ)))))
         _file = os.path.normpath(

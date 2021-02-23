@@ -4,7 +4,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import SectionInfoTemplate, SectionInfo
-from ...base import _check_workdir_file
+from ...base import _check_workdir_file, _process_environ
 from ....utils import get_repr_info, env_template
 
 
@@ -47,7 +47,7 @@ class LocalSectionInfoTemplate(SectionInfoTemplate, _ILocalSectionInfo):
         :param environ: environment variable
         :return: local info info object
         """
-        environ = environ or {}
+        environ = _process_environ(environ)
         _local = os.path.normpath(
             os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__file, environ)))))
 

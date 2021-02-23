@@ -3,7 +3,7 @@ from typing import Union, List, Optional
 
 from .base import _ICommandBase, CommandMode
 from .command import Command
-from ..base import _check_workdir_position
+from ..base import _check_workdir_position, _process_environ
 from ...control.model import ResourceLimit, Identification
 from ...utils import env_template
 
@@ -109,7 +109,7 @@ class CommandTemplate(_ICommandBase):
         :param environ: environment variables
         :return: command object
         """
-        environ = {key: str(value) for key, value in (environ or {}).items()}
+        environ = _process_environ(environ)
         _identification = Identification.loads(identification or {})
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources or {}), self.__resources)
         _workdir = os.path.normpath(

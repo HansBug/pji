@@ -5,7 +5,7 @@ from typing import Optional, Mapping
 from pysystem import FileAuthority
 
 from .base import FileInputTemplate, FileInput, _load_privilege, _apply_privilege_and_identification
-from ...base import _check_os_path, _check_workdir_file
+from ...base import _check_os_path, _check_workdir_file, _process_environ
 from ....control.model import Identification
 from ....utils import auto_copy_file, get_repr_info, env_template
 
@@ -72,7 +72,7 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
         :param environ: environment variable
         :return: copy file input object
         """
-        environ = environ or {}
+        environ = _process_environ(environ)
         _file = os.path.normpath(
             os.path.abspath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ)))))
         _local = os.path.normpath(

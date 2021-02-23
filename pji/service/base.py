@@ -1,4 +1,5 @@
 import os
+from typing import Mapping, Optional, Any
 
 from ..utils import is_inner_relative_path, FilePool
 
@@ -44,3 +45,12 @@ def _check_pool_tag(tag: str) -> str:
     """
     FilePool.check_tag_name(tag)
     return tag
+
+
+def _process_environ(environ: Optional[Mapping[str, Any]] = None) -> Mapping[str, str]:
+    """
+    process environment variables
+    :param environ: environment variables
+    :return: string environment variables
+    """
+    return {key: str(value) for key, value in (environ or {}).items()}

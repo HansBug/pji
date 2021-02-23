@@ -3,7 +3,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import FileInput, FileInputTemplate
-from ...base import _check_workdir_file, _check_os_path
+from ...base import _check_workdir_file, _check_os_path, _process_environ
 from ....utils import get_repr_info, env_template
 
 
@@ -58,7 +58,7 @@ class LinkFileInputTemplate(FileInputTemplate, _ILinkFileInput):
         :param environ: environment variable
         :return: link file input object
         """
-        environ = environ or {}
+        environ = _process_environ(environ)
         _file = os.path.normpath(
             os.path.abspath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ)))))
         _local = os.path.normpath(

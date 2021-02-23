@@ -5,7 +5,7 @@ from abc import ABCMeta
 from typing import Optional, Mapping
 
 from .base import SectionInfoTemplate, SectionInfo
-from ...base import _check_pool_tag, _check_workdir_file
+from ...base import _check_pool_tag, _check_workdir_file, _process_environ
 from ....utils import get_repr_info, FilePool, env_template
 
 
@@ -57,7 +57,7 @@ class TagSectionInfoTemplate(SectionInfoTemplate, _ITagSectionInfo):
         :param environ: environment variables
         :return: tag info info object
         """
-        environ = environ or {}
+        environ = _process_environ(environ)
         _tag = _check_pool_tag(env_template(self.__tag, environ))
         if self.__file is not None:
             _file = os.path.normpath(_check_workdir_file(env_template(self.__file, environ)))

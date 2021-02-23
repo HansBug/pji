@@ -1,6 +1,7 @@
 from typing import Optional, Mapping
 
 from .base import SectionInfoTemplate, SectionInfo
+from ...base import _process_environ
 from ....utils import get_repr_info, env_template
 
 
@@ -41,7 +42,7 @@ class StaticSectionInfoTemplate(SectionInfoTemplate, _IStaticSectionInfo):
         :param environ: environment variables
         :return: static info info object
         """
-        environ = environ or {}
+        environ = _process_environ(environ)
         if isinstance(self.__value, str):
             _value = env_template(self.__value, environ)
         else:
