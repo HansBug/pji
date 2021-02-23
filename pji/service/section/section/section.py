@@ -87,7 +87,7 @@ class Section(_ISection):
         :return: success or not, result list, information
         """
         with tempfile.TemporaryDirectory() as workdir:
-            chmod(workdir, 'r--------')
+            chmod(workdir, 'r-x------')
             if self.__identification:
                 chown(workdir, user=self.__identification.user, group=self.__identification.group)
 

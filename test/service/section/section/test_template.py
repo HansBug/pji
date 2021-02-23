@@ -3,59 +3,39 @@ import os
 import pytest
 
 from pji.control.model import Identification, ResourceLimit
-from pji.service.command import CommandTemplate, CommandCollectionTemplate
-from pji.service.section import SectionTemplate, CopyFileInputTemplate, CopyFileOutputTemplate, TagFileOutputTemplate, \
-    StaticSectionInfoTemplate, LocalSectionInfoTemplate, FileInputCollectionTemplate, FileOutputCollectionTemplate, \
-    SectionInfoMappingTemplate
+from pji.service.command import CommandCollectionTemplate
+from pji.service.section import FileInputCollectionTemplate, FileOutputCollectionTemplate, \
+    SectionInfoMappingTemplate, SectionTemplate
+from .base import _SECTION_TEMPLATE
 
 
 @pytest.mark.unittest
 class TestServiceSectionSectionTemplate:
-    def test_simple(self):
-        st = SectionTemplate(
-            name='name_${V}',
-            commands=[
-                CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
-                CommandTemplate(args='echo 2334 ${V} 1>&2', stdout='stdout_2_${V}.txt', stderr='stderr_2_${V}.txt'),
-                CommandTemplate(args='cat ${V}/r.md', stdout='stdout_3_${V}.txt', stderr='stderr_3_${V}.txt'),
-                CommandTemplate(args='base64 ${V}/r.md 1>&2', stdout='stdout_4_${V}.txt', stderr='stderr_4_${V}.txt'),
-            ],
-            identification='nobody',
-            resources=dict(max_real_time='2.0s'),
-            environ=dict(V='233'),
-            inputs=[
-                CopyFileInputTemplate(file='README.md', local='${V}/r.md', privilege='r--')
-            ],
-            outputs=[
-                CopyFileOutputTemplate(local='stdout_1_${V}.txt', file='f1.txt'),
-                CopyFileOutputTemplate(local='stderr_2_${V}.txt', file='f2.txt'),
-                TagFileOutputTemplate(local='stdout_3_${V}.txt', tag='t_1_${V}'),
-                TagFileOutputTemplate(local='stderr_4_${V}.txt', tag='t_2_${V}'),
-            ],
-            infos={
-                'static': StaticSectionInfoTemplate('this is v : ${V}'),
-                'value': StaticSectionInfoTemplate(233),
-                'local': LocalSectionInfoTemplate('stdout_1_${V}.txt'),
-                'tag': LocalSectionInfoTemplate('t_1_${V}'),
-            }
-        )
+    __DEMO_TEMPLATE = _SECTION_TEMPLATE
 
-        assert st.name == 'name_${V}'
-        assert st.identification == Identification.loads('nobody')
-        assert st.resources == ResourceLimit.loads({'max_real_time': '2.0s'})
-        assert st.environ == {'V': '233'}
-        assert isinstance(st.commands, CommandCollectionTemplate)
-        assert len(st.commands.commands) == 4
-        assert isinstance(st.inputs, FileInputCollectionTemplate)
-        assert len(st.inputs.items) == 1
-        assert isinstance(st.outputs, FileOutputCollectionTemplate)
-        assert len(st.outputs.items) == 4
-        assert isinstance(st.infos, SectionInfoMappingTemplate)
-        assert len(st.infos.items.keys()) == 4
+    def test_template_simple(self):
+        assert self.__DEMO_TEMPLATE.name == 'name_${V}'
+        assert self.__DEMO_TEMPLATE.identification == Identification.loads('nobody')
+        assert self.__DEMO_TEMPLATE.resources == ResourceLimit.loads({'max_real_time': '2.0s'})
+        assert self.__DEMO_TEMPLATE.environ == {'V': '233'}
+        assert isinstance(self.__DEMO_TEMPLATE.commands, CommandCollectionTemplate)
+        assert len(self.__DEMO_TEMPLATE.commands.commands) == 4
+        assert isinstance(self.__DEMO_TEMPLATE.inputs, FileInputCollectionTemplate)
+        assert len(self.__DEMO_TEMPLATE.inputs.items) == 1
+        assert isinstance(self.__DEMO_TEMPLATE.outputs, FileOutputCollectionTemplate)
+        assert len(self.__DEMO_TEMPLATE.outputs.items) == 4
+        assert isinstance(self.__DEMO_TEMPLATE.infos, SectionInfoMappingTemplate)
+        assert len(self.__DEMO_TEMPLATE.infos.items.keys()) == 5
 
-        assert repr(st) == "<SectionTemplate name: 'name_${V}', identification: <Identification user: nobody, " \
-                           "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
-                           "inputs: 1, outputs: 4, infos: 4, commands: 4>"
+        assert repr(self.__DEMO_TEMPLATE) == "<SectionTemplate name: 'name_${V}', " \
+                                             "identification: <Identification user: nobody, " \
+                                             "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
+                                             "inputs: 1, outputs: 4, infos: 5, commands: 4>"
+
+    def test_loads(self):
+        assert SectionTemplate.loads(_SECTION_TEMPLATE) == _SECTION_TEMPLATE
+        with pytest.raises(TypeError):
+            SectionTemplate.loads([])
 
 
 if __name__ == "__main__":

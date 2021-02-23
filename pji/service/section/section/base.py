@@ -4,7 +4,7 @@ from abc import ABCMeta
 from ....control.model import Identification, ResourceLimit
 from ....utils import get_repr_info, truncate
 
-_SECTION_NAME_PATTERN = re.compile('[a-zA-Z_][0-9a-zA-Z_]?')
+_SECTION_NAME_PATTERN = re.compile('[a-zA-Z_][0-9a-zA-Z_]*')
 
 
 def _check_section_name(name: str) -> str:
