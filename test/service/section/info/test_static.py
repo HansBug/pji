@@ -31,13 +31,13 @@ class TestServiceSectionInfoStatic:
         st = StaticSectionInfoTemplate(value='sdfglsdfkj${NO}')
 
         t = st(environ=dict(NO='233'))
-        assert t() == 'sdfglsdfkj233'
+        assert t() == (True, 'sdfglsdfkj233')
 
     def test_call_execute_with_non_string(self):
         st = StaticSectionInfoTemplate(value=2147483647)
 
         t = st(environ=dict(NO='233'))
-        assert t() == 2147483647
+        assert t() == (True, 2147483647)
 
 
 if __name__ == "__main__":

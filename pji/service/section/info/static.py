@@ -1,4 +1,4 @@
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Tuple, Any
 
 from .base import SectionInfoTemplate, SectionInfo
 from ...base import _process_environ
@@ -63,8 +63,8 @@ class StaticSectionInfo(SectionInfo, _IStaticSectionInfo):
     def value(self):
         return self.__value
 
-    def __call__(self):
+    def __call__(self) -> Tuple[bool, Any]:
         """
         execute this info info
         """
-        return self.__value
+        return True, self.__value

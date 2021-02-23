@@ -1,7 +1,7 @@
 import codecs
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Tuple
 
 from .base import SectionInfoTemplate, SectionInfo
 from ...base import _check_workdir_file, _process_environ
@@ -67,11 +67,18 @@ class LocalSectionInfo(SectionInfo, _ILocalSectionInfo):
     def file(self) -> str:
         return self.__file
 
-    def __call__(self) -> str:
+    def __call__(self) -> Tuple[bool, Optional[str]]:
         """
         execute this info info
         """
-        if os.path.isdir(self.__file):
-            raise IsADirectoryError('Path {path} is directory.'.format(path=repr(self.__file)))
-        with codecs.open(self.__file, 'r') as file:
-            return file.read()
+
+        def _result_func():
+            if os.path.isdir(self.__file):
+                raise IsADirectoryError('Path {path} is directory.'.format(path=repr(self.__file)))
+            with codecs.open(self.__file, 'r') as file:
+                return file.read()
+
+        try:
+            return True, _result_func()
+        except (FileNotFoundError, IsADirectoryError, PermissionError):
+            return False, None

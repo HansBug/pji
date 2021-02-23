@@ -41,7 +41,7 @@ class TestServiceSectionInfoLocal:
 
             t = tl(workdir=wtd, environ=dict(DIR='.'))
             with open('README.md', 'r') as of:
-                assert t() == of.read()
+                assert t() == (True, of.read())
 
     def test_call_execute_invalid(self):
         tl = LocalSectionInfoTemplate(file='./${DIR}/r.md')
@@ -50,8 +50,7 @@ class TestServiceSectionInfoLocal:
             shutil.copyfile('README.md', os.path.join(wtd, '1/2/3/r.md/', 'r.md'))
 
             t = tl(workdir=wtd, environ=dict(DIR='1/2/3'))
-            with pytest.raises(IsADirectoryError):
-                t()
+            assert t() == (False, None)
 
 
 if __name__ == "__main__":

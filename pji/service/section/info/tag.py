@@ -2,7 +2,7 @@ import codecs
 import os
 import warnings
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Tuple
 
 from .base import SectionInfoTemplate, SectionInfo
 from ...base import _check_pool_tag, _check_workdir_file, _process_environ
@@ -88,22 +88,29 @@ class TagSectionInfo(SectionInfo, _ITagSectionInfo):
     def file(self) -> str:
         return self.__file
 
-    def __call__(self):
+    def __call__(self) -> Tuple[bool, Optional[str]]:
         """
         execute this info info
         """
-        _tagged_file = self.__pool[self.__tag]
-        if os.path.isdir(_tagged_file):
-            if self.__file is None:
-                raise RuntimeError('Tag {tag} represent a dir but file is empty.'.format(tag=repr(self.__tag)))
-            else:
-                _output_file = os.path.join(_tagged_file, self.__file)
-        else:
-            if self.__file is not None:
-                warnings.warn(RuntimeWarning(
-                    'Tag {tag} represent a file, {file} data item will be ignored.'.format(tag=repr(self.__tag),
-                                                                                           file=repr('file'))))
-            _output_file = _tagged_file
 
-        with codecs.open(_output_file, 'r') as f:
-            return f.read()
+        def _result_func():
+            _tagged_file = self.__pool[self.__tag]
+            if os.path.isdir(_tagged_file):
+                if self.__file is None:
+                    raise RuntimeError('Tag {tag} represent a dir but file is empty.'.format(tag=repr(self.__tag)))
+                else:
+                    _output_file = os.path.join(_tagged_file, self.__file)
+            else:
+                if self.__file is not None:
+                    warnings.warn(RuntimeWarning(
+                        'Tag {tag} represent a file, {file} data item will be ignored.'.format(tag=repr(self.__tag),
+                                                                                               file=repr('file'))))
+                _output_file = _tagged_file
+
+            with codecs.open(_output_file, 'r') as f:
+                return f.read()
+
+        try:
+            return True, _result_func()
+        except (KeyError, RuntimeError):
+            return False, None

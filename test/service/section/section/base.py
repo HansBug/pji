@@ -54,7 +54,9 @@ _SECTION_FAILED_TEMPLATE = SectionTemplate(
     infos={
         'static': StaticSectionInfoTemplate('this is v : ${V}'),
         'value': StaticSectionInfoTemplate(233),
-        'tag_1': LocalSectionInfoTemplate('stdout_1_${V}.txt'),
-        'tag_2': LocalSectionInfoTemplate('stderr_2_${V}.txt'),
+        'local_1': LocalSectionInfoTemplate('stdout_1_${V}.txt'),
+        'local_2': LocalSectionInfoTemplate('stderr_2_${V}.txt'),
+        'tag_1': TagSectionInfoTemplate('t_1_${V}'),
+        'tag_2': TagSectionInfoTemplate('t_2_${V}'),
     }
 )

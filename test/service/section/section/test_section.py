@@ -96,7 +96,10 @@ class TestServiceSectionSectionSection:
             assert _results[0].ok
             assert _results[1].ok
             assert not _results[2].ok
-            assert _infos == {'static': 'this is v : 233', 'value': 233, 'tag_1': '233 233\n', 'tag_2': 'xxx 233\n'}
+            assert _infos == {
+                'static': 'this is v : 233', 'value': 233,
+                'local_1': '233 233\n', 'local_2': 'xxx 233\n'
+            }
 
 
 if __name__ == "__main__":

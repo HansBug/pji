@@ -87,4 +87,5 @@ class SectionInfoMapping(_ISectionInfoMapping):
         """
         execute this info info
         """
-        return {key: info() for key, info in self.__items.items()}
+        _ret = {key: info() for key, info in self.__items.items()}
+        return {key: _data for key, (_ok, _data) in _ret.items() if _ok}

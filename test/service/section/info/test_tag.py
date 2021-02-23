@@ -71,7 +71,7 @@ class TestServiceSectionInfoTag:
             t = tt(pool=pool, environ=dict(NOX='233'))
 
             with open('README.md', 'r') as of:
-                assert t() == of.read()
+                assert t() == (True, of.read())
 
     def test_call_execute_with_file(self):
         tt = TagSectionInfoTemplate(
@@ -83,7 +83,7 @@ class TestServiceSectionInfoTag:
             t = tt(pool=pool, environ=dict(NOX='233', NOD='eadme'))
             with pytest.warns(RuntimeWarning):
                 with open('README.md', 'r') as of:
-                    assert t() == of.read()
+                    assert t() == (True, of.read())
 
     def test_call_execute_from_dir(self):
         tt = TagSectionInfoTemplate(
@@ -95,7 +95,7 @@ class TestServiceSectionInfoTag:
             t = tt(pool=pool, environ=dict(NOX='233', NOD='EADME'))
 
             with open('README.md', 'r') as of:
-                assert t() == of.read()
+                assert t() == (True, of.read())
 
     def test_call_execute_from_dir_without_file(self):
         tt = TagSectionInfoTemplate(
@@ -104,9 +104,7 @@ class TestServiceSectionInfoTag:
 
         with FilePool({'tag_233_x': os.curdir}) as pool:
             t = tt(pool=pool, environ=dict(NOX='233', NOD='EADME'))
-
-            with pytest.raises(RuntimeError):
-                t()
+            assert t() == (False, None)
 
 
 if __name__ == "__main__":
