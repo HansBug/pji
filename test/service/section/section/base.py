@@ -2,6 +2,7 @@ from pji.service.command import CommandTemplate
 from pji.service.section import SectionTemplate, CopyFileInputTemplate, CopyFileOutputTemplate, TagFileOutputTemplate, \
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate
 
+# noinspection DuplicatedCode
 _SECTION_TEMPLATE = SectionTemplate(
     name='name_${V}',
     commands=[
@@ -28,5 +29,32 @@ _SECTION_TEMPLATE = SectionTemplate(
         'local': LocalSectionInfoTemplate('stdout_3_${V}.txt'),
         'tag': TagSectionInfoTemplate('t_1_${V}'),
         'base64': LocalSectionInfoTemplate('stderr_4_${V}.txt'),
+    }
+)
+
+_SECTION_FAILED_TEMPLATE = SectionTemplate(
+    name='name_${V}',
+    commands=[
+        CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
+        CommandTemplate(args='echo ${ENV} ${V} 1>&2', stdout='stdout_2_${V}.txt', stderr='stderr_2_${V}.txt'),
+        CommandTemplate(args='false'),
+    ],
+    identification='nobody',
+    resources=dict(max_real_time='2.0s'),
+    environ=dict(V='233'),
+    inputs=[
+        CopyFileInputTemplate(file='README.md', local='${V}/r.md', privilege='r-x')
+    ],
+    outputs=[
+        CopyFileOutputTemplate(local='stdout_1_${V}.txt', file='f1.txt'),
+        CopyFileOutputTemplate(local='stderr_2_${V}.txt', file='f2.txt'),
+        TagFileOutputTemplate(local='stdout_1_${V}.txt', tag='t_1_${V}'),
+        TagFileOutputTemplate(local='stderr_2_${V}.txt', tag='t_2_${V}'),
+    ],
+    infos={
+        'static': StaticSectionInfoTemplate('this is v : ${V}'),
+        'value': StaticSectionInfoTemplate(233),
+        'tag_1': LocalSectionInfoTemplate('stdout_1_${V}.txt'),
+        'tag_2': LocalSectionInfoTemplate('stderr_2_${V}.txt'),
     }
 )
