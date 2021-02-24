@@ -38,7 +38,7 @@ _SECTION_1_TEMPLATE = SectionTemplate(
 )
 
 _SECTION_2_TEMPLATE = SectionTemplate(
-    name='name_2_${V}',
+    name='name_2_${VT}',
     commands=[
         CommandTemplate(args='whoami', stdout='stdout_5_${VT}.txt', stderr='stderr_5_${VT}.txt'),
         CommandTemplate(args='base64 stdout_3_${V}.txt', stdout='stdout_6_${VT}.txt', stderr='stderr_6_${VT}.txt'),
@@ -67,8 +67,37 @@ _SECTION_2_TEMPLATE = SectionTemplate(
     }
 )
 
-_SECTION_FAILED_TEMPLATE = SectionTemplate(
+_SECTION_FAILED_1_TEMPLATE = SectionTemplate(
     name='name_${V}',
+    commands=[
+        CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
+        CommandTemplate(args='echo ${ENV} ${V} 1>&2', stdout='stdout_2_${V}.txt', stderr='stderr_2_${V}.txt'),
+        CommandTemplate(args='false'),
+    ],
+    identification='nobody',
+    resources=dict(max_real_time='2.0s'),
+    environ=dict(V='233'),
+    inputs=[
+        CopyFileInputTemplate(file='README.md', local='${V}/r.md', privilege='r-x')
+    ],
+    outputs=[
+        CopyFileOutputTemplate(local='stdout_1_${V}.txt', file='f1.txt'),
+        CopyFileOutputTemplate(local='stderr_2_${V}.txt', file='f2.txt'),
+        TagFileOutputTemplate(local='stdout_1_${V}.txt', tag='t_1_${V}'),
+        TagFileOutputTemplate(local='stderr_2_${V}.txt', tag='t_2_${V}'),
+    ],
+    infos={
+        'static': StaticSectionInfoTemplate('this is v : ${V}'),
+        'value': StaticSectionInfoTemplate(233),
+        'local_1': LocalSectionInfoTemplate('stdout_1_${V}.txt'),
+        'local_2': LocalSectionInfoTemplate('stderr_2_${V}.txt'),
+        'tag_1': TagSectionInfoTemplate('t_1_${V}'),
+        'tag_2': TagSectionInfoTemplate('t_2_${V}'),
+    }
+)
+
+_SECTION_FAILED_2_TEMPLATE = SectionTemplate(
+    name='name_f2_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
         CommandTemplate(args='echo ${ENV} ${V} 1>&2', stdout='stdout_2_${V}.txt', stderr='stderr_2_${V}.txt'),

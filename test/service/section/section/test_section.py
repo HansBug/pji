@@ -6,7 +6,7 @@ import pytest
 
 from pji.control.model import Identification, ResourceLimit
 from pji.utils import FilePool
-from .base import _SECTION_1_TEMPLATE, _SECTION_FAILED_TEMPLATE, _COMPLEX_TEXT
+from .base import _SECTION_1_TEMPLATE, _SECTION_FAILED_1_TEMPLATE, _COMPLEX_TEXT, _SECTION_2_TEMPLATE
 
 
 @pytest.mark.unittest
@@ -47,6 +47,14 @@ class TestServiceSectionSectionSection:
                     identification='nobody',
                     resources=dict(max_real_time='2.0s'),
                     environ=dict(ENV='xxx'),
+                )
+            with pytest.raises(ValueError):
+                _SECTION_2_TEMPLATE(
+                    scriptdir=scriptdir,
+                    pool=pool,
+                    identification='nobody',
+                    resources=dict(max_real_time='2.0s'),
+                    environ=dict(ENV='xxx', VF='???'),
                 )
 
     def test_section_call(self):
@@ -98,7 +106,7 @@ class TestServiceSectionSectionSection:
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(_COMPLEX_TEXT)
-            s = _SECTION_FAILED_TEMPLATE(
+            s = _SECTION_FAILED_1_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',
