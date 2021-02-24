@@ -16,7 +16,7 @@ def _check_section_name(name: str) -> str:
     if _SECTION_NAME_PATTERN.fullmatch(name):
         return name
     else:
-        raise ValueError('Name should match {pattern} but {actual} found.'.format(
+        raise ValueError('Section name should match {pattern} but {actual} found.'.format(
             pattern=repr(_SECTION_NAME_PATTERN.pattern),
             actual=repr(name),
         ))
