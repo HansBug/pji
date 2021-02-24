@@ -54,6 +54,6 @@ class _ITask(metaclass=ABCMeta):
                 ('resources', lambda: truncate(repr(self.__resources), width=64, show_length=True, tail_length=16),
                  lambda: self.__resources != ResourceLimit.loads({})),
                 ('sections', lambda: truncate(repr(self.__sections), width=64, show_length=True, tail_length=16),
-                 lambda: self.__sections and len(self.__sections) > 0),
+                 lambda: self.__sections),
             ]
         )

@@ -17,6 +17,9 @@ class TestServiceTaskTemplate:
         assert tt.resources == ResourceLimit.loads(dict(max_real_time='1.5s'))
         assert tt.environ == dict(NAME='x${K}x')
         assert len(tt.sections.items) == 1
+        assert repr(tt) == "<TaskTemplate name: 'task_${NAME}', identification: <Identification user: nobody, " \
+                           "group: nogroup>, resources: <ResourceLimit real time: 1.500s>, " \
+                           "sections: <SectionCollectionTemplate sections: ('name_${V}',)>>"
 
     def test_loads(self):
         assert TaskTemplate.loads(TASK_TEMPLATE_SUCCESS_1) == TASK_TEMPLATE_SUCCESS_1
