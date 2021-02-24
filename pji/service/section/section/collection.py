@@ -13,7 +13,7 @@ class _ISectionCollection(metaclass=ABCMeta):
         """
         :param sections: list of sections
         """
-        self.__section_getters = sections
+        self.__sections = sections
 
     def __repr__(self):
         """
@@ -22,7 +22,7 @@ class _ISectionCollection(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('sections', lambda: len(self.__section_getters)),
+                ('sections', lambda: repr(tuple(section.name for section in self.__sections))),
             ]
         )
 
@@ -59,13 +59,15 @@ class SectionCollectionTemplate(_ISectionCollection):
         if 'pool' in kwargs.keys():
             raise KeyError('Pool is not allowed to pass into section collection template.')
 
-        return SectionCollection(*[partial(
+        _section_getters = [partial(
             item,
             scriptdir=scriptdir,
             identification=identification,
             resources=resources,
             environ=environ,
-        ) for item in self.__sections])
+        ) for item in self.__sections]
+
+        return SectionCollection(*_section_getters)
 
     @classmethod
     def loads(cls, data) -> 'SectionCollectionTemplate':

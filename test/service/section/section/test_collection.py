@@ -23,7 +23,7 @@ class TestServiceSectionSectionCollection:
         assert sct.sections[1].name == 'name_2_${VT}'
         assert list(sct)[0].name == 'name_${V}'
         assert list(sct)[1].name == 'name_2_${VT}'
-        assert repr(sct) == "<SectionCollectionTemplate sections: 2>"
+        assert repr(sct) == "<SectionCollectionTemplate sections: ('name_${V}', 'name_2_${VT}')>"
 
     def test_template_call(self):
         sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
@@ -41,7 +41,7 @@ class TestServiceSectionSectionCollection:
             assert isinstance(sc, SectionCollection)
             assert len(sc.section_getters) == 2
             assert len(list(sc)) == 2
-            assert repr(sc) == '<SectionCollection sections: 2>'
+            assert repr(sc) == "<SectionCollection sections: ('name_233', 'name_2_123233')>"
 
     def test_template_call_invalid(self):
         sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
