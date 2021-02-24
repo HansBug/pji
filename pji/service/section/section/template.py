@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Mapping
+from typing import Mapping, Optional
 
 from .base import _ISection, _check_section_name
 from .section import Section
@@ -72,10 +72,12 @@ class SectionTemplate(_ISection):
     def infos(self) -> SectionInfoMappingTemplate:
         return self.__infos
 
-    def __call__(self, scriptdir: str, pool: FilePool,
+    def __call__(self, scriptdir: str, pool: Optional[FilePool] = None,
                  identification=None, resources=None, environ=None, **kwargs) -> Section:
         """
         generate section object
+        :param scriptdir: script directory
+        :param pool: file pool
         :param identification: identification
         :param resources: resource limits
         :param environ: environment variables
