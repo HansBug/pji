@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from typing import List, Tuple
 
-from .base import ENV_PJI_COMMAND
+from .base import ENV_PJI_COMMAND_INDEX
 from .command import Command
 from .template import CommandTemplate
 from ..base import _process_environ
@@ -55,7 +55,7 @@ class CommandCollectionTemplate(_ICommandCollection):
 
         def _env_with_id(index_):
             _env = dict(environ)
-            _env[ENV_PJI_COMMAND] = str(index_)
+            _env[ENV_PJI_COMMAND_INDEX] = str(index_)
             return _env
 
         return CommandCollection(*[item(

@@ -39,7 +39,7 @@ class CommandMode(IntEnum):
             ))
 
 
-ENV_PJI_COMMAND = 'PJI_COMMAND'
+ENV_PJI_COMMAND_INDEX = 'PJI_COMMAND_INDEX'
 
 
 class _ICommandBase:
