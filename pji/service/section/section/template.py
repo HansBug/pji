@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Mapping, Optional
 
-from .base import _ISection, _check_section_name
+from .base import _ISection, _check_section_name, ENV_PJI_SECTION_NAME
 from .section import Section
 from ..info import SectionInfoMappingTemplate
 from ..input import FileInputCollectionTemplate
@@ -87,7 +87,9 @@ class SectionTemplate(_ISection):
         if 'workdir' in kwargs.keys():
             raise KeyError('Workdir is not allowed to pass into section template.')
 
-        environ = _process_environ(self.__environ, environ, enable_ext=True)
+        environ = dict(_process_environ(self.__environ, environ, enable_ext=True))
+        _name = _check_section_name(env_template(self.__name, environ))
+        environ[ENV_PJI_SECTION_NAME] = _name
         _identification = Identification.merge(Identification.loads(identification), self.__identification)
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources), self.__resources)
 
@@ -101,7 +103,7 @@ class SectionTemplate(_ISection):
         )
 
         return Section(
-            name=_check_section_name(env_template(self.__name, environ)),
+            name=_name,
             identification=_identification, resources=_resources, environ=environ,
             commands_getter=partial(self.__commands, **arguments),
             inputs_getter=partial(self.__inputs, **arguments),

@@ -22,6 +22,9 @@ def _check_section_name(name: str) -> str:
         ))
 
 
+ENV_PJI_SECTION_NAME = 'PJI_SECTION_NAME'
+
+
 class _ISection(metaclass=ABCMeta):
     def __init__(self, name: str, identification, resources, environ,
                  inputs, outputs, infos, commands):

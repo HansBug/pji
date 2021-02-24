@@ -27,7 +27,7 @@ class TestServiceSectionSectionSection:
             assert s.name == 'name_233'
             assert s.identification == Identification.loads('nobody')
             assert s.resources == ResourceLimit.loads({'max_real_time': '2.0s'})
-            assert s.environ == {'V': '233', 'ENV': 'xxx'}
+            assert s.environ == {'V': '233', 'ENV': 'xxx', 'PJI_SECTION_NAME': 'name_233'}
             assert repr(s.commands_getter(workdir='.')) == "<CommandCollection commands: 4>"
             assert repr(s.infos_getter(workdir='.')) == "<SectionInfoMapping keys: " \
                                                         "('base64', 'local', 'static', 'tag', 'value')>"
