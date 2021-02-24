@@ -19,9 +19,9 @@ class TestServiceSectionSectionCollection:
     def test_template_simple(self):
         sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
 
-        assert len(sct.sections) == 2
-        assert sct.sections[0].name == 'name_${V}'
-        assert sct.sections[1].name == 'name_2_${VT}'
+        assert len(sct.items) == 2
+        assert sct.items[0].name == 'name_${V}'
+        assert sct.items[1].name == 'name_2_${VT}'
         assert list(sct)[0].name == 'name_${V}'
         assert list(sct)[1].name == 'name_2_${VT}'
         assert repr(sct) == "<SectionCollectionTemplate sections: ('name_${V}', 'name_2_${VT}')>"
@@ -40,7 +40,7 @@ class TestServiceSectionSectionCollection:
             )
 
             assert isinstance(sc, SectionCollection)
-            assert len(sc.section_getters) == 2
+            assert len(sc.getters) == 2
             assert len(list(sc)) == 2
             assert repr(sc) == "<SectionCollection sections: ('name_233', 'name_2_123233')>"
 
@@ -87,7 +87,7 @@ class TestServiceSectionSectionCollection:
 
         sctx = SectionCollectionTemplate.loads(_SECTION_1_TEMPLATE)
         assert isinstance(sctx, SectionCollectionTemplate)
-        assert len(sctx.sections) == 1
+        assert len(sctx.items) == 1
 
         sctx = SectionCollectionTemplate.loads(dict(
             name='name_${V}',
@@ -118,7 +118,7 @@ class TestServiceSectionSectionCollection:
             }
         ))
         assert isinstance(sctx, SectionCollectionTemplate)
-        assert len(sctx.sections) == 1
+        assert len(sctx.items) == 1
 
         sctx = SectionCollectionTemplate.loads([dict(
             name='name_${V}',
@@ -149,7 +149,7 @@ class TestServiceSectionSectionCollection:
             }
         )])
         assert isinstance(sctx, SectionCollectionTemplate)
-        assert len(sctx.sections) == 1
+        assert len(sctx.items) == 1
 
         with pytest.raises(TypeError):
             SectionCollectionTemplate.loads(123)

@@ -9,11 +9,11 @@ from ....utils import get_repr_info, FilePool, duplicates
 
 
 class _ISectionCollection(metaclass=ABCMeta):
-    def __init__(self, sections):
+    def __init__(self, items):
         """
-        :param sections: list of sections
+        :param items: list of sections
         """
-        self.__sections = sections
+        self.__items = items
 
     def __repr__(self):
         """
@@ -22,7 +22,7 @@ class _ISectionCollection(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('sections', lambda: repr(tuple(section.name for section in self.__sections))),
+                ('sections', lambda: repr(tuple(section.name for section in self.__items))),
             ]
         )
 
@@ -31,19 +31,19 @@ _SECTION_GETTER = Callable[..., Section]
 
 
 class SectionCollectionTemplate(_ISectionCollection):
-    def __init__(self, *sections):
+    def __init__(self, *items):
         """
-        :param sections: section templates
+        :param items: section templates
         """
-        self.__sections = [SectionTemplate.loads(item) for item in sections]
-        _ISectionCollection.__init__(self, self.__sections)
+        self.__items = [SectionTemplate.loads(item) for item in items]
+        _ISectionCollection.__init__(self, self.__items)
 
     @property
-    def sections(self) -> List[SectionTemplate]:
-        return list(self.__sections)
+    def items(self) -> List[SectionTemplate]:
+        return list(self.__items)
 
     def __iter__(self):
-        return self.sections.__iter__()
+        return self.items.__iter__()
 
     def __call__(self, scriptdir: str, identification=None, resources=None, environ=None,
                  **kwargs) -> 'SectionCollection':
@@ -65,7 +65,7 @@ class SectionCollectionTemplate(_ISectionCollection):
             identification=identification,
             resources=resources,
             environ=environ,
-        ) for item in self.__sections]
+        ) for item in self.__items]
 
         _duplicated_names = duplicates([_getter().name for _getter in _section_getters])
         if _duplicated_names:
@@ -94,19 +94,19 @@ class SectionCollectionTemplate(_ISectionCollection):
 
 
 class SectionCollection(_ISectionCollection):
-    def __init__(self, *sections_getter: _SECTION_GETTER):
+    def __init__(self, *getters: _SECTION_GETTER):
         """
-        :param sections_getter: functions to get section
+        :param getters: functions to get section
         """
-        self.__section_getters = list(sections_getter)
-        _ISectionCollection.__init__(self, [item() for item in self.__section_getters])
+        self.__getters = list(getters)
+        _ISectionCollection.__init__(self, [item() for item in self.__getters])
 
     @property
-    def section_getters(self) -> List[_SECTION_GETTER]:
-        return list(self.__section_getters)
+    def getters(self) -> List[_SECTION_GETTER]:
+        return list(self.__getters)
 
     def __iter__(self):
-        return self.section_getters.__iter__()
+        return self.getters.__iter__()
 
     def __call__(self) -> Tuple[bool, List[Tuple[str, Tuple[bool, List[RunResult], Mapping[str, str]]]]]:
         """
@@ -116,7 +116,7 @@ class SectionCollection(_ISectionCollection):
         with FilePool() as pool:
             _success = True
             _results = []
-            for section_getter in self.__section_getters:
+            for section_getter in self.__getters:
                 section = section_getter(pool=pool)
                 _section_success, _section_results, _section_info = section()
                 _results.append((section.name, (_section_success, _section_results, _section_info)))
