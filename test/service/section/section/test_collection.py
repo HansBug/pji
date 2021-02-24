@@ -9,7 +9,8 @@ from pji.service.section import CopyFileInputTemplate, CopyFileOutputTemplate, T
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, SectionCollectionTemplate, \
     SectionCollection
 from pji.utils import FilePool
-from .base import _SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _COMPLEX_TEXT, _SECTION_FAILED_2_TEMPLATE
+from .base import _SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _COMPLEX_TEXT, _SECTION_FAILED_2_TEMPLATE, \
+    _SECTION_FAILED_1_TEMPLATE
 
 
 # noinspection DuplicatedCode
@@ -65,6 +66,19 @@ class TestServiceSectionSectionCollection:
                     identification='nobody',
                     resources=dict(max_real_time='1.8s'),
                     environ=dict(ENV='xxx', V='123'),
+                )
+
+    def test_template_call_duplicate_names(self):
+        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _SECTION_FAILED_1_TEMPLATE)
+        with tempfile.TemporaryDirectory() as scriptdir:
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(_COMPLEX_TEXT)
+            with pytest.raises(KeyError):
+                sct(
+                    scriptdir=scriptdir,
+                    identification='nobody',
+                    resources=dict(max_real_time='1.8s'),
+                    environ=dict(ENV='xxx', VF='123'),
                 )
 
     def test_template_loads(self):

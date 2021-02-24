@@ -5,7 +5,7 @@ from typing import Tuple, List, Mapping, Callable
 from .section import Section
 from .template import SectionTemplate
 from ....control.model import RunResult
-from ....utils import get_repr_info, FilePool
+from ....utils import get_repr_info, FilePool, duplicates
 
 
 class _ISectionCollection(metaclass=ABCMeta):
@@ -66,6 +66,10 @@ class SectionCollectionTemplate(_ISectionCollection):
             resources=resources,
             environ=environ,
         ) for item in self.__sections]
+
+        _duplicated_names = duplicates([_getter().name for _getter in _section_getters])
+        if _duplicated_names:
+            raise KeyError('Duplicate names - {names}.'.format(names=repr(tuple(_duplicated_names))))
 
         return SectionCollection(*_section_getters)
 
