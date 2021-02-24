@@ -11,6 +11,13 @@ from ...utils import env_template
 
 class TaskTemplate(_ITask):
     def __init__(self, name: str, identification=None, resources=None, environ=None, sections=None):
+        """
+        :param name: name of task
+        :param identification: identification
+        :param resources: resource limit
+        :param environ: environment variables
+        :param sections: section templates
+        """
         self.__name = name
         self.__identification = Identification.loads(identification)
         self.__resources = ResourceLimit.loads(resources)
@@ -40,6 +47,15 @@ class TaskTemplate(_ITask):
         return self.__sections
 
     def __call__(self, scriptdir: str, identification=None, resources=None, environ=None, **kwargs) -> 'Task':
+        """
+        generate task object
+        :param scriptdir: script directory
+        :param identification: identification
+        :param resources: resource limit
+        :param environ: environment variables
+        :param kwargs: other arguments
+        :return: task object
+        """
         environ = dict(_process_environ(self.__environ, environ, enable_ext=True))
         _name = _check_task_name(env_template(self.__name, environ))
         environ[ENV_PJI_TASK_NAME] = _name
@@ -60,6 +76,11 @@ class TaskTemplate(_ITask):
 
     @classmethod
     def loads(cls, data) -> 'TaskTemplate':
+        """
+        load task template object from raw data
+        :param data: raw data
+        :return: task template object
+        """
         if isinstance(data, cls):
             return data
         elif isinstance(data, dict):

@@ -27,6 +27,13 @@ ENV_PJI_TASK_NAME = 'PJI_TASK_NAME'
 
 class _ITask(metaclass=ABCMeta):
     def __init__(self, name: str, identification=None, resources=None, environ=None, sections=None):
+        """
+        :param name: name of task
+        :param identification: identification
+        :param resources: resource limit
+        :param environ: environment variables
+        :param sections: sections
+        """
         self.__name = name
         self.__identification = identification
         self.__resources = resources
@@ -34,6 +41,9 @@ class _ITask(metaclass=ABCMeta):
         self.__sections = sections
 
     def __repr__(self):
+        """
+        :return: representation string
+        """
         return get_repr_info(
             cls=self.__class__,
             args=[
