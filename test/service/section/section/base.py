@@ -2,6 +2,11 @@ from pji.service.command import CommandTemplate
 from pji.service.section import SectionTemplate, CopyFileInputTemplate, CopyFileOutputTemplate, TagFileOutputTemplate, \
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate
 
+_COMPLEX_TEXT = """I have a dream that one day, down in Alabama, with its vicious racists, 
+with its governor having his lips dripping with the words of "interposition" and "nullification"
+ -- one day right there in Alabama little black boys and black girls will be able to join 
+ hands with little white boys and white girls as sisters and brothers."""
+
 # noinspection DuplicatedCode
 _SECTION_TEMPLATE = SectionTemplate(
     name='name_${V}',

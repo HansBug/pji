@@ -1,13 +1,12 @@
 import codecs
 import os
-import shutil
 import tempfile
 
 import pytest
 
 from pji.control.model import Identification, ResourceLimit
 from pji.utils import FilePool
-from .base import _SECTION_TEMPLATE, _SECTION_FAILED_TEMPLATE
+from .base import _SECTION_TEMPLATE, _SECTION_FAILED_TEMPLATE, _COMPLEX_TEXT
 
 
 @pytest.mark.unittest
@@ -15,7 +14,8 @@ class TestServiceSectionSectionSection:
     def test_section_simple(self):
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
-            shutil.copyfile('README.md', os.path.join(scriptdir, 'README.md'))
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(_COMPLEX_TEXT)
             s = _SECTION_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
@@ -37,7 +37,8 @@ class TestServiceSectionSectionSection:
     def test_section_invalid(self):
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
-            shutil.copyfile('README.md', os.path.join(scriptdir, 'README.md'))
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(_COMPLEX_TEXT)
             with pytest.raises(KeyError):
                 _SECTION_TEMPLATE(
                     workdir=os.curdir,
@@ -51,7 +52,8 @@ class TestServiceSectionSectionSection:
     def test_section_call(self):
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
-            shutil.copyfile('README.md', os.path.join(scriptdir, 'README.md'))
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(_COMPLEX_TEXT)
             s = _SECTION_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
@@ -68,10 +70,23 @@ class TestServiceSectionSectionSection:
             assert _results[2].ok
             assert _results[3].ok
             assert _infos == {'static': 'this is v : 233', 'value': 233,
-                              'local': '# pji\n\nAn easy-to-use python interaction for judgement.',
-                              'tag': '# pji\n\nAn easy-to-use python interaction for judgement.',
-                              'base64': 'IyBwamkKCkFuIGVhc3ktdG8tdXNlIHB5dGhvbiBpbn'
-                                        'RlcmFjdGlvbiBmb3IganVkZ2VtZW50Lg==\n'}
+                              'local': 'I have a dream that one day, down in Alabama, with its vicious racists, \n'
+                                       'with its governor having his lips dripping with the words of "interposition"'
+                                       ' and "nullification"\n -- one day right there in Alabama little black boys'
+                                       ' and black girls will be able to join \n hands with little white boys and'
+                                       ' white girls as sisters and brothers.',
+                              'tag': 'I have a dream that one day, down in Alabama, with its vicious racists,'
+                                     ' \nwith its governor having his lips dripping with the words of "interposition"'
+                                     ' and "nullification"\n -- one day right there in Alabama little black boys and'
+                                     ' black girls will be able to join \n hands with little white boys and white'
+                                     ' girls as sisters and brothers.',
+                              'base64': 'SSBoYXZlIGEgZHJlYW0gdGhhdCBvbmUgZGF5LCBkb3duIGluIEFsYWJhbWEsIHdpdGggaXR'
+                                        'zIHZp\nY2lvdXMgcmFjaXN0cywgCndpdGggaXRzIGdvdmVybm9yIGhhdmluZyBoaXMgbGlw'
+                                        'cyBkcmlwcGlu\nZyB3aXRoIHRoZSB3b3JkcyBvZiAiaW50ZXJwb3NpdGlvbiIgYW5kICJud'
+                                        'WxsaWZpY2F0aW9uIgog\nLS0gb25lIGRheSByaWdodCB0aGVyZSBpbiBBbGFiYW1hIGxpdH'
+                                        'RsZSBibGFjayBib3lzIGFuZCBi\nbGFjayBnaXJscyB3aWxsIGJlIGFibGUgdG8gam9pbiA'
+                                        'KIGhhbmRzIHdpdGggbGl0dGxlIHdoaXRl\nIGJveXMgYW5kIHdoaXRlIGdpcmxzIGFzIHNp'
+                                        'c3RlcnMgYW5kIGJyb3RoZXJzLg==\n'}
 
             with codecs.open(os.path.join(scriptdir, 'f1.txt'), 'r') as tf:
                 assert tf.read().rstrip() == '233 233'
@@ -81,7 +96,8 @@ class TestServiceSectionSectionSection:
     def test_section_fail(self):
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
-            shutil.copyfile('README.md', os.path.join(scriptdir, 'README.md'))
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(_COMPLEX_TEXT)
             s = _SECTION_FAILED_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
