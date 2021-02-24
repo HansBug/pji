@@ -6,7 +6,7 @@ import pytest
 
 from pji.control.model import Identification, ResourceLimit
 from pji.utils import FilePool
-from .base import _SECTION_1_TEMPLATE, _SECTION_FAILED_1_TEMPLATE, _COMPLEX_TEXT, _SECTION_2_TEMPLATE
+from .base import SECTION_1_TEMPLATE, SECTION_FAILED_1_TEMPLATE, COMPLEX_TEXT, SECTION_2_TEMPLATE
 
 
 @pytest.mark.unittest
@@ -15,8 +15,8 @@ class TestServiceSectionSectionSection:
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
-            s = _SECTION_1_TEMPLATE(
+                of.write(COMPLEX_TEXT)
+            s = SECTION_1_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',
@@ -38,9 +38,9 @@ class TestServiceSectionSectionSection:
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
             with pytest.raises(KeyError):
-                _SECTION_1_TEMPLATE(
+                SECTION_1_TEMPLATE(
                     workdir=os.curdir,
                     scriptdir=scriptdir,
                     pool=pool,
@@ -49,7 +49,7 @@ class TestServiceSectionSectionSection:
                     environ=dict(ENV='xxx'),
                 )
             with pytest.raises(ValueError):
-                _SECTION_2_TEMPLATE(
+                SECTION_2_TEMPLATE(
                     scriptdir=scriptdir,
                     pool=pool,
                     identification='nobody',
@@ -61,8 +61,8 @@ class TestServiceSectionSectionSection:
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
-            s = _SECTION_1_TEMPLATE(
+                of.write(COMPLEX_TEXT)
+            s = SECTION_1_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',
@@ -105,8 +105,8 @@ class TestServiceSectionSectionSection:
         with tempfile.TemporaryDirectory() as scriptdir, \
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
-            s = _SECTION_FAILED_1_TEMPLATE(
+                of.write(COMPLEX_TEXT)
+            s = SECTION_FAILED_1_TEMPLATE(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',

@@ -2,13 +2,13 @@ from pji.service.command import CommandTemplate
 from pji.service.section import SectionTemplate, CopyFileInputTemplate, CopyFileOutputTemplate, TagFileOutputTemplate, \
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, TagFileInputTemplate
 
-_COMPLEX_TEXT = """I have a dream that one day, down in Alabama, with its vicious racists, 
+COMPLEX_TEXT = """I have a dream that one day, down in Alabama, with its vicious racists, 
 with its governor having his lips dripping with the words of "interposition" and "nullification"
  -- one day right there in Alabama little black boys and black girls will be able to join 
  hands with little white boys and white girls as sisters and brothers."""
 
 # noinspection DuplicatedCode
-_SECTION_1_TEMPLATE = SectionTemplate(
+SECTION_1_TEMPLATE = SectionTemplate(
     name='name_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
@@ -37,7 +37,7 @@ _SECTION_1_TEMPLATE = SectionTemplate(
     }
 )
 
-_SECTION_2_TEMPLATE = SectionTemplate(
+SECTION_2_TEMPLATE = SectionTemplate(
     name='name_2_${VT}',
     commands=[
         CommandTemplate(args='whoami', stdout='stdout_5_${VT}.txt', stderr='stderr_5_${VT}.txt'),
@@ -67,7 +67,7 @@ _SECTION_2_TEMPLATE = SectionTemplate(
     }
 )
 
-_SECTION_FAILED_1_TEMPLATE = SectionTemplate(
+SECTION_FAILED_1_TEMPLATE = SectionTemplate(
     name='name_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
@@ -96,7 +96,7 @@ _SECTION_FAILED_1_TEMPLATE = SectionTemplate(
     }
 )
 
-_SECTION_FAILED_2_TEMPLATE = SectionTemplate(
+SECTION_FAILED_2_TEMPLATE = SectionTemplate(
     name='name_f2_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),

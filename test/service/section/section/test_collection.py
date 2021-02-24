@@ -9,15 +9,15 @@ from pji.service.section import CopyFileInputTemplate, CopyFileOutputTemplate, T
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, SectionCollectionTemplate, \
     SectionCollection
 from pji.utils import FilePool
-from .base import _SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _COMPLEX_TEXT, _SECTION_FAILED_2_TEMPLATE, \
-    _SECTION_FAILED_1_TEMPLATE
+from .base import SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, COMPLEX_TEXT, SECTION_FAILED_2_TEMPLATE, \
+    SECTION_FAILED_1_TEMPLATE
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestServiceSectionSectionCollection:
     def test_template_simple(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
 
         assert len(sct.items) == 2
         assert sct.items[0].name == 'name_${V}'
@@ -27,11 +27,11 @@ class TestServiceSectionSectionCollection:
         assert repr(sct) == "<SectionCollectionTemplate sections: ('name_${V}', 'name_2_${VT}')>"
 
     def test_template_call(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
             sc = sct(
                 scriptdir=scriptdir,
                 identification='nobody',
@@ -45,11 +45,11 @@ class TestServiceSectionSectionCollection:
             assert repr(sc) == "<SectionCollection sections: ('name_233', 'name_2_123233')>"
 
     def test_template_call_invalid(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
 
             with pytest.raises(KeyError):
                 with FilePool() as pool:
@@ -69,10 +69,10 @@ class TestServiceSectionSectionCollection:
                 )
 
     def test_template_call_duplicate_names(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _SECTION_FAILED_1_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, SECTION_FAILED_1_TEMPLATE)
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
             with pytest.raises(KeyError):
                 sct(
                     scriptdir=scriptdir,
@@ -82,10 +82,10 @@ class TestServiceSectionSectionCollection:
                 )
 
     def test_template_loads(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
         assert SectionCollectionTemplate.loads(sct) is sct
 
-        sctx = SectionCollectionTemplate.loads(_SECTION_1_TEMPLATE)
+        sctx = SectionCollectionTemplate.loads(SECTION_1_TEMPLATE)
         assert isinstance(sctx, SectionCollectionTemplate)
         assert len(sctx.items) == 1
 
@@ -155,11 +155,11 @@ class TestServiceSectionSectionCollection:
             SectionCollectionTemplate.loads(123)
 
     def test_collection_call(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
             sc = sct(
                 scriptdir=scriptdir,
                 identification='nobody',
@@ -241,11 +241,11 @@ class TestServiceSectionSectionCollection:
                                                  'lhKekxnPT0K\n'}
 
     def test_collection_call_fail(self):
-        sct = SectionCollectionTemplate(_SECTION_1_TEMPLATE, _SECTION_2_TEMPLATE, _SECTION_FAILED_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, SECTION_FAILED_2_TEMPLATE)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(_COMPLEX_TEXT)
+                of.write(COMPLEX_TEXT)
             sc = sct(
                 scriptdir=scriptdir,
                 identification='nobody',
