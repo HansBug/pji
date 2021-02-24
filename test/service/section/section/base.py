@@ -1,6 +1,6 @@
 from pji.service.command import CommandTemplate
 from pji.service.section import SectionTemplate, CopyFileInputTemplate, CopyFileOutputTemplate, TagFileOutputTemplate, \
-    StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate
+    StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, TagFileInputTemplate
 
 _COMPLEX_TEXT = """I have a dream that one day, down in Alabama, with its vicious racists, 
 with its governor having his lips dripping with the words of "interposition" and "nullification"
@@ -8,7 +8,7 @@ with its governor having his lips dripping with the words of "interposition" and
  hands with little white boys and white girls as sisters and brothers."""
 
 # noinspection DuplicatedCode
-_SECTION_TEMPLATE = SectionTemplate(
+_SECTION_1_TEMPLATE = SectionTemplate(
     name='name_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
@@ -34,6 +34,36 @@ _SECTION_TEMPLATE = SectionTemplate(
         'local': LocalSectionInfoTemplate('stdout_3_${V}.txt'),
         'tag': TagSectionInfoTemplate('t_1_${V}'),
         'base64': LocalSectionInfoTemplate('stderr_4_${V}.txt'),
+    }
+)
+
+_SECTION_2_TEMPLATE = SectionTemplate(
+    name='name_2_${V}',
+    commands=[
+        CommandTemplate(args='whoami', stdout='stdout_5_${VT}.txt', stderr='stderr_5_${VT}.txt'),
+        CommandTemplate(args='base64 stdout_3_${V}.txt', stdout='stdout_6_${VT}.txt', stderr='stderr_6_${VT}.txt'),
+        CommandTemplate(args='base64 stdout_4_${V}.txt 1>&2', stdout='stdout_7_${VT}.txt', stderr='stderr_7_${VT}.txt'),
+    ],
+    identification='sys',
+    resources=dict(max_real_time='2.0s'),
+    environ=dict(V='233', VT='${VF}233'),
+    inputs=[
+        CopyFileInputTemplate(file='README.md', local='${V}/r.md', privilege='r-x'),
+        TagFileInputTemplate(tag='t_1_${V}', local='stdout_3_${V}.txt', privilege='r--'),
+        TagFileInputTemplate(tag='t_2_${V}', local='stdout_4_${V}.txt', privilege='r--'),
+    ],
+    outputs=[
+        TagFileOutputTemplate(local='stdout_5_${VT}.txt', tag='t_3_${VT}'),
+        TagFileOutputTemplate(local='stdout_6_${VT}.txt', tag='t_4_${VT}'),
+        TagFileOutputTemplate(local='stderr_7_${VT}.txt', tag='t_5_${VT}'),
+    ],
+    infos={
+        'static': StaticSectionInfoTemplate('this is vt : ${VT}'),
+        'tag_1': TagSectionInfoTemplate('t_1_${V}'),
+        'tag_2': TagSectionInfoTemplate('t_2_${V}'),
+        'tag_3t': TagSectionInfoTemplate('t_3_${VT}'),
+        'tag_4t': TagSectionInfoTemplate('t_4_${VT}'),
+        'tag_5t': TagSectionInfoTemplate('t_5_${VT}'),
     }
 )
 

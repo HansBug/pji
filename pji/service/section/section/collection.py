@@ -42,6 +42,9 @@ class SectionCollectionTemplate(_ISectionCollection):
     def sections(self) -> List[SectionTemplate]:
         return list(self.__sections)
 
+    def __iter__(self):
+        return self.sections.__iter__()
+
     def __call__(self, scriptdir: str, identification=None, resources=None, environ=None,
                  **kwargs) -> 'SectionCollection':
         """
@@ -95,6 +98,9 @@ class SectionCollection(_ISectionCollection):
     @property
     def section_getters(self) -> List[_SECTION_GETTER]:
         return list(self.__section_getters)
+
+    def __iter__(self):
+        return self.section_getters.__iter__()
 
     def __call__(self) -> Tuple[bool, List[Tuple[str, Tuple[bool, List[RunResult], Mapping[str, str]]]]]:
         """

@@ -8,33 +8,33 @@ from pji.service.section import CopyFileInputTemplate, CopyFileOutputTemplate, T
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, FileInputCollectionTemplate, \
     FileOutputCollectionTemplate, \
     SectionInfoMappingTemplate, SectionTemplate
-from .base import _SECTION_TEMPLATE
+from .base import _SECTION_1_TEMPLATE
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestServiceSectionSectionTemplate:
     def test_template_simple(self):
-        assert _SECTION_TEMPLATE.name == 'name_${V}'
-        assert _SECTION_TEMPLATE.identification == Identification.loads('nobody')
-        assert _SECTION_TEMPLATE.resources == ResourceLimit.loads({'max_real_time': '2.0s'})
-        assert _SECTION_TEMPLATE.environ == {'V': '233'}
-        assert isinstance(_SECTION_TEMPLATE.commands, CommandCollectionTemplate)
-        assert len(_SECTION_TEMPLATE.commands.commands) == 4
-        assert isinstance(_SECTION_TEMPLATE.inputs, FileInputCollectionTemplate)
-        assert len(_SECTION_TEMPLATE.inputs.items) == 1
-        assert isinstance(_SECTION_TEMPLATE.outputs, FileOutputCollectionTemplate)
-        assert len(_SECTION_TEMPLATE.outputs.items) == 4
-        assert isinstance(_SECTION_TEMPLATE.infos, SectionInfoMappingTemplate)
-        assert len(_SECTION_TEMPLATE.infos.items.keys()) == 5
+        assert _SECTION_1_TEMPLATE.name == 'name_${V}'
+        assert _SECTION_1_TEMPLATE.identification == Identification.loads('nobody')
+        assert _SECTION_1_TEMPLATE.resources == ResourceLimit.loads({'max_real_time': '2.0s'})
+        assert _SECTION_1_TEMPLATE.environ == {'V': '233'}
+        assert isinstance(_SECTION_1_TEMPLATE.commands, CommandCollectionTemplate)
+        assert len(_SECTION_1_TEMPLATE.commands.commands) == 4
+        assert isinstance(_SECTION_1_TEMPLATE.inputs, FileInputCollectionTemplate)
+        assert len(_SECTION_1_TEMPLATE.inputs.items) == 1
+        assert isinstance(_SECTION_1_TEMPLATE.outputs, FileOutputCollectionTemplate)
+        assert len(_SECTION_1_TEMPLATE.outputs.items) == 4
+        assert isinstance(_SECTION_1_TEMPLATE.infos, SectionInfoMappingTemplate)
+        assert len(_SECTION_1_TEMPLATE.infos.items.keys()) == 5
 
-        assert repr(_SECTION_TEMPLATE) == "<SectionTemplate name: 'name_${V}', " \
-                                          "identification: <Identification user: nobody, " \
-                                          "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
-                                          "inputs: 1, outputs: 4, infos: 5, commands: 4>"
+        assert repr(_SECTION_1_TEMPLATE) == "<SectionTemplate name: 'name_${V}', " \
+                                            "identification: <Identification user: nobody, " \
+                                            "group: nogroup>, resources: <ResourceLimit real time: 2.000s>, " \
+                                            "inputs: 1, outputs: 4, infos: 5, commands: 4>"
 
     def test_loads(self):
-        assert SectionTemplate.loads(_SECTION_TEMPLATE) == _SECTION_TEMPLATE
+        assert SectionTemplate.loads(_SECTION_1_TEMPLATE) == _SECTION_1_TEMPLATE
 
         c = SectionTemplate.loads(dict(
             name='name_${V}',
