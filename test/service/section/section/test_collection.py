@@ -9,15 +9,15 @@ from pji.service.section import CopyFileInputTemplate, CopyFileOutputTemplate, T
     StaticSectionInfoTemplate, LocalSectionInfoTemplate, TagSectionInfoTemplate, SectionCollectionTemplate, \
     SectionCollection
 from pji.utils import FilePool
-from .base import SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, COMPLEX_TEXT, SECTION_FAILED_2_TEMPLATE, \
-    SECTION_FAILED_1_TEMPLATE
+from .base import SECTION_TEMPLATE_1, SECTION_TEMPLATE_2, COMPLEX_TEXT, SECTION_TEMPLATE_FAILED_2, \
+    SECTION_TEMPLATE_FAILED_1
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestServiceSectionSectionCollection:
     def test_template_simple(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2)
 
         assert len(sct.items) == 2
         assert sct.items[0].name == 'name_${V}'
@@ -27,7 +27,7 @@ class TestServiceSectionSectionCollection:
         assert repr(sct) == "<SectionCollectionTemplate sections: ('name_${V}', 'name_2_${VT}')>"
 
     def test_template_call(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
@@ -45,7 +45,7 @@ class TestServiceSectionSectionCollection:
             assert repr(sc) == "<SectionCollection sections: ('name_233', 'name_2_123233')>"
 
     def test_template_call_invalid(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
@@ -69,7 +69,7 @@ class TestServiceSectionSectionCollection:
                 )
 
     def test_template_call_duplicate_names(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, SECTION_FAILED_1_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2, SECTION_TEMPLATE_FAILED_1)
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(COMPLEX_TEXT)
@@ -82,10 +82,10 @@ class TestServiceSectionSectionCollection:
                 )
 
     def test_template_loads(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2)
         assert SectionCollectionTemplate.loads(sct) is sct
 
-        sctx = SectionCollectionTemplate.loads(SECTION_1_TEMPLATE)
+        sctx = SectionCollectionTemplate.loads(SECTION_TEMPLATE_1)
         assert isinstance(sctx, SectionCollectionTemplate)
         assert len(sctx.items) == 1
 
@@ -155,7 +155,7 @@ class TestServiceSectionSectionCollection:
             SectionCollectionTemplate.loads(123)
 
     def test_collection_call(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
@@ -241,7 +241,7 @@ class TestServiceSectionSectionCollection:
                                                  'lhKekxnPT0K\n'}
 
     def test_collection_call_fail(self):
-        sct = SectionCollectionTemplate(SECTION_1_TEMPLATE, SECTION_2_TEMPLATE, SECTION_FAILED_2_TEMPLATE)
+        sct = SectionCollectionTemplate(SECTION_TEMPLATE_1, SECTION_TEMPLATE_2, SECTION_TEMPLATE_FAILED_2)
 
         with tempfile.TemporaryDirectory() as scriptdir:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:

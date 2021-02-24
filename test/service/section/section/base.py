@@ -8,7 +8,7 @@ with its governor having his lips dripping with the words of "interposition" and
  hands with little white boys and white girls as sisters and brothers."""
 
 # noinspection DuplicatedCode
-SECTION_1_TEMPLATE = SectionTemplate(
+SECTION_TEMPLATE_1 = SectionTemplate(
     name='name_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
@@ -37,7 +37,7 @@ SECTION_1_TEMPLATE = SectionTemplate(
     }
 )
 
-SECTION_2_TEMPLATE = SectionTemplate(
+SECTION_TEMPLATE_2 = SectionTemplate(
     name='name_2_${VT}',
     commands=[
         CommandTemplate(args='whoami', stdout='stdout_5_${VT}.txt', stderr='stderr_5_${VT}.txt'),
@@ -67,7 +67,7 @@ SECTION_2_TEMPLATE = SectionTemplate(
     }
 )
 
-SECTION_FAILED_1_TEMPLATE = SectionTemplate(
+SECTION_TEMPLATE_FAILED_1 = SectionTemplate(
     name='name_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),
@@ -96,7 +96,7 @@ SECTION_FAILED_1_TEMPLATE = SectionTemplate(
     }
 )
 
-SECTION_FAILED_2_TEMPLATE = SectionTemplate(
+SECTION_TEMPLATE_FAILED_2 = SectionTemplate(
     name='name_f2_${V}',
     commands=[
         CommandTemplate(args='echo 233 ${V}', stdout='stdout_1_${V}.txt', stderr='stderr_1_${V}.txt'),

@@ -6,7 +6,7 @@ import pytest
 
 from pji.control.model import Identification, ResourceLimit
 from pji.utils import FilePool
-from .base import SECTION_1_TEMPLATE, SECTION_FAILED_1_TEMPLATE, COMPLEX_TEXT, SECTION_2_TEMPLATE
+from .base import SECTION_TEMPLATE_1, SECTION_TEMPLATE_FAILED_1, COMPLEX_TEXT, SECTION_TEMPLATE_2
 
 
 @pytest.mark.unittest
@@ -16,7 +16,7 @@ class TestServiceSectionSectionSection:
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(COMPLEX_TEXT)
-            s = SECTION_1_TEMPLATE(
+            s = SECTION_TEMPLATE_1(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',
@@ -40,7 +40,7 @@ class TestServiceSectionSectionSection:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(COMPLEX_TEXT)
             with pytest.raises(KeyError):
-                SECTION_1_TEMPLATE(
+                SECTION_TEMPLATE_1(
                     workdir=os.curdir,
                     scriptdir=scriptdir,
                     pool=pool,
@@ -49,7 +49,7 @@ class TestServiceSectionSectionSection:
                     environ=dict(ENV='xxx'),
                 )
             with pytest.raises(ValueError):
-                SECTION_2_TEMPLATE(
+                SECTION_TEMPLATE_2(
                     scriptdir=scriptdir,
                     pool=pool,
                     identification='nobody',
@@ -62,7 +62,7 @@ class TestServiceSectionSectionSection:
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(COMPLEX_TEXT)
-            s = SECTION_1_TEMPLATE(
+            s = SECTION_TEMPLATE_1(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',
@@ -106,7 +106,7 @@ class TestServiceSectionSectionSection:
                 FilePool() as pool:
             with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
                 of.write(COMPLEX_TEXT)
-            s = SECTION_FAILED_1_TEMPLATE(
+            s = SECTION_TEMPLATE_FAILED_1(
                 scriptdir=scriptdir,
                 pool=pool,
                 identification='nobody',

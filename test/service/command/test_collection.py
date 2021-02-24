@@ -43,7 +43,8 @@ class TestServiceCommandCollection:
 
     def test_collection_with_output(self):
         cct = CommandCollectionTemplate(
-            CommandTemplate(args='echo 233 ${PJI_COMMAND_INDEX}', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt'),
+            CommandTemplate(args='echo 233 ${PJI_COMMAND_INDEX}', stdout='stdout_1_${T}.txt',
+                            stderr='stderr_1_${T}.txt'),
             CommandTemplate(args='echo 2334 ${PJI_COMMAND_INDEX} 1>&2 ', stdout='stdout_2_${T}.txt',
                             stderr='stderr_2_${T}.txt'),
         )

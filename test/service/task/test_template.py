@@ -4,7 +4,7 @@ import pytest
 
 from pji.control.model import Identification, ResourceLimit
 from pji.service.task import TaskTemplate
-from .base import TASK_TEMPLATE_SUCCESS_1, SECTION_1_TEMPLATE
+from .base import TASK_TEMPLATE_SUCCESS_1, SECTION_TEMPLATE_1
 
 
 @pytest.mark.unittest
@@ -26,7 +26,7 @@ class TestServiceTaskTemplate:
             resources=dict(max_real_time='1.5s'),
             environ=dict(NAME='x${K}x'),
             sections=[
-                SECTION_1_TEMPLATE,
+                SECTION_TEMPLATE_1,
             ]
         )).sections.items) == 1
         assert TaskTemplate.loads(('task_${NAME}', dict(
@@ -34,7 +34,7 @@ class TestServiceTaskTemplate:
             resources=dict(max_real_time='1.5s'),
             environ=dict(NAME='x${K}x'),
             sections=[
-                SECTION_1_TEMPLATE,
+                SECTION_TEMPLATE_1,
             ]
         ))).name == 'task_${NAME}'
 
@@ -45,7 +45,7 @@ class TestServiceTaskTemplate:
                 resources=dict(max_real_time='1.5s'),
                 environ=dict(NAME='x${K}x'),
                 sections=[
-                    SECTION_1_TEMPLATE,
+                    SECTION_TEMPLATE_1,
                 ]
             ))).name == 'task_${NAME}'
 
