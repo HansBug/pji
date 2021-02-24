@@ -4,63 +4,160 @@ import tempfile
 
 import pytest
 
-from pji.control.model import Identification, ResourceLimit
-from .base import TASK_TEMPLATE_SUCCESS_1, TASK_TEMPLATE_SUCCESS_2
-from ..section.section.base import COMPLEX_TEXT
+from pji.service.task import TaskMappingTemplate
+from .base import TASK_TEMPLATE_SUCCESS_1, TASK_TEMPLATE_FAILURE_1, TASK_TEMPLATE_SUCCESS_2
+from ..section.section.base import SECTION_TEMPLATE_2, SECTION_TEMPLATE_1, SECTION_TEMPLATE_FAILED_2, COMPLEX_TEXT
 
 
 # noinspection DuplicatedCode
 @pytest.mark.unittest
-class TestServiceTaskTask:
-    def test_task_simple(self):
-        tt = TASK_TEMPLATE_SUCCESS_1
+class TestServiceTaskMapping:
+    def test_template_simple(self):
+        tmt = TaskMappingTemplate(
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        )
 
-        with tempfile.TemporaryDirectory() as scriptdir:
-            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(COMPLEX_TEXT)
+        assert len(tmt.items) == 3
+        assert len(list(tmt)) == 3
+        assert list(tmt.items.keys()) == ['task1_${NAME}', 'task2_${NAME}', 'task3_${NAME}']
+        assert repr(tmt) == "<TaskMappingTemplate tasks: ('task1_${NAME}', 'task2_${NAME}', 'task3_${NAME}')>"
 
-            t = tt(
-                scriptdir=scriptdir,
-                resources=dict(max_real_time='1.0s'),
-                environ=dict(K='233'),
+    def test_template_invalid(self):
+        with pytest.raises(KeyError):
+            TaskMappingTemplate(
+                TASK_TEMPLATE_SUCCESS_1,
+                TASK_TEMPLATE_SUCCESS_2,
+                TASK_TEMPLATE_FAILURE_1,
+                TASK_TEMPLATE_FAILURE_1,
             )
 
-            assert t.name == 'task1_x233x'
-            assert t.identification == Identification.loads('nobody')
-            assert t.resources == ResourceLimit.loads(dict(max_real_time='1.0s'))
-            assert t.environ == {'K': '233', 'NAME': 'x233x', 'PJI_TASK_NAME': 'task1_x233x'}
-            assert len(t.sections.getters) == 1
-            assert repr(t) == "<Task name: 'task1_x233x', identification: <Identification user: nobody, " \
-                              "group: nogroup>, resources: <ResourceLimit real time: 1.000s>, " \
-                              "sections: <SectionCollection sections: ('name_233',)>>"
+    def test_loads(self):
+        tmt = TaskMappingTemplate(
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        )
+        assert TaskMappingTemplate.loads(tmt) is tmt
 
-    def test_task_invalid(self):
-        tt = TASK_TEMPLATE_SUCCESS_1
+        assert set(TaskMappingTemplate.loads({
+            't233_233': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                ]
+            ),
+            't233_${K}': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                    SECTION_TEMPLATE_2,
+                ]
+            ),
+            't${K}_${K}': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                    SECTION_TEMPLATE_2,
+                    SECTION_TEMPLATE_FAILED_2,
+                ]
+            )
+        }).items.keys()) == {'t${K}_${K}', 't233_233', 't233_${K}'}
+        assert set(TaskMappingTemplate.loads([
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        ]).items.keys()) == {'task2_${NAME}', 'task3_${NAME}', 'task1_${NAME}'}
+        assert set(TaskMappingTemplate.loads(
+            TASK_TEMPLATE_SUCCESS_1,
+        ).items.keys()) == {'task1_${NAME}'}
+
+        with pytest.raises(TypeError):
+            TaskMappingTemplate.loads(123)
+
+    def test_template_call_invalid(self):
+        tmt = TaskMappingTemplate.loads({
+            't233_233': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                ]
+            ),
+            't233_${K}': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                    SECTION_TEMPLATE_2,
+                ]
+            ),
+            't${K}_${K}': dict(
+                identification='nobody',
+                resources=dict(max_real_time='1.5s'),
+                environ=dict(NAME='x${K}x'),
+                sections=[
+                    SECTION_TEMPLATE_1,
+                    SECTION_TEMPLATE_2,
+                    SECTION_TEMPLATE_FAILED_2,
+                ]
+            )
+        })
 
         with tempfile.TemporaryDirectory() as scriptdir:
-            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(COMPLEX_TEXT)
-            with pytest.raises(ValueError):
-                tt(
+            with pytest.raises(KeyError):
+                tmt(
                     scriptdir=scriptdir,
                     resources=dict(max_real_time='1.0s'),
-                    environ=dict(K='???'),
+                    environ=dict(K='233', ENV='xxx', VF='123'),
                 )
 
-    def test_task_call(self):
-        tt = TASK_TEMPLATE_SUCCESS_2
+    def test_mapping_simple(self):
+        tmt = TaskMappingTemplate(
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        )
 
         with tempfile.TemporaryDirectory() as scriptdir:
-            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
-                of.write(COMPLEX_TEXT)
-
-            t = tt(
+            tm = tmt(
                 scriptdir=scriptdir,
                 resources=dict(max_real_time='1.0s'),
                 environ=dict(K='233', ENV='xxx', VF='123'),
             )
 
-            _success, _results = t()
+            assert len(tm.items) == 3
+            assert len(list(tm)) == 3
+            assert list(tm.items.keys()) == ['task1_x233x', 'task2_x233x', 'task3_x233x']
+            assert repr(tm) == "<TaskMapping tasks: ('task1_x233x', 'task2_x233x', 'task3_x233x')>"
+
+    def test_mapping_call(self):
+        tmt = TaskMappingTemplate(
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        )
+
+        with tempfile.TemporaryDirectory() as scriptdir:
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(COMPLEX_TEXT)
+
+            tm = tmt(
+                scriptdir=scriptdir,
+                resources=dict(max_real_time='1.0s'),
+                environ=dict(K='233', ENV='xxx', VF='123'),
+            )
+
+            _success, _results = tm('task2_x233x')
             assert _success
 
             _name_1, (_section_1_success, _section_1_results, _section_1_info) = _results[0]
@@ -132,6 +229,26 @@ class TestServiceTaskTask:
                                                  'GdhbTlwYmlBS0lHaGhibVJ6SUhkcGRHZ2diR2wwZEd4bElIZG9hWFJsCklHSnZlWE1n'
                                                  'WVc1a0lI\nZG9hWFJsSUdkcGNteHpJR0Z6SUhOcGMzUmxjbk1nWVc1a0lHSnliM1JvW'
                                                  'lhKekxnPT0K\n'}
+
+    def test_mapping_call_invalid(self):
+        tmt = TaskMappingTemplate(
+            TASK_TEMPLATE_SUCCESS_1,
+            TASK_TEMPLATE_SUCCESS_2,
+            TASK_TEMPLATE_FAILURE_1,
+        )
+
+        with tempfile.TemporaryDirectory() as scriptdir:
+            with codecs.open(os.path.join(scriptdir, 'README.md'), 'w') as of:
+                of.write(COMPLEX_TEXT)
+
+            tm = tmt(
+                scriptdir=scriptdir,
+                resources=dict(max_real_time='1.0s'),
+                environ=dict(K='233', ENV='xxx', VF='123'),
+            )
+
+            with pytest.raises(KeyError):
+                tm('123')
 
 
 if __name__ == "__main__":

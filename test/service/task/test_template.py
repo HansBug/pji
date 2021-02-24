@@ -12,12 +12,12 @@ class TestServiceTaskTemplate:
     def test_template_simple(self):
         tt = TASK_TEMPLATE_SUCCESS_1
 
-        assert tt.name == 'task_${NAME}'
+        assert tt.name == 'task1_${NAME}'
         assert tt.identification == Identification.loads('nobody')
         assert tt.resources == ResourceLimit.loads(dict(max_real_time='1.5s'))
         assert tt.environ == dict(NAME='x${K}x')
         assert len(tt.sections.items) == 1
-        assert repr(tt) == "<TaskTemplate name: 'task_${NAME}', identification: <Identification user: nobody, " \
+        assert repr(tt) == "<TaskTemplate name: 'task1_${NAME}', identification: <Identification user: nobody, " \
                            "group: nogroup>, resources: <ResourceLimit real time: 1.500s>, " \
                            "sections: <SectionCollectionTemplate sections: ('name_${V}',)>>"
 
