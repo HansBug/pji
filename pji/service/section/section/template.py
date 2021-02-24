@@ -90,6 +90,7 @@ class SectionTemplate(_ISection):
         environ = dict(_process_environ(self.__environ, environ, enable_ext=True))
         _name = _check_section_name(env_template(self.__name, environ))
         environ[ENV_PJI_SECTION_NAME] = _name
+
         _identification = Identification.merge(Identification.loads(identification), self.__identification)
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources), self.__resources)
 
