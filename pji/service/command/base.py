@@ -76,6 +76,6 @@ class _ICommandBase:
                  lambda: truncate(repr(self.__identification), width=48, show_length=True, tail_length=16),
                  lambda: self.__identification and self.__identification != Identification.loads({})),
                 ('resources', lambda: truncate(repr(self.__resources), width=64, show_length=True, tail_length=16),
-                 lambda: self.__resources != ResourceLimit.loads({})),
+                 lambda: self.__resources and self.__resources != ResourceLimit.loads({})),
             ]
         )
