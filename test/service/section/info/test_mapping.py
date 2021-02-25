@@ -85,7 +85,7 @@ class TestServiceSectionInfoMapping:
         )).items.keys()) == sorted(['static', 'local', 'tag'])
 
         with pytest.raises(TypeError):
-            SectionInfoMappingTemplate.loads([])
+            SectionInfoMappingTemplate.loads(123)
 
 
 if __name__ == "__main__":
