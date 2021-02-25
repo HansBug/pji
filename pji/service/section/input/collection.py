@@ -55,6 +55,7 @@ class FileInputCollectionTemplate(_IFileInputCollection):
         :param data: raw data
         :return: file input collection template
         """
+        data = data or []
         if isinstance(data, cls):
             return data
         elif isinstance(data, FileInputTemplate):

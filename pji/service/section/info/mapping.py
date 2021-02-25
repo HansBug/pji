@@ -58,6 +58,7 @@ class SectionInfoMappingTemplate(_ISectionInfoMapping):
         :param data: raw data
         :return: section info mapping template
         """
+        data = data or {}
         if isinstance(data, cls):
             return data
         elif isinstance(data, dict):

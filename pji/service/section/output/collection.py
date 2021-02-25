@@ -54,6 +54,7 @@ class FileOutputCollectionTemplate(_IFileOutputCollection):
         :param data: raw data
         :return: file output collection template
         """
+        data = data or []
         if isinstance(data, cls):
             return data
         elif isinstance(data, FileOutputTemplate):
