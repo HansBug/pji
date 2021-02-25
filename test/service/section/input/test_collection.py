@@ -111,6 +111,11 @@ class TestServiceSectionInputCollection:
             TagFileInputTemplate(tag='tag_${V}_r', local='./${DIR}/rt.md', privilege='rw-'),
             LinkFileInputTemplate(file='README.md', local='./${DIR}/rl.md'),
         ]).items) == 3
+        assert len(FileInputCollectionTemplate.loads([
+            'copy:README.md:./${DIR}/rc.md:r--',
+            'tag:tag_${V}_r:./${DIR}/rt.md:rw-',
+            'link:README.md:./${DIR}/rl.md',
+        ]).items) == 3
         assert len(FileInputCollectionTemplate.loads(
             dict(type='link', file='README.md', local='./${DIR}/rl.md')
         ).items) == 1

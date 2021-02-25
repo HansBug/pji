@@ -2,7 +2,7 @@ from abc import ABCMeta
 from typing import Mapping, Any
 
 from .base import SectionInfoTemplate, SectionInfo
-from .general import load_error_template
+from .general import load_info_template
 from ....utils import get_repr_info
 
 
@@ -30,7 +30,7 @@ class SectionInfoMappingTemplate(_ISectionInfoMapping):
         """
         :param kwargs: mapping of section info template objects
         """
-        self.__items = {key: load_error_template(data) for key, data in kwargs.items()}
+        self.__items = {key: load_info_template(data) for key, data in kwargs.items()}
 
         _ISectionInfoMapping.__init__(self, self.__items)
 

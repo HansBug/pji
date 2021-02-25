@@ -83,6 +83,11 @@ class TestServiceSectionInfoMapping:
             local=LocalSectionInfoTemplate(file='./r${V}.md'),
             tag=TagSectionInfoTemplate(tag='tag_${V}'),
         )).items.keys()) == sorted(['static', 'local', 'tag'])
+        assert sorted(SectionInfoMappingTemplate.loads(dict(
+            static='static:233${V}',
+            local='local:./r${V}.md',
+            tag='tag:tag_${V}',
+        )).items.keys()) == sorted(['static', 'local', 'tag'])
 
         with pytest.raises(TypeError):
             SectionInfoMappingTemplate.loads(123)

@@ -91,6 +91,10 @@ class TestServiceSectionOutputCollection:
             CopyFileOutputTemplate(local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
             TagFileOutputTemplate(local='./${DIR}/r.md', tag='tag_${V}_x'),
         ]).items) == 2
+        assert len(FileOutputCollectionTemplate.loads([
+            'copy:./${DIR}/r.md:${DIR}/r${V}.md',
+            'tag:./${DIR}/r.md:tag_${V}_x',
+        ]).items) == 2
         assert len(FileOutputCollectionTemplate.loads(
             dict(type='copy', local='./${DIR}/r.md', file='${DIR}/r${V}.md'),
         ).items) == 1

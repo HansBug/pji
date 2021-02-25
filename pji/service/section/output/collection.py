@@ -61,7 +61,7 @@ class FileOutputCollectionTemplate(_IFileOutputCollection):
             return cls(data)
         elif isinstance(data, (list, tuple)):
             return cls(*data)
-        elif isinstance(data, dict):
+        elif isinstance(data, (dict, str)):
             return cls(load_output_template(data))
         else:
             raise TypeError('Array or {type} expected but {actual} found.'.format(

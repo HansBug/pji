@@ -29,8 +29,18 @@ class TestServiceSectionOutputGeneral:
         assert ct.file == '/this/is/file'
         assert ct.local == './file'
 
+        ct = load_output_template('copy:./file:/this/is/file')
+        assert isinstance(ct, CopyFileOutputTemplate)
+        assert ct.file == '/this/is/file'
+        assert ct.local == './file'
+
     def test_load_template_tag(self):
         tt = load_output_template(dict(type='tag', tag='djgfld', local='./file'))
+        assert isinstance(tt, TagFileOutputTemplate)
+        assert tt.tag == 'djgfld'
+        assert tt.local == './file'
+
+        tt = load_output_template('tag:./file:djgfld')
         assert isinstance(tt, TagFileOutputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'

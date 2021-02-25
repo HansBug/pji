@@ -61,6 +61,17 @@ def _load_output_template_from_json(json: Mapping[str, Any]) -> FileOutputTempla
     return _TYPE_TO_TEMPLATE_CLASS[_type](**_json)
 
 
+def _load_output_template_from_string(string: str) -> FileOutputTemplate:
+    """
+    load template object from string (should split with :)
+    :param string: string value
+    :return: file output template object
+    """
+    _items = string.split(':')
+    _type, _args = FileOutputType.loads(_items[0].strip()), [_item.strip() for _item in _items[1:]]
+    return _TYPE_TO_TEMPLATE_CLASS[_type](*_args)
+
+
 def load_output_template(data) -> FileOutputTemplate:
     """
     load file output template object from data
@@ -71,6 +82,8 @@ def load_output_template(data) -> FileOutputTemplate:
         return data
     elif isinstance(data, dict):
         return _load_output_template_from_json(data)
+    elif isinstance(data, str):
+        return _load_output_template_from_string(data)
     else:
-        raise TypeError('Json or {type} expected but {actual} found.'.format(
+        raise TypeError('Json, string or {type} expected but {actual} found.'.format(
             type=FileOutputTemplate.__name__, actual=repr(type(data).__name__)))

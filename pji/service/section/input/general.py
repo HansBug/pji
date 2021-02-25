@@ -66,6 +66,17 @@ def _load_input_template_from_json(json: Mapping[str, Any]) -> FileInputTemplate
     return _TYPE_TO_TEMPLATE_CLASS[_type](**_json)
 
 
+def _load_input_template_from_string(string: str) -> FileInputTemplate:
+    """
+    load template object from string (should split with :)
+    :param string: string value
+    :return: file input template object
+    """
+    _items = string.split(':')
+    _type, _args = FileInputType.loads(_items[0].strip()), [_item.strip() for _item in _items[1:]]
+    return _TYPE_TO_TEMPLATE_CLASS[_type](*_args)
+
+
 def load_input_template(data) -> FileInputTemplate:
     """
     load file input template object from data
@@ -76,6 +87,8 @@ def load_input_template(data) -> FileInputTemplate:
         return data
     elif isinstance(data, dict):
         return _load_input_template_from_json(data)
+    elif isinstance(data, str):
+        return _load_input_template_from_string(data)
     else:
-        raise TypeError('Json or {type} expected but {actual} found.'.format(
+        raise TypeError('Json, string or {type} expected but {actual} found.'.format(
             type=FileInputTemplate.__name__, actual=repr(type(data).__name__)))

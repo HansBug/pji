@@ -35,14 +35,31 @@ class TestServiceSectionInputGeneral:
         assert ct.local == './file'
         assert ct.privilege == FileAuthority.loads('rw-------')
 
+        ct = load_input_template('copy:/this/is/file:./file:rw-')
+        assert isinstance(ct, CopyFileInputTemplate)
+        assert ct.file == '/this/is/file'
+        assert ct.local == './file'
+        assert ct.privilege == FileAuthority.loads('rw-------')
+
     def test_load_template_link(self):
         lnt = load_input_template(dict(type='link', file='/this/is/file', local='./file'))
         assert isinstance(lnt, LinkFileInputTemplate)
         assert lnt.file == '/this/is/file'
         assert lnt.local == './file'
 
+        lnt = load_input_template('link:/this/is/file:./file')
+        assert isinstance(lnt, LinkFileInputTemplate)
+        assert lnt.file == '/this/is/file'
+        assert lnt.local == './file'
+
     def test_load_template_tag(self):
         tt = load_input_template(dict(type='tag', tag='djgfld', local='./file', privilege='777'))
+        assert isinstance(tt, TagFileInputTemplate)
+        assert tt.tag == 'djgfld'
+        assert tt.local == './file'
+        assert tt.privilege == FileAuthority.loads('rwxrwxrwx')
+
+        tt = load_input_template('tag:djgfld:./file:777')
         assert isinstance(tt, TagFileInputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'
