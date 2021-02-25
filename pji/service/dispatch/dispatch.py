@@ -23,7 +23,8 @@ class _IDispatch(metaclass=ABCMeta):
         return get_repr_info(
             cls=self.__class__,
             args=[
-                ('tasks', lambda: truncate(repr(self.__tasks), width=64, show_length=True, tail_length=16),
+                ('tasks', lambda: truncate(repr(tuple(sorted(self.__tasks.items.keys()))),
+                                           width=64, show_length=True, tail_length=16),
                  lambda: self.__tasks),
             ]
         )
