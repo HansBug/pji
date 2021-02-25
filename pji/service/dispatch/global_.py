@@ -109,6 +109,22 @@ class GlobalConfigTemplate(_IGlobalConfig):
             resources=self.__resources, environ=_environ,
         )
 
+    @classmethod
+    def loads(cls, data) -> 'GlobalConfigTemplate':
+        """
+        load global config template from data
+        :param data: raw data
+        :return: global config template
+        """
+        data = data or {}
+        if isinstance(data, cls):
+            return data
+        elif isinstance(data, dict):
+            return cls(**data)
+        else:
+            raise TypeError('Json or {type} expected but {actual} found.'.format(
+                type=cls.__name__, actual=repr(type(data).__name__)))
+
 
 class GlobalConfig(_IGlobalConfig):
     def __init__(self, identification, resources, environ):
