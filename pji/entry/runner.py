@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from functools import partial
 
 from ..control.model import RunResult
@@ -10,11 +10,9 @@ class DispatchRunner(metaclass=ABCMeta):
     def __init__(self, template: DispatchTemplate):
         self.__template = template
 
-    @abstractmethod
     def _command_start(self, command: Command):
         pass
 
-    @abstractmethod
     def _command_complete(self, command: Command, result: RunResult):
         pass
 

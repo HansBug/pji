@@ -1,15 +1,15 @@
 import codecs
 import os
-import warnings
 
 import pytest
 from click.testing import CliRunner
 
 from pji.entry import cli
-from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY, DEMO_B64_FAIL_SCRIPT
+from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY, DEMO_B64_FAIL_SCRIPT, DEMO_B64_BEFORE_SCRIPT, \
+    DEMO_B64_LINK_SCRIPT
 
 
-# ATTENTION: cli runner of click cannot run properly when using the cli
+# noinspection DuplicatedCode
 @pytest.mark.unittest
 class TestEntryCli:
     def test_version(self):
@@ -37,8 +37,41 @@ class TestEntryCli:
             with codecs.open('test_result.txt', 'r') as rf:
                 assert rf.read().rstrip() == '5'
 
+    def test_simple_with_link(self):
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_LINK_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python'])
+
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '5'
+
     def test_before_env(self):
-        warnings.warn(Warning('This test is skipped.'))
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_BEFORE_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python', '-e', 'INPUT=1 2 3 4 5 6 7'])
+
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '33'
 
     def test_after_env(self):
         runner = CliRunner()
