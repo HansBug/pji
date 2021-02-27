@@ -28,7 +28,7 @@ class DispatchEventRunner(DispatchRunner):
     def _section_complete(self, section: Section, result):
         _success, _results, _info = result
         _color = 'green' if _success else 'red'
-        _result_str = 'complete' if _success else 'failed'
+        _result_str = 'completed' if _success else 'failed'
 
         click.echo(click.style('Section {section} execute {result}!'.format(
             section=repr(section.name),

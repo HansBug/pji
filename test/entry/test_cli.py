@@ -1,11 +1,12 @@
 import codecs
 import os
+import warnings
 
 import pytest
 from click.testing import CliRunner
 
 from pji.entry import cli
-from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY
+from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY, DEMO_B64_FAIL_SCRIPT
 
 
 # ATTENTION: cli runner of click cannot run properly when using the cli
@@ -28,8 +29,49 @@ class TestEntryCli:
 
             result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python'])
 
-        assert result.exit_code == 0
-        assert "Section 'get_test_info' execute complete!" in result.output
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '5'
+
+    def test_before_env(self):
+        warnings.warn(Warning('This test is skipped.'))
+
+    def test_after_env(self):
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python', '-E', 'INPUT=1 2 3 4 5 6 7'])
+
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '28'
+
+    def test_after_fail(self):
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_FAIL_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python', '-E', 'INPUT=1 2 3 4 5 6 7'])
+
+            assert result.exit_code == 1
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute failed!" in result.output
 
 
 if __name__ == "__main__":
