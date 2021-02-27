@@ -1,9 +1,9 @@
 from abc import ABCMeta
-from typing import List
+from typing import List, Optional, Callable
 
 from .base import FileInputTemplate, FileInput
 from .general import load_input_template
-from ....utils import get_repr_info
+from ....utils import get_repr_info, wrap_empty
 
 
 class _IFileInputCollection(metaclass=ABCMeta):
@@ -84,9 +84,12 @@ class FileInputCollection(_IFileInputCollection):
     def __iter__(self):
         return self.items.__iter__()
 
-    def __call__(self):
+    def __call__(self, input_collection_start: Optional[Callable[['FileInputCollection'], None]] = None,
+                 input_collection_complete: Optional[Callable[['FileInputCollection'], None]] = None, **kwargs):
         """
         execute this file input setting
         """
+        wrap_empty(input_collection_start)(self)
         for item in self.__items:
-            item()
+            item(**kwargs)
+        wrap_empty(input_collection_complete)(self)

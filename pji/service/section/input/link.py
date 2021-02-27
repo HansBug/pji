@@ -1,10 +1,10 @@
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 
 from .base import FileInput, FileInputTemplate
 from ...base import _check_workdir_file, _check_os_path, _process_environ
-from ....utils import get_repr_info, env_template, makedirs
+from ....utils import get_repr_info, env_template, makedirs, wrap_empty
 
 
 class _ILinkFileInput(metaclass=ABCMeta):
@@ -88,10 +88,13 @@ class LinkFileInput(FileInput, _ILinkFileInput):
     def local(self) -> str:
         return self.__local
 
-    def __call__(self):
+    def __call__(self, input_start: Optional[Callable[['LinkFileInput'], None]] = None,
+                 input_complete: Optional[Callable[['LinkFileInput'], None]] = None, **kwargs):
         """
         execute this link event
         """
+        wrap_empty(input_start)(self)
         _parent_path, _ = os.path.split(self.__local)
         makedirs(_parent_path)
         os.symlink(self.__file, self.__local, target_is_directory=os.path.isdir(self.__file))
+        wrap_empty(input_complete)(self)

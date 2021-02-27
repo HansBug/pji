@@ -50,5 +50,5 @@ class FileInputTemplate(metaclass=ABCMeta):
 
 class FileInput(metaclass=ABCMeta):
     @abstractmethod
-    def __call__(self):
+    def __call__(self, **kwargs):
         raise NotImplementedError

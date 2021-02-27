@@ -1,13 +1,13 @@
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 
 from pysystem import FileAuthority
 
 from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
 from ....control.model import Identification
-from ....utils import get_repr_info, FilePool, env_template, truncate
+from ....utils import get_repr_info, FilePool, env_template, truncate, wrap_empty
 
 
 class _ITagFileInput(metaclass=ABCMeta):
@@ -120,10 +120,13 @@ class TagFileInput(FileInput, _ITagFileInput):
     def privilege(self) -> Optional[FileAuthority]:
         return self.__privilege
 
-    def __call__(self):
+    def __call__(self, input_start: Optional[Callable[['TagFileInput'], None]] = None,
+                 input_complete: Optional[Callable[['TagFileInput'], None]] = None, **kwargs):
         """
         execute this file input
         """
+        wrap_empty(input_start)(self)
         self.__pool.export(self.__tag, self.__local, self.__privilege, self.__identification.user,
                            self.__identification.group)
         _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)
+        wrap_empty(input_complete)(self)
