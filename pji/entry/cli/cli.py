@@ -4,9 +4,10 @@ import click
 from click.core import Context, Option
 
 from .environ import _load_environ
-from .event import _DEFAULT_FILENAME, _load_dispatch_getter
+from .event import _load_dispatch_getter
 from .exception import _raise_exception_with_exit_code
-from ..config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
+from ..event import _DEFAULT_FILENAME
+from ...config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
 
 
 def print_version(ctx: Context, param: Option, value: bool) -> None:
@@ -34,7 +35,7 @@ _DEFAULT_TASK = 'main'
 @click.option('-v', '--version', is_flag=True,
               callback=print_version, expose_value=False, is_eager=True,
               help="Show package's version information.")
-@click.option('-s', '--script', type=click.Path(exists=True, dir_okay=False, readable=True),
+@click.option('-s', '--script', type=click.Path(exists=True, readable=True),
               help='Path of pji script.', default=_DEFAULT_FILENAME, show_default=True)
 @click.option('-t', '--task', type=str, help='Task going to be executed.',
               default=_DEFAULT_TASK, show_default=True)
@@ -44,11 +45,10 @@ _DEFAULT_TASK = 'main'
               help='Environment variables (loaded after global config).')
 def cli(script: str, task: str, environ: List[str], environ_after: List[str]):
     _dispatch_getter = _load_dispatch_getter(script)
-    _dispatch = _dispatch_getter(
+    _success, _result = _dispatch_getter(
         environ=_load_environ(environ),
         environ_after=_load_environ(environ_after),
-    )
-    _success, _result = _dispatch(task)
+    )(task)
 
     if _success:
         click.echo(click.style('Task success.', fg='green'))
