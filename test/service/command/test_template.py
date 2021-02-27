@@ -90,9 +90,15 @@ class TestServiceCommandTemplate:
         ct = CommandTemplate.loads(dict(args='echo 233'))
         assert ct.args == 'echo 233'
 
+        ct = CommandTemplate.loads('echo 233')
+        assert ct.args == 'echo 233'
+
+        ct = CommandTemplate.loads(['echo', '233'])
+        assert ct.args == ['echo', '233']
+
     def test_loads_invalid(self):
         with pytest.raises(TypeError):
-            CommandTemplate.loads([])
+            CommandTemplate.loads(123)
 
     def test_run_with_stdout_stderr_1(self):
         ct = CommandTemplate(args='echo 233', stdout='stdout_1_${T}.txt', stderr='stderr_1_${T}.txt')
