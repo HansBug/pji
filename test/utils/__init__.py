@@ -4,6 +4,7 @@ from .test_context import TestUtilsContext
 from .test_decorator import TestUtilsDecorator
 from .test_encoding import TestUtilsEncoding
 from .test_file import TestUtilsFile
+from .test_func import TestUtilsFunc
 from .test_iter import TestUtilsIter
 from .test_json import TestUtilsJson
 from .test_path import TestUtilsPath

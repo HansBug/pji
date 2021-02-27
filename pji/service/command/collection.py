@@ -1,12 +1,12 @@
 from abc import ABCMeta
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Callable
 
 from .base import ENV_PJI_COMMAND_INDEX
 from .command import Command
 from .template import CommandTemplate
 from ..base import _process_environ
 from ...control.model import RunResult
-from ...utils import get_repr_info
+from ...utils import get_repr_info, wrap_empty
 
 
 class _ICommandCollection(metaclass=ABCMeta):
@@ -82,6 +82,9 @@ class CommandCollectionTemplate(_ICommandCollection):
                 type=cls.__name__, actual=repr(type(data).__name__)))
 
 
+_COLLECTION_RESULT = Tuple[bool, List[RunResult]]
+
+
 class CommandCollection(_ICommandCollection):
     def __init__(self, *commands: Command):
         """
@@ -95,15 +98,24 @@ class CommandCollection(_ICommandCollection):
     def commands(self) -> List[Command]:
         return list(self.__commands)
 
-    def __call__(self) -> Tuple[bool, List[RunResult]]:
+    def __call__(self, command_collection_start: Optional[Callable[['CommandCollection'], None]] = None,
+                 command_collection_complete: Optional[
+                     Callable[['CommandCollection', _COLLECTION_RESULT], None]] = None,
+                 **kwargs) -> _COLLECTION_RESULT:
         """
         execute multiple commands one by one
         :return: success or not, list of results
         """
+        wrap_empty(command_collection_start)(self)
         _results = []
+        _success = True
         for index, cmd in enumerate(self.__commands):
-            result = cmd()
+            result = cmd(**kwargs)
             _results.append(result)
             if not result.ok:
-                return False, _results
-        return True, _results
+                _success = False
+                break
+
+        _return = (_success, _results)
+        wrap_empty(command_collection_complete)(self, _return)
+        return _return

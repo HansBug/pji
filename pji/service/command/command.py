@@ -1,9 +1,9 @@
-from typing import Union, List, Optional, Mapping
+from typing import Union, List, Optional, Mapping, Callable
 
 from .base import _ICommandBase, CommandMode
 from ...control.model import ResourceLimit, Identification, RunResult
 from ...control.run import common_run, timing_run, mutual_run
-from ...utils import env_template, eclosing
+from ...utils import env_template, eclosing, wrap_empty
 
 
 class Command(_ICommandBase):
@@ -86,11 +86,13 @@ class Command(_ICommandBase):
         CommandMode.MUTUAL: mutual_run,
     }
 
-    def __call__(self) -> RunResult:
+    def __call__(self, command_start: Optional[Callable[['Command'], None]] = None,
+                 command_complete: Optional[Callable[['Command', RunResult], None]] = None, **kwargs) -> RunResult:
         """
         run this command
         :return: run result
         """
+        wrap_empty(command_start)(self)
         if isinstance(self.__stdin, str) and self.__mode != CommandMode.MUTUAL:
             stdin = open(self.__stdin, 'rb', 0)
             stdin_need_close = True
@@ -115,10 +117,12 @@ class Command(_ICommandBase):
         with eclosing(stdin, stdin_need_close) as fstdin, \
                 eclosing(stdout, stdout_need_close) as fstdout, \
                 eclosing(stderr, stderr_need_close) as fstderr:
-
-            return self.__RUN_FUNCTION[self.__mode](
+            _result = self.__RUN_FUNCTION[self.__mode](
                 args=self.__args, shell=self.__shell,
                 stdin=fstdin, stdout=fstdout, stderr=fstderr,
                 environ=self.__environ, cwd=self.__workdir,
                 resources=self.__resources, identification=self.__identification,
             )
+
+        wrap_empty(command_complete)(self, _result)
+        return _result
