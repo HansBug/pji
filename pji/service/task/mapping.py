@@ -84,7 +84,7 @@ class TaskMapping(_ITaskMapping):
     def __iter__(self):
         return self.items.__iter__()
 
-    def __call__(self, task_name: str):
+    def __call__(self, task_name: str, **kwargs):
         if task_name not in self.__tasks.keys():
             raise KeyError('Task {task} not found.'.format(task=repr(task_name)))
-        return self.__tasks[task_name]()
+        return self.__tasks[task_name](**kwargs)

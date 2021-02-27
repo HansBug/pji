@@ -102,10 +102,10 @@ class Dispatch(_IDispatch):
     def tasks(self) -> TaskMapping:
         return self.__tasks
 
-    def __call__(self, task_name: str):
+    def __call__(self, task_name: str, **kwargs):
         """
         run a task
         :param task_name: name of a task
         :return: result of task
         """
-        return self.__tasks(task_name)
+        return self.__tasks(task_name, **kwargs)

@@ -1,8 +1,9 @@
-from typing import Mapping
+from typing import Mapping, Optional, Callable, Any
 
 from .base import _ITask
 from ..section import SectionCollection
 from ...control.model import Identification, ResourceLimit
+from ...utils import wrap_empty
 
 
 class Task(_ITask):
@@ -42,9 +43,14 @@ class Task(_ITask):
     def sections(self) -> SectionCollection:
         return self.__sections
 
-    def __call__(self):
+    def __call__(self, task_start: Optional[Callable[['Task'], None]] = None,
+                 task_complete: Optional[Callable[['Task', Any], None]] = None,
+                 **kwargs):
         """
         run this task
         :return: return value of this task
         """
-        return self.__sections()
+        wrap_empty(task_start)(self)
+        _return = self.__sections()
+        wrap_empty(task_complete)(self, _return)
+        return _return
