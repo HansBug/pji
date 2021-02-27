@@ -51,6 +51,6 @@ class Task(_ITask):
         :return: return value of this task
         """
         wrap_empty(task_start)(self)
-        _return = self.__sections()
+        _return = self.__sections(**kwargs)
         wrap_empty(task_complete)(self, _return)
         return _return
