@@ -1,5 +1,5 @@
 import tempfile
-from typing import List, Mapping, Tuple, Any, Callable
+from typing import Mapping, Callable, Tuple, List, Any, Optional
 
 from pysystem import chown, chmod
 
@@ -10,8 +10,10 @@ from ..output import FileOutputCollection
 from ...base import _process_environ
 from ...command import CommandCollection
 from ....control.model import Identification, ResourceLimit, RunResult
+from ....utils import wrap_empty
 
 _DEFAULT_WORKDIR = '.'
+_SECTION_RESULT = Tuple[bool, List[RunResult], Mapping[str, Any]]
 
 
 class Section(_ISection):
@@ -81,20 +83,26 @@ class Section(_ISection):
     def infos_getter(self) -> Callable[..., SectionInfoMapping]:
         return self.__infos_getter
 
-    def __call__(self) -> Tuple[bool, List[RunResult], Mapping[str, Any]]:
+    def __call__(self, section_start: Optional[Callable[['Section'], None]] = None,
+                 section_complete: Optional[Callable[['Section', _SECTION_RESULT], None]] = None,
+                 **kwargs) -> _SECTION_RESULT:
         """
         run section
         :return: success or not, result list, information
         """
+        wrap_empty(section_start)(self)
         with tempfile.TemporaryDirectory() as workdir:
             chmod(workdir, 'r-x------')
             if self.__identification:
                 chown(workdir, user=self.__identification.user, group=self.__identification.group)
 
-            self.__inputs_getter(workdir=workdir)()
-            _success, _results = self.__commands_getter(workdir=workdir)()
+            self.__inputs_getter(workdir=workdir)(**kwargs)
+            _success, _results = self.__commands_getter(workdir=workdir)(**kwargs)
             if _success:
-                self.__outputs_getter(workdir=workdir)()
-            _info = self.__infos_getter(workdir=workdir)()
+                self.__outputs_getter(workdir=workdir)(**kwargs)
+            _info = self.__infos_getter(workdir=workdir)(**kwargs)
 
-            return _success, _results, _info
+            _return = (_success, _results, _info)
+
+        wrap_empty(section_complete)(self, _return)
+        return _return

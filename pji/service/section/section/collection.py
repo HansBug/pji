@@ -1,11 +1,10 @@
 from abc import ABCMeta
 from functools import partial
-from typing import Tuple, List, Mapping, Callable
+from typing import Tuple, List, Callable, Optional
 
-from .section import Section
+from .section import Section, _SECTION_RESULT
 from .template import SectionTemplate
-from ....control.model import RunResult
-from ....utils import get_repr_info, FilePool, duplicates
+from ....utils import get_repr_info, FilePool, duplicates, wrap_empty
 
 
 class _ISectionCollection(metaclass=ABCMeta):
@@ -28,6 +27,7 @@ class _ISectionCollection(metaclass=ABCMeta):
 
 
 _SECTION_GETTER = Callable[..., Section]
+_SECTION_COLLECTION_RESULT = Tuple[bool, List[Tuple[str, _SECTION_RESULT]]]
 
 
 class SectionCollectionTemplate(_ISectionCollection):
@@ -108,20 +108,27 @@ class SectionCollection(_ISectionCollection):
     def __iter__(self):
         return self.getters.__iter__()
 
-    def __call__(self) -> Tuple[bool, List[Tuple[str, Tuple[bool, List[RunResult], Mapping[str, str]]]]]:
+    def __call__(self, section_collection_start: Optional[Callable[['SectionCollection'], None]] = None,
+                 section_collection_complete: Optional[
+                     Callable[['SectionCollection', _SECTION_COLLECTION_RESULT], None]] = None,
+                 **kwargs) -> _SECTION_COLLECTION_RESULT:
         """
         execute this section collection
         :return: success or not, full sections result
         """
+        wrap_empty(section_collection_start)(self)
         with FilePool() as pool:
             _success = True
             _results = []
             for section_getter in self.__getters:
                 section = section_getter(pool=pool)
-                _section_success, _section_results, _section_info = section()
+                _section_success, _section_results, _section_info = section(**kwargs)
                 _results.append((section.name, (_section_success, _section_results, _section_info)))
                 if not _section_success:
                     _success = False
                     break
 
-            return _success, _results
+            _return = (_success, _results)
+
+        wrap_empty(section_collection_start)(self, _return)
+        return _return
