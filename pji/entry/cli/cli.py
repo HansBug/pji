@@ -34,7 +34,7 @@ _DEFAULT_TASK = 'main'
 @click.option('-v', '--version', is_flag=True,
               callback=print_version, expose_value=False, is_eager=True,
               help="Show package's version information.")
-@click.option('-s', '--script', type=click.Path(exists=True, dir_okay=False, readable=True),
+@click.option('-s', '--script', type=click.Path(exists=True, readable=True),
               help='Path of pji script.', default=_DEFAULT_FILENAME, show_default=True)
 @click.option('-t', '--task', type=str, help='Task going to be executed.',
               default=_DEFAULT_TASK, show_default=True)

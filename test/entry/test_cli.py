@@ -55,6 +55,24 @@ class TestEntryCli:
             with codecs.open('test_result.txt', 'r') as rf:
                 assert rf.read().rstrip() == '5'
 
+    def test_simple_with_dir_script(self):
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', '.', '-t', 'run_python'])
+
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '5'
+
     def test_simple_with_link(self):
         runner = CliRunner()
         with runner.isolated_filesystem():

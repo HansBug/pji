@@ -83,6 +83,9 @@ class DispatchEventRunner(DispatchRunner):
 
 def _load_dispatch_getter(filename: str = None) -> Callable[..., Dispatch]:
     filename = filename or _DEFAULT_FILENAME
+    if os.path.isdir(filename):
+        filename = os.path.join(filename, _DEFAULT_FILENAME)
+
     _dir, _ = os.path.split(os.path.normpath(os.path.abspath(filename)))
 
     return partial(DispatchEventRunner(_load_dispatch_template(filename)), scriptdir=_dir)
