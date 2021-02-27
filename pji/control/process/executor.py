@@ -10,8 +10,6 @@ import where
 
 from ...utils import args_split
 
-_stdin, _stdout, _stderr = sys.stdin, sys.stdout, sys.stderr
-
 
 class ExecutorException(Exception):
     def __init__(self, exception):
@@ -42,15 +40,15 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
     # noinspection DuplicatedCode
     def _execute_child():
         os.close(stdin_write)
-        sys.stdin = _stdin
+        sys.stdin = sys.__stdin__
         os.dup2(stdin_read, sys.stdin.fileno())
 
         os.close(stdout_read)
-        sys.stdout = _stdout
+        sys.stdout = sys.__stdout__
         os.dup2(stdout_write, sys.stdout.fileno())
 
         os.close(stderr_read)
-        sys.stderr = _stderr
+        sys.stderr = sys.__stderr__
         os.dup2(stderr_write, sys.stderr.fileno())
 
         _exception = None
