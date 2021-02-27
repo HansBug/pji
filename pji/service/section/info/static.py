@@ -63,7 +63,7 @@ class StaticSectionInfo(SectionInfo, _IStaticSectionInfo):
     def value(self):
         return self.__value
 
-    def __call__(self) -> Tuple[bool, Any]:
+    def __call__(self, **kwargs) -> Tuple[bool, Any]:
         """
         execute this info info
         """

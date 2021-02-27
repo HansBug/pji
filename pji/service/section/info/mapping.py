@@ -1,9 +1,9 @@
 from abc import ABCMeta
-from typing import Mapping, Any
+from typing import Mapping, Any, Optional, Callable
 
 from .base import SectionInfoTemplate, SectionInfo
 from .general import load_info_template
-from ....utils import get_repr_info
+from ....utils import get_repr_info, wrap_empty
 
 
 class _ISectionInfoMapping(metaclass=ABCMeta):
@@ -68,6 +68,9 @@ class SectionInfoMappingTemplate(_ISectionInfoMapping):
                 type=cls.__name__, actual=repr(type(data).__name__)))
 
 
+_INFO_MAPPING_RESULT = Mapping[str, Any]
+
+
 class SectionInfoMapping(_ISectionInfoMapping):
     def __init__(self, **kwargs):
         """
@@ -84,9 +87,15 @@ class SectionInfoMapping(_ISectionInfoMapping):
     def __iter__(self):
         return self.items.items().__iter__()
 
-    def __call__(self) -> Mapping[str, Any]:
+    def __call__(self, info_mapping_start: Optional[Callable[['SectionInfoMapping'], None]] = None,
+                 info_mapping_complete: Optional[Callable[['SectionInfoMapping', _INFO_MAPPING_RESULT], None]] = None,
+                 **kwargs) -> _INFO_MAPPING_RESULT:
         """
         execute this info info
         """
+        wrap_empty(info_mapping_start)(self)
         _ret = {key: info() for key, info in self.__items.items()}
-        return {key: _data for key, (_ok, _data) in _ret.items() if _ok}
+        _result = {key: _data for key, (_ok, _data) in _ret.items() if _ok}
+
+        wrap_empty(info_mapping_complete)(self, _result)
+        return _result

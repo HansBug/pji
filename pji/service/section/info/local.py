@@ -67,7 +67,7 @@ class LocalSectionInfo(SectionInfo, _ILocalSectionInfo):
     def file(self) -> str:
         return self.__file
 
-    def __call__(self) -> Tuple[bool, Optional[str]]:
+    def __call__(self, **kwargs) -> Tuple[bool, Optional[str]]:
         """
         execute this info info
         """
