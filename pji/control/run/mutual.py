@@ -23,6 +23,8 @@ class MutualStderr(TimingContent):
 
 _INTERACT_FUNC = Callable[[], None]
 
+_stdin, _stdout, _stderr = sys.stdin, sys.stdout, sys.stderr
+
 
 def _load_func_from_str(source: str) -> _INTERACT_FUNC:
     _split = source.split(':')
@@ -84,12 +86,15 @@ def mutual_run(args, shell: bool = False, stdin=None, stdout=None, stderr=None,
         # noinspection DuplicatedCode
         def _launch_mutual():
             os.close(mutual_stdin_put)
+            # sys.stdin = _stdin  # this stdin is closed, ValueError: I/O operation on closed file
             os.dup2(mutual_stdin_get, sys.stdin.fileno())
 
             os.close(mutual_stdout_get)
+            sys.stdout = _stdout
             os.dup2(mutual_stdout_put, sys.stdout.fileno())
 
             os.close(mutual_stderr_get)
+            sys.stderr = _stderr
             os.dup2(mutual_stderr_put, sys.stderr.fileno())
 
             _mutual_initialize_ok.set()
