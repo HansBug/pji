@@ -1,8 +1,4 @@
-from multiprocessing import cpu_count
-
 import click
-
-_DEFAULT_CONCURRENCY = cpu_count()
 
 
 def _click_exception_with_exit_code(name: str, message: str, exitcode: int):

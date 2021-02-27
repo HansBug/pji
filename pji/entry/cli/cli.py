@@ -6,7 +6,7 @@ from click.core import Context, Option
 from .environ import _load_environ
 from .event import _DEFAULT_FILENAME, _load_dispatch_getter
 from .exception import _raise_exception_with_exit_code
-from ..config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
+from ...config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
 
 
 def print_version(ctx: Context, param: Option, value: bool) -> None:
