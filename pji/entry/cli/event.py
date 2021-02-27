@@ -1,10 +1,9 @@
 import os
-from functools import partial
 from typing import Callable
 
 import click
 
-from ..event import _load_dispatch_template, _DEFAULT_FILENAME
+from ..event import _load_dispatch_getter as _load_abstract_dispatch_getter
 from ..runner import DispatchRunner
 from ...control import RunResult
 from ...service import Dispatch, Command, FileInput, CopyFileInput, TagFileInput, LinkFileInput, \
@@ -82,10 +81,4 @@ class DispatchEventRunner(DispatchRunner):
 
 
 def _load_dispatch_getter(filename: str = None) -> Callable[..., Dispatch]:
-    filename = filename or _DEFAULT_FILENAME
-    if os.path.isdir(filename):
-        filename = os.path.join(filename, _DEFAULT_FILENAME)
-
-    _dir, _ = os.path.split(os.path.normpath(os.path.abspath(filename)))
-
-    return partial(DispatchEventRunner(_load_dispatch_template(filename)), scriptdir=_dir)
+    return _load_abstract_dispatch_getter(DispatchEventRunner, filename)

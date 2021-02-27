@@ -4,8 +4,9 @@ import click
 from click.core import Context, Option
 
 from .environ import _load_environ
-from .event import _DEFAULT_FILENAME, _load_dispatch_getter
+from .event import _load_dispatch_getter
 from .exception import _raise_exception_with_exit_code
+from ..event import _DEFAULT_FILENAME
 from ...config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
 
 
