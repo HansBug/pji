@@ -139,6 +139,10 @@ class CommandTemplate(_ICommandBase):
             return data
         elif isinstance(data, dict):
             return cls(**data)
+        elif isinstance(data, str):
+            return cls(args=data)
+        elif isinstance(data, (list, tuple)):
+            return cls(args=list(data), shell=False)
         else:
             raise TypeError('Json or {type} expected but {actual} found.'.format(
                 type=cls.__name__, actual=repr(type(data).__name__)))
