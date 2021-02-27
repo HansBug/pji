@@ -17,7 +17,7 @@ def _load_dispatch_template(filename: str) -> DispatchTemplate:
     return DispatchTemplate.loads(_json)
 
 
-def _load_dispatch_getter(dispatch_event_class: Type[DispatchRunner], filename: str = None) \
+def _load_dispatch_getter(runner_class: Type[DispatchRunner], filename: str = None) \
         -> Callable[..., Dispatch]:
     filename = filename or _DEFAULT_FILENAME
     if os.path.isdir(filename):
@@ -25,4 +25,4 @@ def _load_dispatch_getter(dispatch_event_class: Type[DispatchRunner], filename: 
 
     _dir, _ = os.path.split(os.path.normpath(os.path.abspath(filename)))
 
-    return partial(dispatch_event_class(_load_dispatch_template(filename)), scriptdir=_dir)
+    return partial(runner_class(_load_dispatch_template(filename)), scriptdir=_dir)

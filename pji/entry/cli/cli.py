@@ -45,11 +45,10 @@ _DEFAULT_TASK = 'main'
               help='Environment variables (loaded after global config).')
 def cli(script: str, task: str, environ: List[str], environ_after: List[str]):
     _dispatch_getter = _load_dispatch_getter(script)
-    _dispatch = _dispatch_getter(
+    _success, _result = _dispatch_getter(
         environ=_load_environ(environ),
         environ_after=_load_environ(environ_after),
-    )
-    _success, _result = _dispatch(task)
+    )(task)
 
     if _success:
         click.echo(click.style('Task success.', fg='green'))
