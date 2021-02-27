@@ -48,4 +48,9 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
+    entry_points={
+        'console_scripts': [
+            'pji=pji.entry.cli:cli'
+        ]
+    },
 )

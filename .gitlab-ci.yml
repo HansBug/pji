@@ -9,7 +9,6 @@ stages:
   - deploy
 
 variables:
-  MIN_UNITTEST_COVERAGE: 90
   TWINE_REPOSITORY: pypi
   OSS_NAME: oss
   OSS_RELEASE_ROOT: ${OSS_NAME}/releases/${CI_PROJECT_NAME}
@@ -36,6 +35,8 @@ demo_development:
     - pji_dir=$(pip3 show pji | grep Location | cut -c 11-)/pji
       && tree -a ${pji_dir}
     - cd ${DEMO_ROOT}
+    - pji -v
+    - pji -h
     - cd ..
 
 demo_production:
@@ -45,4 +46,140 @@ demo_production:
     - pji_dir=$(pip3 show pji | grep Location | cut -c 11-)/pji
       && tree -a ${pji_dir}
     - cd ${DEMO_ROOT}
+    - pji -v
+    - pji -h
     - cd ..
+
+unit_test_in_3.6.3:
+  stage: unit_test
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  variables:
+    MIN_COVERAGE: 90
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - make test
+
+unit_test_in_3.7.6:
+  stage: unit_test
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  variables:
+    MIN_COVERAGE: 90
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - make test
+
+unit_test_in_3.8.1:
+  stage: unit_test
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  variables:
+    MIN_COVERAGE: 90
+  script:
+    - pip3 install -e .
+    - pytest --version
+    - make test
+
+source_install_in_3.6.3:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+    - cd .. && ls -al
+
+source_install_in_3.7.6:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+    - cd .. && ls -al
+
+source_install_in_3.8.1:
+  stage: source_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  script:
+    - pip3 install .
+    - mkdir -p ${DEMO_ROOT} && cd ${DEMO_ROOT} && ls -al
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+    - cd .. && ls -al
+
+package_in_3.6.3:
+  stage: package
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  script:
+    - python3 setup.py bdist_wheel
+    - ls -al
+    - tree -a build dist
+  artifacts:
+    name: ${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_JOB_ID}-${CI_COMMIT_SHA}
+    when: on_success
+    expire_in: 2 hrs
+    paths:
+      - 'dist'
+
+package_test_in_3.6.3:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+
+package_test_in_3.7.6:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.7.6
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+
+package_test_in_3.8.1:
+  stage: package_install
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.8.1
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - ls -al
+    - tree -a build dist
+    - pip3 install $(ls dist/*.whl)
+    - python3 -c 'from pji.config.meta import __TITLE__, __VERSION__;print(__TITLE__, __VERSION__);'
+    - pji -v
+    - pji -h
+
+deploy:
+  stage: deploy
+  image: local-registry.inner.buaaoo.top/image-dev/python:3.6.3
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - package_in_3.6.3
+  script:
+    - twine upload -r "${TWINE_REPOSITORY}" dist/*
+  only:
+    - /^release/.*$/@oo_system/utils/pji

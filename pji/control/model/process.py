@@ -1,8 +1,9 @@
 import os
 import signal
+from resource import struct_rusage
 from typing import Optional
 
-import bitmath
+from ...utils import size_to_bytes_str, get_repr_info
 
 
 class _IStatus:
@@ -23,16 +24,23 @@ class _IStatus:
         """
         return os.WTERMSIG(self.__status)
 
+    # noinspection PyArgumentList
     @property
     def signal(self) -> Optional[signal.Signals]:
         """
-        获取信号
-        :return: 信号
+        :return: signal object
         """
         if self.signal_code:
             return signal.Signals(self.signal_code)
         else:
             return None
+
+    @property
+    def ok(self) -> bool:
+        """
+        :return: true if quit normally, otherwise false
+        """
+        return not self.__status
 
 
 class _IDuration:
@@ -70,7 +78,7 @@ class _IDuration:
 
 
 class _IResource:
-    def __init__(self, resource_usage):
+    def __init__(self, resource_usage: struct_rusage):
         self.__resource_usage = resource_usage
 
     @property
@@ -122,11 +130,13 @@ class ProcessResult(_IStatus, _IDuration, _IResource):
         """
         :return: get presentation format
         """
-        return "<{cls} exitcode: {exitcode}, signal: {signal}, real time: {real_time}, " \
-               "cpu time: {cpu_time}, max memory: {max_memory}>".format(cls=type(self).__name__,
-                                                                        exitcode=self.exitcode,
-                                                                        signal=self.signal_code,
-                                                                        real_time='%.3fs' % self.real_time,
-                                                                        cpu_time='%.3fs' % self.cpu_time,
-                                                                        max_memory=bitmath.Byte(
-                                                                            self.max_memory).best_prefix(), )
+        return get_repr_info(
+            cls=self.__class__,
+            args=[
+                ('exitcode', lambda: self.exitcode),
+                ('signal', (lambda: self.signal.name, lambda: self.signal)),
+                ('real time', lambda: '%.3fs' % self.real_time),
+                ('cpu time', lambda: '%.3fs' % self.cpu_time),
+                ('max memory', lambda: size_to_bytes_str(self.max_memory)),
+            ]
+        )

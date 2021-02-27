@@ -1,10 +1,43 @@
 import resource
+from typing import Optional, Union
+
+from bitmath import MiB
+
+from ...utils import allow_none, size_to_bytes, time_to_duration, get_repr_info, size_to_bytes_str
+
+_UNLIMITED = -1
+
+
+def _rmin(x, y):
+    if x == _UNLIMITED:
+        return y
+    elif y == _UNLIMITED:
+        return x
+    else:
+        return min(x, y)
+
+
+def _rprocess(cur, new):
+    _cur_soft, _cur_hard = cur
+    if isinstance(new, tuple):
+        _new_soft, _new_hard = new
+    else:
+        _new_soft, _new_hard = new, new
+
+    _hard = _rmin(_cur_hard, _new_hard)
+    _soft = _rmin(_new_soft, _hard)
+
+    return _soft, _hard
+
+
+_memory_process = allow_none(size_to_bytes)
+_duration_process = allow_none(time_to_duration)
+_number_process = allow_none(lambda x: x)
 
 
 class ResourceLimit:
-    __RESOURCE_UNLIMITED = -1
-    __RESOURCE_LIMITS = {"max_stack", "max_memory", "max_cpu_time", "max_real_time",
-                         "max_process_number", "max_output_size", }
+    __RESOURCES = {"max_stack", "max_memory", "max_cpu_time", "max_real_time",
+                   "max_process_number", "max_output_size", }
 
     def __init__(
             self,
@@ -23,12 +56,12 @@ class ResourceLimit:
         :param max_process_number: max process count
         :param max_output_size: max output size (unit: B)
         """
-        self.__max_stack = max_stack
-        self.__max_memory = max_memory
-        self.__max_cpu_time = max_cpu_time
-        self.__max_real_time = max_real_time
-        self.__max_process_number = max_process_number
-        self.__max_output_size = max_output_size
+        self.__max_stack = _memory_process(max_stack)
+        self.__max_memory = _memory_process(max_memory)
+        self.__max_cpu_time = _duration_process(max_cpu_time)
+        self.__max_real_time = _duration_process(max_real_time)
+        self.__max_process_number = _number_process(max_process_number)
+        self.__max_output_size = _memory_process(max_output_size)
 
     @property
     def max_stack(self):
@@ -79,7 +112,8 @@ class ResourceLimit:
         :param limit_type: type of limitation
         :param value: limitation value
         """
-        resource.setrlimit(limit_type, (value, value))
+        _limit_value = _rprocess(resource.getrlimit(limit_type), value)
+        resource.setrlimit(limit_type, _limit_value)
 
     def __apply_max_stack(self):
         """
@@ -88,7 +122,7 @@ class ResourceLimit:
         if self.max_stack:
             real = self.max_stack
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_STACK, real)
 
     def __apply_max_memory(self):
@@ -96,9 +130,9 @@ class ResourceLimit:
         apply max rss memory limit
         """
         if self.max_memory:
-            real = max(round(self.max_memory * 1.5), round(self.max_memory + 512 << 20))
+            real = round(self.max_memory + MiB(256).bytes)
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_AS, real)
 
     def __apply_max_cpu_time(self):
@@ -108,7 +142,7 @@ class ResourceLimit:
         if self.max_cpu_time:
             real = round(self.max_cpu_time) + 1
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_CPU, real)
 
     def __apply_max_process_number(self):
@@ -118,7 +152,7 @@ class ResourceLimit:
         if self.max_process_number:
             real = self.max_process_number
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_NPROC, real)
 
     def __apply_max_output_size(self):
@@ -128,7 +162,7 @@ class ResourceLimit:
         if self.max_output_size:
             real = self.max_output_size
         else:
-            real = self.__RESOURCE_UNLIMITED
+            real = _UNLIMITED
         self.__apply_limit(resource.RLIMIT_FSIZE, real)
 
     @property
@@ -155,6 +189,25 @@ class ResourceLimit:
         """
         return cls(**cls.__filter_by_properties(**json_data))
 
+    @classmethod
+    def loads(cls, data: Optional[Union[dict, 'ResourceLimit']]) -> 'ResourceLimit':
+        """
+        load object from json data or resource limit object
+        :param data: json data or object
+        :return: resource limit object
+        """
+        data = data or {}
+        if isinstance(data, ResourceLimit):
+            return data
+        elif isinstance(data, dict):
+            return ResourceLimit.load_from_json(json_data=data)
+        else:
+            raise TypeError('{rl} or {dict} expected, but {actual} found.'.format(
+                rl=ResourceLimit.__name__,
+                dict=dict.__name__,
+                actual=type(data).__name__,
+            ))
+
     def apply(self):
         """
         apply the resource limits
@@ -173,7 +226,7 @@ class ResourceLimit:
         :return: filtered arguments
         """
         return {
-            key: value for key, value in kwargs.items() if key in cls.__RESOURCE_LIMITS
+            key: value for key, value in kwargs.items() if key in cls.__RESOURCES
         }
 
     @classmethod
@@ -205,4 +258,33 @@ class ResourceLimit:
             max_real_time=_max_real_time,
             max_process_number=_max_process_number,
             max_output_size=_max_output_size,
+        )
+
+    def __tuple(self):
+        return self.__max_stack, self.__max_memory, self.__max_cpu_time, \
+               self.__max_real_time, self.__max_process_number, self.__max_output_size
+
+    def __eq__(self, other):
+        if other is self:
+            return True
+        elif isinstance(other, self.__class__):
+            return self.__tuple() == other.__tuple()
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.__tuple())
+
+    def __repr__(self):
+        return get_repr_info(
+            cls=self.__class__,
+            args=[
+                ('cpu time', (lambda: '%.3fs' % self.max_cpu_time, lambda: self.max_cpu_time is not None)),
+                ('real time', (lambda: '%.3fs' % self.max_real_time, lambda: self.max_real_time is not None)),
+                ('memory', (lambda: size_to_bytes_str(self.max_memory), lambda: self.max_memory is not None)),
+                ('stack', (lambda: size_to_bytes_str(self.max_stack), lambda: self.max_stack is not None)),
+                ('process', (lambda: self.max_process_number, lambda: self.max_process_number is not None)),
+                ('output size',
+                 (lambda: size_to_bytes_str(self.max_output_size), lambda: self.max_output_size is not None)),
+            ]
         )
