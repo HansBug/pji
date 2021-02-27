@@ -23,14 +23,6 @@ def print_version(ctx: Context, param: Option, value: bool) -> None:
     ctx.exit()
 
 
-# noinspection PyUnusedLocal
-def validate_concurrency(ctx: Context, param: Option, value: int):
-    if value > 0:
-        return value
-    else:
-        raise ValueError("Concurrency should be no less than 1.")
-
-
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help']
 )
