@@ -9,5 +9,5 @@ class FileOutputTemplate(metaclass=ABCMeta):
 
 class FileOutput(metaclass=ABCMeta):
     @abstractmethod
-    def __call__(self):
+    def __call__(self, **kwargs):
         raise NotImplementedError

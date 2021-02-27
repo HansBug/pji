@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional, Callable
 
 from .base import FileOutputTemplate, FileOutput
 from .general import load_output_template
-from ....utils import get_repr_info
+from ....utils import get_repr_info, wrap_empty
 
 
 class _IFileOutputCollection:
@@ -83,9 +83,12 @@ class FileOutputCollection(_IFileOutputCollection):
     def __iter__(self):
         return self.items.__iter__()
 
-    def __call__(self):
+    def __call__(self, output_collection_start: Optional[Callable[['FileOutputCollection'], None]] = None,
+                 output_collection_complete: Optional[Callable[['FileOutputCollection'], None]] = None, **kwargs):
         """
         execute this file output setting
         """
+        wrap_empty(output_collection_start)(self)
         for item in self.__items:
-            item()
+            item(**kwargs)
+        wrap_empty(output_collection_complete)(self)

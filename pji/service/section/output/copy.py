@@ -1,10 +1,10 @@
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 
 from .base import FileOutputTemplate, FileOutput
 from ...base import _check_workdir_file, _process_environ
-from ....utils import get_repr_info, auto_copy_file, env_template
+from ....utils import get_repr_info, auto_copy_file, env_template, wrap_empty
 
 
 def _check_os_path(path: str) -> str:
@@ -96,8 +96,11 @@ class CopyFileOutput(FileOutput, _ICopyFileOutput):
     def local(self) -> str:
         return self.__local
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, output_start: Optional[Callable[['CopyFileOutput'], None]] = None,
+                 output_complete: Optional[Callable[['CopyFileOutput'], None]] = None, **kwargs):
         """
         execute this file output
         """
+        wrap_empty(output_start)(self)
         auto_copy_file(self.__local, self.__file)
+        wrap_empty(output_complete)(self)

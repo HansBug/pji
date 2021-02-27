@@ -1,10 +1,10 @@
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 
 from .base import FileOutputTemplate, FileOutput
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
-from ....utils import get_repr_info, FilePool, env_template
+from ....utils import get_repr_info, FilePool, env_template, wrap_empty
 
 
 class _ITagFileOutput(metaclass=ABCMeta):
@@ -88,8 +88,11 @@ class TagFileOutput(FileOutput, _ITagFileOutput):
     def local(self) -> str:
         return self.__local
 
-    def __call__(self):
+    def __call__(self, output_start: Optional[Callable[['TagFileOutput'], None]] = None,
+                 output_complete: Optional[Callable[['TagFileOutput'], None]] = None, **kwargs):
         """
         execute this file output
         """
+        wrap_empty(output_start)(self)
         self.__pool[self.__tag] = self.__local
+        wrap_empty(output_complete)(self)
