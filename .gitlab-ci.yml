@@ -182,4 +182,4 @@ deploy:
   script:
     - twine upload -r "${TWINE_REPOSITORY}" dist/*
   only:
-    - /^release/.*$/@oo_system/utils/pji
+    - /^release/.*$/@oo_system/judge/pji
