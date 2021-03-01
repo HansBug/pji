@@ -87,6 +87,7 @@ class Section(_ISection):
     def infos_getter(self) -> Callable[..., SectionInfoMapping]:
         return self.__infos_getter
 
+    @property
     def info_dump(self) -> Optional[str]:
         return self.__info_dump
 

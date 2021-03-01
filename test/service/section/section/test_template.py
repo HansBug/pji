@@ -27,6 +27,7 @@ class TestServiceSectionSectionTemplate:
         assert len(SECTION_TEMPLATE_1.outputs.items) == 4
         assert isinstance(SECTION_TEMPLATE_1.infos, SectionInfoMappingTemplate)
         assert len(SECTION_TEMPLATE_1.infos.items.keys()) == 5
+        assert SECTION_TEMPLATE_1.info_dump == 'info.txt'
 
         assert repr(SECTION_TEMPLATE_1) == "<SectionTemplate name: 'name_${V}', " \
                                            "identification: <Identification user: nobody, " \

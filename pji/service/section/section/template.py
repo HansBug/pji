@@ -1,3 +1,4 @@
+import os
 from functools import partial
 from typing import Mapping, Optional
 
@@ -6,7 +7,7 @@ from .section import Section
 from ..info import SectionInfoMappingTemplate
 from ..input import FileInputCollectionTemplate
 from ..output import FileOutputCollectionTemplate
-from ...base import _process_environ
+from ...base import _process_environ, _check_os_path
 from ...command import CommandCollectionTemplate
 from ....control.model import Identification, ResourceLimit
 from ....utils import env_template, FilePool
@@ -99,6 +100,9 @@ class SectionTemplate(_ISection):
 
         _identification = Identification.merge(Identification.loads(identification), self.__identification)
         _resources = ResourceLimit.merge(ResourceLimit.loads(resources), self.__resources)
+        _info_dump = os.path.normpath(
+            os.path.abspath(os.path.join(scriptdir, _check_os_path(
+                env_template(self.__info_dump, environ))))) if self.__info_dump else None
 
         arguments = dict(kwargs)
         arguments.update(
@@ -116,7 +120,7 @@ class SectionTemplate(_ISection):
             inputs_getter=partial(self.__inputs, **arguments),
             outputs_getter=partial(self.__outputs, **arguments),
             infos_getter=partial(self.__infos, **arguments),
-            info_dump=env_template(self.__info_dump, environ) if self.__info_dump else None,
+            info_dump=_info_dump,
         )
 
     @classmethod
