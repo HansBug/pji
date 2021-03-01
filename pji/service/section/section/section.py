@@ -93,6 +93,8 @@ class Section(_ISection):
 
     def __call__(self, section_start: Optional[Callable[['Section'], None]] = None,
                  section_complete: Optional[Callable[['Section', _SECTION_RESULT], None]] = None,
+                 info_dump_start: Optional[Callable[['Section', Mapping[str, Any]], None]] = None,
+                 info_dump_complete: Optional[Callable[['Section', Mapping[str, Any]], None]] = None,
                  **kwargs) -> _SECTION_RESULT:
         """
         run section
@@ -110,8 +112,10 @@ class Section(_ISection):
                 self.__outputs_getter(workdir=workdir)(**kwargs)
             _info = self.__infos_getter(workdir=workdir)(**kwargs)
             if self.__info_dump:
+                wrap_empty(info_dump_start)(self, _info)
                 with codecs.open(self.__info_dump, 'w') as cf:
                     json.dump(_info, cf, indent=4, sort_keys=True)
+                wrap_empty(info_dump_complete)(self, _info)
 
             _return = (_success, _results, _info)
 

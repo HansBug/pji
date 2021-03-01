@@ -5,6 +5,7 @@ import time
 
 import pytest
 from bitmath import MiB
+
 from pji.control.model import ProcessResult
 
 _DEMO_RUSAGE = resource.struct_rusage((2.0, 1.0, 131072, 0, 0, 0, 2216, 0, 0, 0, 0, 0, 0, 0, 246, 129))

@@ -1,8 +1,8 @@
 import os
 
 import pytest
-from pji.control.model import ProcessResult, RunResult, ResourceLimit, RunResultStatus
 
+from pji.control.model import ProcessResult, RunResult, ResourceLimit, RunResultStatus
 from .test_process import _DEMO_RUSAGE, _TIME_1_5, _TIME_0_0
 
 _DEMO_RESULT_NORMAL = ProcessResult(

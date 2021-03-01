@@ -1,4 +1,5 @@
 import codecs
+import json
 import os
 
 import pytest
@@ -36,6 +37,8 @@ class TestEntryCli:
 
             with codecs.open('test_result.txt', 'r') as rf:
                 assert rf.read().rstrip() == '5'
+            with codecs.open('result.txt', 'r') as rf:
+                assert json.loads(rf.read()) == {'input': '2 3\n', 'wc': '7\n'}
 
     def test_simple_with_default(self):
         runner = CliRunner()

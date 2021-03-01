@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from functools import partial
+from typing import Mapping, Any
 
 from ..control.model import RunResult
 from ..service import DispatchTemplate, Command, CommandCollection, SectionInfoMapping, FileInput, \
@@ -26,6 +27,12 @@ class DispatchRunner(metaclass=ABCMeta):
         pass
 
     def _info_mapping_complete(self, mapping: SectionInfoMapping, result):
+        pass
+
+    def _info_dump_start(self, section: Section, info: Mapping[str, Any]):
+        pass
+
+    def _info_dump_complete(self, section: Section, info: Mapping[str, Any]):
         pass
 
     def _input_start(self, input_: FileInput):
@@ -76,6 +83,8 @@ class DispatchRunner(metaclass=ABCMeta):
             command_collection_complete=self._command_collection_complete,
             info_mapping_start=self._info_mapping_start,
             info_mapping_complete=self._info_mapping_complete,
+            info_dump_start=self._info_dump_start,
+            info_dump_complete=self._info_dump_complete,
             input_start=self._input_start,
             input_complete=self._input_complete,
             input_collection_start=self._input_collection_start,

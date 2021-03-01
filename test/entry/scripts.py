@@ -17,6 +17,7 @@ tasks:
         infos:
           wc: "tag:wc"
           input: "tag:input"
+        info_dump: 'result.txt'
         commands:
           - args: "cat test_script.py | wc -l"
             stdout: wc_result.txt
