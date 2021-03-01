@@ -64,6 +64,8 @@ global:
     INPUT: 2 3
   use_sys_env:
     - PATH
+    - LC_ALL
+    - LANG
 tasks:
   run_python:
     sections:
@@ -76,6 +78,7 @@ tasks:
         infos:
           wc: "tag:wc"
           input: "tag:input"
+        info_dump: "test_info.txt"
         commands:
           - args: "cat test_script.py | wc -l"
             stdout: wc_result.txt
@@ -102,7 +105,7 @@ tasks:
         commands:
           - args: "cat base64.txt | python test_script.py"
             stdout: result.txt
-          - args: 'true'
+          - 'true'
 ```
 
 脚本文件`test_script.py`
@@ -126,27 +129,28 @@ pji -s /root/123/test_dispatch.yml -t run_python
 
 ```
 Section 'get_test_info' start ...
-Coping file from '/root/123/test_script.py' to '/tmp/tmpe_out8yd/test_script.py' ... COMPLETE
+Coping file from '/root/123/test_script.py' to '/tmp/tmpqx4_zkut/test_script.py' ... COMPLETE
 Running 'cat test_script.py | wc -l' ... SUCCESS
 Running 'echo ${INPUT}' ... SUCCESS
-Saving file from '/tmp/tmpe_out8yd/wc_result.txt' to tag 'wc' ... COMPLETE
-Saving file from '/tmp/tmpe_out8yd/input_result.txt' to tag 'input' ... COMPLETE
+Saving file from '/tmp/tmpqx4_zkut/wc_result.txt' to tag 'wc' ... COMPLETE
+Saving file from '/tmp/tmpqx4_zkut/input_result.txt' to tag 'input' ... COMPLETE
 Collecting result information ... COMPLETE
+Dumping result information to '/root/123/test_info.txt' ... COMPLETE
 Section 'get_test_info' execute completed!
 
 Section 'generate_base64' start ...
 Running 'echo ${INPUT} | base64' ... SUCCESS
-Saving file from '/tmp/tmp1h6ih7kq/base64.txt' to tag 'b64' ... COMPLETE
+Saving file from '/tmp/tmp6318l82p/base64.txt' to tag 'b64' ... COMPLETE
 Collecting result information ... COMPLETE
 Section 'generate_base64' execute completed!
 
 Section 'run_result' start ...
-Coping file from '/root/123/test_script.py' to '/tmp/tmpzw6fik7e/test_script.py' ... COMPLETE
-Loading tag 'b64' to '/tmp/tmpzw6fik7e/base64.txt' ... COMPLETE
+Coping file from '/root/123/test_script.py' to '/tmp/tmpeotfbp0p/test_script.py' ... COMPLETE
+Loading tag 'b64' to '/tmp/tmpeotfbp0p/base64.txt' ... COMPLETE
 Running 'cat base64.txt | python test_script.py' ... SUCCESS
 Running 'true' ... SUCCESS
-Saving file from '/tmp/tmpzw6fik7e/result.txt' to tag 'result' ... COMPLETE
-Coping file from '/tmp/tmpzw6fik7e/result.txt' to '/root/123/test_result.txt' ... COMPLETE
+Saving file from '/tmp/tmpeotfbp0p/result.txt' to tag 'result' ... COMPLETE
+Coping file from '/tmp/tmpeotfbp0p/result.txt' to '/root/123/test_result.txt' ... COMPLETE
 Collecting result information ... COMPLETE
 Section 'run_result' execute completed!
 
