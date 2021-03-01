@@ -113,3 +113,13 @@ class RunResult:
                 ('signal', (lambda: self.result.signal.name, lambda: self.result.signal is not None)),
             ],
         )
+
+    @property
+    def json(self):
+        """
+        :return: get run result information
+        """
+        return {
+            'limit': self.limit.json,
+            'result': self.result.json if self.result else None,
+        }

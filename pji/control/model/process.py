@@ -140,3 +140,17 @@ class ProcessResult(_IStatus, _IDuration, _IResource):
                 ('max memory', lambda: size_to_bytes_str(self.max_memory)),
             ]
         )
+
+    @property
+    def json(self):
+        """
+        get process information
+        :return: process information json
+        """
+        return {
+            'exitcode': self.exitcode,
+            'signal': self.signal.name if self.signal else None,
+            'real_time': self.real_time,
+            'cpu_time': self.cpu_time,
+            'max_memory': self.max_memory,
+        }
