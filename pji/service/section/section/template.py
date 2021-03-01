@@ -15,7 +15,7 @@ from ....utils import env_template, FilePool
 class SectionTemplate(_ISection):
     def __init__(self, name: str, commands,
                  identification=None, resources=None, environ=None,
-                 inputs=None, outputs=None, infos=None):
+                 inputs=None, outputs=None, infos=None, info_dump=None):
         """
         :param name: section name
         :param commands: commands
@@ -25,6 +25,7 @@ class SectionTemplate(_ISection):
         :param inputs: input collection template
         :param outputs: output collection template
         :param infos: information collection template
+        :param info_dump: information result dump
         """
         self.__name = name
         self.__commands = CommandCollectionTemplate.loads(commands)
@@ -36,6 +37,7 @@ class SectionTemplate(_ISection):
         self.__inputs = FileInputCollectionTemplate.loads(inputs)
         self.__outputs = FileOutputCollectionTemplate.loads(outputs)
         self.__infos = SectionInfoMappingTemplate.loads(infos)
+        self.__info_dump = info_dump
 
         _ISection.__init__(self, self.__name, self.__identification, self.__resources,
                            self.__environ, self.__inputs, self.__outputs, self.__infos, self.__commands)
@@ -71,6 +73,10 @@ class SectionTemplate(_ISection):
     @property
     def infos(self) -> SectionInfoMappingTemplate:
         return self.__infos
+
+    @property
+    def info_dump(self) -> str:
+        return self.__info_dump
 
     def __call__(self, scriptdir: str, pool: Optional[FilePool] = None,
                  identification=None, resources=None, environ=None, **kwargs) -> Section:
@@ -110,6 +116,7 @@ class SectionTemplate(_ISection):
             inputs_getter=partial(self.__inputs, **arguments),
             outputs_getter=partial(self.__outputs, **arguments),
             infos_getter=partial(self.__infos, **arguments),
+            info_dump=env_template(self.__info_dump, environ) if self.__info_dump else None,
         )
 
     @classmethod
