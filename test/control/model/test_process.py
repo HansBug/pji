@@ -5,7 +5,6 @@ import time
 
 import pytest
 from bitmath import MiB
-
 from pji.control.model import ProcessResult
 
 _DEMO_RUSAGE = resource.struct_rusage((2.0, 1.0, 131072, 0, 0, 0, 2216, 0, 0, 0, 0, 0, 0, 0, 246, 129))
@@ -50,6 +49,22 @@ class TestControlModelProcessNormal:
         )
 
         assert repr(pr) == '<ProcessResult exitcode: 0, real time: 5.500s, cpu time: 2.000s, max memory: 128.0 MiB>'
+
+    def test_json(self):
+        pr = ProcessResult(
+            status=0,
+            start_time=_TIME_0_0,
+            end_time=_TIME_1_5,
+            resource_usage=_DEMO_RUSAGE,
+        )
+
+        assert pr.json == {
+            'cpu_time': 2.0,
+            'exitcode': 0,
+            'max_memory': 134217728.0,
+            'real_time': 1.5,
+            'signal': None
+        }
 
 
 @pytest.mark.unittest

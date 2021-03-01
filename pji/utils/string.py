@@ -10,6 +10,14 @@ def env_template(template: str, environ: Optional[Mapping[str, str]] = None, saf
 
 
 def truncate(text: str, width: int = 70, tail_length: int = 0, show_length: bool = False):
+    """
+    truncate string into short form
+    :param text: original text
+    :param width: final width
+    :param tail_length: tail's length
+    :param show_length: show length in middle part or not
+    :return: short-formed string
+    """
     text = str(text)
 
     if show_length:

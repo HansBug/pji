@@ -2,6 +2,12 @@ from typing import List, Tuple
 
 
 def get_repr_info(cls: type, args: List[Tuple]):
+    """
+    get representation information
+    :param cls: class object
+    :param args: arguments to display
+    :return: representation string
+    """
     _data_items = []
     for item in args:
         if isinstance(item, tuple):

@@ -1,8 +1,8 @@
 import os
 
 import pytest
-
 from pji.control.model import ProcessResult, RunResult, ResourceLimit, RunResultStatus
+
 from .test_process import _DEMO_RUSAGE, _TIME_1_5, _TIME_0_0
 
 _DEMO_RESULT_NORMAL = ProcessResult(
@@ -41,6 +41,24 @@ class TestControlModelRun:
         assert rr.ok
         assert rr.status == RunResultStatus.SUCCESS
         assert repr(rr) == '<RunResult status: SUCCESS>'
+
+        assert rr.json == {
+            'limit': dict(
+                max_stack=None,
+                max_memory=None,
+                max_cpu_time=None,
+                max_real_time=None,
+                max_output_size=None,
+                max_process_number=None,
+            ),
+            'result': {
+                'cpu_time': 2.0,
+                'exitcode': 0,
+                'max_memory': 134217728.0,
+                'real_time': 1.5,
+                'signal': None
+            }
+        }
 
     def test_real_time_limit_exceed_1(self):
         rr = RunResult(
