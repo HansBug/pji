@@ -34,7 +34,8 @@ SECTION_TEMPLATE_1 = SectionTemplate(
         'local': LocalSectionInfoTemplate('stdout_3_${V}.txt'),
         'tag': TagSectionInfoTemplate('t_1_${V}'),
         'base64': LocalSectionInfoTemplate('stderr_4_${V}.txt'),
-    }
+    },
+    info_dump='info.txt',
 )
 
 SECTION_TEMPLATE_2 = SectionTemplate(

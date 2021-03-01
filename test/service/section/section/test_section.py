@@ -1,4 +1,5 @@
 import codecs
+import json
 import os
 import tempfile
 
@@ -33,6 +34,7 @@ class TestServiceSectionSectionSection:
                                                         "('base64', 'local', 'static', 'tag', 'value')>"
             assert repr(s.inputs_getter(workdir='.')) == "<FileInputCollection inputs: 1>"
             assert repr(s.outputs_getter(workdir='.')) == "<FileOutputCollection outputs: 4>"
+            assert s.info_dump == os.path.join(scriptdir, "info.txt")
 
     def test_section_invalid(self):
         with tempfile.TemporaryDirectory() as scriptdir, \
@@ -100,6 +102,8 @@ class TestServiceSectionSectionSection:
                 assert tf.read().rstrip() == '233 233'
             with codecs.open(os.path.join(scriptdir, 'f2.txt'), 'r') as tf:
                 assert tf.read().rstrip() == 'xxx 233'
+            with codecs.open(os.path.join(scriptdir, 'info.txt'), 'r') as tf:
+                assert json.loads(tf.read()) == _infos
 
     def test_section_fail(self):
         with tempfile.TemporaryDirectory() as scriptdir, \

@@ -1,5 +1,5 @@
 import os
-from typing import Callable
+from typing import Callable, Mapping, Any
 
 import click
 
@@ -77,6 +77,13 @@ class DispatchEventRunner(DispatchRunner):
         click.echo(click.style('Collecting result information ... ', bold=False), nl=False)
 
     def _info_mapping_complete(self, mapping: SectionInfoMapping, result):
+        click.echo(click.style('COMPLETE', fg='green'), nl=True)
+
+    def _info_dump_start(self, section: Section, info: Mapping[str, Any]):
+        click.echo(click.style('Dumping result information to {dump} ... '.format(
+            dump=repr(section.info_dump)), bold=False), nl=False)
+
+    def _info_dump_complete(self, section: Section, info: Mapping[str, Any]):
         click.echo(click.style('COMPLETE', fg='green'), nl=True)
 
 
