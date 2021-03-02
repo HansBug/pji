@@ -1,4 +1,4 @@
-def _result_to_json(result):
+def _section_result_to_json(result):
     _name, (_ok, _runs, _info) = result
     return dict(
         name=_name,
@@ -8,7 +8,7 @@ def _result_to_json(result):
     )
 
 
-def to_json(success: bool, result):
+def result_to_json(success: bool, result):
     """
     from result to json data
     :param success: success or not
@@ -17,5 +17,5 @@ def to_json(success: bool, result):
     """
     return dict(
         ok=not not success,
-        result=[_result_to_json(item) for item in result],
+        result=[_section_result_to_json(item) for item in result],
     )
