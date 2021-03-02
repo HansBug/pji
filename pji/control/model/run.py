@@ -122,4 +122,7 @@ class RunResult:
         return {
             'limit': self.limit.json,
             'result': self.result.json if self.result else None,
+            'status': self.status.name,
+            'ok': self.ok,
+            'completed': self.completed,
         }
