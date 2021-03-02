@@ -129,28 +129,28 @@ pji -s /root/123/test_dispatch.yml -t run_python
 
 ```
 Section 'get_test_info' start ...
-Coping file from '/root/123/test_script.py' to '/tmp/tmpqx4_zkut/test_script.py' ... COMPLETE
-Running 'cat test_script.py | wc -l' ... SUCCESS
-Running 'echo ${INPUT}' ... SUCCESS
-Saving file from '/tmp/tmpqx4_zkut/wc_result.txt' to tag 'wc' ... COMPLETE
-Saving file from '/tmp/tmpqx4_zkut/input_result.txt' to tag 'input' ... COMPLETE
+Coping file from '/root/123/test_script.py' to '/tmp/tmp6rsk6t2o/test_script.py' ... COMPLETE
+Running 'cat test_script.py | wc -l' ... SUCCESS, time: 0.002s / 0.002s, memory: 18.875 MiB
+Running 'echo ${INPUT}' ... SUCCESS, time: 0.004s / 0.003s, memory: 19.125 MiB
+Saving file from '/tmp/tmp6rsk6t2o/wc_result.txt' to tag 'wc' ... COMPLETE
+Saving file from '/tmp/tmp6rsk6t2o/input_result.txt' to tag 'input' ... COMPLETE
 Collecting result information ... COMPLETE
 Dumping result information to '/root/123/test_info.txt' ... COMPLETE
 Section 'get_test_info' execute completed!
 
 Section 'generate_base64' start ...
-Running 'echo ${INPUT} | base64' ... SUCCESS
-Saving file from '/tmp/tmp6318l82p/base64.txt' to tag 'b64' ... COMPLETE
+Running 'echo ${INPUT} | base64' ... SUCCESS, time: 0.003s / 0.002s, memory: 19.15625 MiB
+Saving file from '/tmp/tmp_n5ftp5d/base64.txt' to tag 'b64' ... COMPLETE
 Collecting result information ... COMPLETE
 Section 'generate_base64' execute completed!
 
 Section 'run_result' start ...
-Coping file from '/root/123/test_script.py' to '/tmp/tmpeotfbp0p/test_script.py' ... COMPLETE
-Loading tag 'b64' to '/tmp/tmpeotfbp0p/base64.txt' ... COMPLETE
-Running 'cat base64.txt | python test_script.py' ... SUCCESS
-Running 'true' ... SUCCESS
-Saving file from '/tmp/tmpeotfbp0p/result.txt' to tag 'result' ... COMPLETE
-Coping file from '/tmp/tmpeotfbp0p/result.txt' to '/root/123/test_result.txt' ... COMPLETE
+Coping file from '/root/123/test_script.py' to '/tmp/tmphcbmt0j9/test_script.py' ... COMPLETE
+Loading tag 'b64' to '/tmp/tmphcbmt0j9/base64.txt' ... COMPLETE
+Running 'cat base64.txt | python test_script.py' ... SUCCESS, time: 0.025s / 0.030s, memory: 19.16796875 MiB
+Running 'true' ... SUCCESS, time: 0.000s / 0.001s, memory: 19.18359375 MiB
+Saving file from '/tmp/tmphcbmt0j9/result.txt' to tag 'result' ... COMPLETE
+Coping file from '/tmp/tmphcbmt0j9/result.txt' to '/root/123/test_result.txt' ... COMPLETE
 Collecting result information ... COMPLETE
 Section 'run_result' execute completed!
 
@@ -175,6 +175,152 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7"
 ```
 28
 ```
+
+以及如果需要导出完整的运行信息，可以执行命令行
+
+```shell
+pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i test_info.json
+```
+
+则会额外有文件`test_info.json`
+
+```json
+{
+    "ok": true,
+    "result": [
+        {
+            "information": {
+                "input": "1 2 3 4 5 6 7\n",
+                "wc": "5\n"
+            },
+            "name": "get_test_info",
+            "ok": true,
+            "result": [
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.00358,
+                        "exitcode": 0,
+                        "max_memory": 19832832.0,
+                        "real_time": 0.0027077198028564453,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                },
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.002692,
+                        "exitcode": 0,
+                        "max_memory": 20008960.0,
+                        "real_time": 0.0017857551574707031,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                }
+            ]
+        },
+        {
+            "information": {
+                "b64": "MSAyIDMgNCA1IDYgNwo=\n"
+            },
+            "name": "generate_base64",
+            "ok": true,
+            "result": [
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.004664,
+                        "exitcode": 0,
+                        "max_memory": 20049920.0,
+                        "real_time": 0.0024199485778808594,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                }
+            ]
+        },
+        {
+            "information": {
+                "result": "28\n"
+            },
+            "name": "run_result",
+            "ok": true,
+            "result": [
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.027184999999999997,
+                        "exitcode": 0,
+                        "max_memory": 20082688.0,
+                        "real_time": 0.04508042335510254,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                },
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.0,
+                        "exitcode": 0,
+                        "max_memory": 20090880.0,
+                        "real_time": 0.001954793930053711,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                }
+            ]
+        }
+    ]
+}
+```
+
+
 
 ### 脚本使用
 
