@@ -187,15 +187,59 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i tes
 ```json
 {
     "ok": true,
-    "result": [
+    "sections": [
         {
+            "commands": [
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.000896,
+                        "exitcode": 0,
+                        "max_memory": 19709952.0,
+                        "real_time": 0.002176523208618164,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                },
+                {
+                    "completed": true,
+                    "limit": {
+                        "max_cpu_time": null,
+                        "max_memory": null,
+                        "max_output_size": null,
+                        "max_process_number": null,
+                        "max_real_time": null,
+                        "max_stack": null
+                    },
+                    "ok": true,
+                    "result": {
+                        "cpu_time": 0.002518,
+                        "exitcode": 0,
+                        "max_memory": 19881984.0,
+                        "real_time": 0.0010895729064941406,
+                        "signal": null
+                    },
+                    "status": "SUCCESS"
+                }
+            ],
             "information": {
                 "input": "1 2 3 4 5 6 7\n",
                 "wc": "5\n"
             },
             "name": "get_test_info",
-            "ok": true,
-            "result": [
+            "ok": true
+        },
+        {
+            "commands": [
                 {
                     "completed": true,
                     "limit": {
@@ -208,72 +252,23 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i tes
                     },
                     "ok": true,
                     "result": {
-                        "cpu_time": 0.00358,
+                        "cpu_time": 0.002568,
                         "exitcode": 0,
-                        "max_memory": 19832832.0,
-                        "real_time": 0.0027077198028564453,
-                        "signal": null
-                    },
-                    "status": "SUCCESS"
-                },
-                {
-                    "completed": true,
-                    "limit": {
-                        "max_cpu_time": null,
-                        "max_memory": null,
-                        "max_output_size": null,
-                        "max_process_number": null,
-                        "max_real_time": null,
-                        "max_stack": null
-                    },
-                    "ok": true,
-                    "result": {
-                        "cpu_time": 0.002692,
-                        "exitcode": 0,
-                        "max_memory": 20008960.0,
-                        "real_time": 0.0017857551574707031,
+                        "max_memory": 19922944.0,
+                        "real_time": 0.0018069744110107422,
                         "signal": null
                     },
                     "status": "SUCCESS"
                 }
-            ]
-        },
-        {
+            ],
             "information": {
                 "b64": "MSAyIDMgNCA1IDYgNwo=\n"
             },
             "name": "generate_base64",
-            "ok": true,
-            "result": [
-                {
-                    "completed": true,
-                    "limit": {
-                        "max_cpu_time": null,
-                        "max_memory": null,
-                        "max_output_size": null,
-                        "max_process_number": null,
-                        "max_real_time": null,
-                        "max_stack": null
-                    },
-                    "ok": true,
-                    "result": {
-                        "cpu_time": 0.004664,
-                        "exitcode": 0,
-                        "max_memory": 20049920.0,
-                        "real_time": 0.0024199485778808594,
-                        "signal": null
-                    },
-                    "status": "SUCCESS"
-                }
-            ]
+            "ok": true
         },
         {
-            "information": {
-                "result": "28\n"
-            },
-            "name": "run_result",
-            "ok": true,
-            "result": [
+            "commands": [
                 {
                     "completed": true,
                     "limit": {
@@ -286,10 +281,10 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i tes
                     },
                     "ok": true,
                     "result": {
-                        "cpu_time": 0.027184999999999997,
+                        "cpu_time": 0.023656999999999997,
                         "exitcode": 0,
-                        "max_memory": 20082688.0,
-                        "real_time": 0.04508042335510254,
+                        "max_memory": 19947520.0,
+                        "real_time": 0.027228593826293945,
                         "signal": null
                     },
                     "status": "SUCCESS"
@@ -306,15 +301,20 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i tes
                     },
                     "ok": true,
                     "result": {
-                        "cpu_time": 0.0,
+                        "cpu_time": 0.001723,
                         "exitcode": 0,
-                        "max_memory": 20090880.0,
-                        "real_time": 0.001954793930053711,
+                        "max_memory": 19955712.0,
+                        "real_time": 0.0009958744049072266,
                         "signal": null
                     },
                     "status": "SUCCESS"
                 }
-            ]
+            ],
+            "information": {
+                "result": "28\n"
+            },
+            "name": "run_result",
+            "ok": true
         }
     ]
 }
