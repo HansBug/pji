@@ -5,10 +5,10 @@ import click
 
 from ..event import _load_dispatch_getter as _load_abstract_dispatch_getter
 from ..runner import DispatchRunner
-from ...control import RunResult
+from ...control import RunResult, RunResultStatus
 from ...service import Dispatch, Command, FileInput, CopyFileInput, TagFileInput, LinkFileInput, \
     Section, SectionInfoMapping, FileOutput, CopyFileOutput, TagFileOutput
-from ...utils import truncate
+from ...utils import truncate, size_to_bytes_str
 
 
 class DispatchEventRunner(DispatchRunner):
@@ -54,7 +54,16 @@ class DispatchEventRunner(DispatchRunner):
 
     def _command_complete(self, command: Command, result: RunResult):
         _color = 'green' if result.ok else 'red'
-        click.echo(click.style(result.status.name, fg=_color, bold=True), nl=True)
+        if result.status != RunResultStatus.NOT_COMPLETED:
+            _title = '{status}, time: {cpu_time} / {real_time}, memory: {memory}'.format(
+                status=result.status.name,
+                cpu_time='%.3fs' % result.result.cpu_time,
+                real_time='%.3fs' % result.result.real_time,
+                memory=size_to_bytes_str(result.result.max_memory),
+            )
+        else:
+            _title = result.status.name
+        click.echo(click.style(_title, fg=_color, bold=True), nl=True)
 
     def _output_start(self, output: FileOutput):
         if isinstance(output, CopyFileOutput):

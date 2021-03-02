@@ -57,7 +57,10 @@ class TestControlModelRun:
                 'max_memory': 134217728.0,
                 'real_time': 1.5,
                 'signal': None
-            }
+            },
+            'completed': True,
+            'ok': True,
+            'status': 'SUCCESS',
         }
 
     def test_real_time_limit_exceed_1(self):

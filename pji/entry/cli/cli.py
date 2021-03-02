@@ -1,4 +1,7 @@
-from typing import List
+import codecs
+import json
+import os
+from typing import List, Optional
 
 import click
 from click.core import Context, Option
@@ -6,10 +9,12 @@ from click.core import Context, Option
 from .environ import _load_environ
 from .event import _load_dispatch_getter
 from .exception import _raise_exception_with_exit_code
+from .result import to_json
 from ..event import _DEFAULT_FILENAME
 from ...config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
 
 
+# noinspection DuplicatedCode,PyUnusedLocal
 def print_version(ctx: Context, param: Option, value: bool) -> None:
     """
     Print version information of cli
@@ -43,12 +48,27 @@ _DEFAULT_TASK = 'main'
               help='Environment variables (loaded before global config).')
 @click.option('-E', '--environ_after', type=str, multiple=True,
               help='Environment variables (loaded after global config).')
-def cli(script: str, task: str, environ: List[str], environ_after: List[str]):
+@click.option('-i', '--information', type=click.Path(dir_okay=False),
+              help='Information dump file (no dumping when not given).')
+def cli(script: str, task: str, environ: List[str], environ_after: List[str],
+        information: Optional[str] = None):
     _dispatch_getter = _load_dispatch_getter(script)
     _success, _result = _dispatch_getter(
         environ=_load_environ(environ),
         environ_after=_load_environ(environ_after),
     )(task)
+
+    if information:
+        click.echo(
+            click.style('Dumping result of this work to {info} ... '.format(
+                info=repr(os.path.abspath(information))), bold=False),
+            nl=False,
+        )
+
+        with codecs.open(information, 'w') as info_file:
+            json.dump(to_json(_success, _result), info_file, indent=4, sort_keys=True)
+
+        click.echo(click.style('COMPLETE', fg='green'), nl=True)
 
     if _success:
         click.echo(click.style('Task success.', fg='green'))
