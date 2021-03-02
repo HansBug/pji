@@ -3,7 +3,7 @@ def _section_result_to_json(result):
     return dict(
         name=_name,
         ok=_ok,
-        result=[item.json for item in _runs],
+        commands=[item.json for item in _runs],
         information=_info,
     )
 
@@ -17,5 +17,5 @@ def result_to_json(success: bool, result):
     """
     return dict(
         ok=not not success,
-        result=[_section_result_to_json(item) for item in result],
+        sections=[_section_result_to_json(item) for item in result],
     )
