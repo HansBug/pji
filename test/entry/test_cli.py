@@ -4,8 +4,8 @@ import os
 
 import pytest
 from click.testing import CliRunner
-
 from pji.entry.cli import cli
+
 from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY, DEMO_B64_FAIL_SCRIPT, DEMO_B64_BEFORE_SCRIPT, \
     DEMO_B64_LINK_SCRIPT
 
@@ -129,6 +129,35 @@ class TestEntryCli:
 
             with codecs.open('test_result.txt', 'r') as rf:
                 assert rf.read().rstrip() == '28'
+
+    def test_after_env_info(self):
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            with codecs.open('pscript.yml', 'w') as sf:
+                sf.write(DEMO_B64_SCRIPT)
+            with codecs.open('test_script.py', 'w') as pf:
+                pf.write(DEMO_B64_TEST_SCRIPT_PY)
+
+            result = runner.invoke(cli, ['-s', 'pscript.yml', '-t', 'run_python',
+                                         '-E', 'INPUT=1 2 3 4 5 6 7', '-i', 'info.json'])
+
+            assert result.exit_code == 0
+            assert "Section 'get_test_info' execute completed!" in result.output
+            assert "Section 'generate_base64' execute completed!" in result.output
+            assert "Section 'run_result' execute completed!" in result.output
+
+            with codecs.open('test_result.txt', 'r') as rf:
+                assert rf.read().rstrip() == '28'
+            with codecs.open('info.json', 'r') as rf:
+                _info = json.loads(rf.read())
+                assert _info['ok']
+                assert len(_info['sections']) == 3
+                assert _info['sections'][0]['ok']
+                assert _info['sections'][0]['information'] == {'input': '1 2 3 4 5 6 7\n', 'wc': '7\n'}
+                assert _info['sections'][1]['ok']
+                assert _info['sections'][1]['information'] == {'b64': 'MSAyIDMgNCA1IDYgNwo=\n'}
+                assert _info['sections'][2]['ok']
+                assert _info['sections'][2]['information'] == {'result': '28\n'}
 
     def test_after_fail(self):
         runner = CliRunner()

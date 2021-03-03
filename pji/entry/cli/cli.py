@@ -9,8 +9,8 @@ from click.core import Context, Option
 from .environ import _load_environ
 from .event import _load_dispatch_getter
 from .exception import _raise_exception_with_exit_code
-from .result import to_json
 from ..event import _DEFAULT_FILENAME
+from ..script.result import result_to_json
 from ...config.meta import __TITLE__, __VERSION__, __AUTHOR__, __AUTHOR_EMAIL__
 
 
@@ -66,7 +66,7 @@ def cli(script: str, task: str, environ: List[str], environ_after: List[str],
         )
 
         with codecs.open(information, 'w') as info_file:
-            json.dump(to_json(_success, _result), info_file, indent=4, sort_keys=True)
+            json.dump(result_to_json(_success, _result), info_file, indent=4, sort_keys=True)
 
         click.echo(click.style('COMPLETE', fg='green'), nl=True)
 
