@@ -143,17 +143,26 @@ def common_process(args, preexec_fn=None, resources=None,
                     nonlocal _stderr
                     _stderr = read_all_from_bytes_stream(fstderr)
 
+                def _write_stdin():
+                    try:
+                        fstdin.write(_communicate_stdin.value)
+                        fstdin.flush()
+                    except BrokenPipeError:
+                        pass
+                    finally:
+                        fstdin.close()
+
+                _stdin_thread = Thread(target=_write_stdin)
                 _stdout_thread = Thread(target=_read_stdout)
                 _stderr_thread = Thread(target=_read_stderr)
 
                 # write stdin into stream
-                fstdin.write(_communicate_stdin.value)
-                fstdin.flush()
+                _stdin_thread.start()
                 _stdout_thread.start()
                 _stderr_thread.start()
 
                 # waiting for receiving of stdout and stderr
-                fstdin.close()
+                _stdin_thread.join()
                 _stdout_thread.join()
                 _stderr_thread.join()
 
