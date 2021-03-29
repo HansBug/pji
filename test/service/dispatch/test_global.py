@@ -1,7 +1,7 @@
 import os
 
+import mock
 import pytest
-
 from pji.control.model import Identification, ResourceLimit
 from pji.service.dispatch.global_ import GlobalConfigTemplate
 
@@ -119,12 +119,13 @@ class TestServiceDispatchGlobal:
             'PATH': '/1/2/3:' + os.environ['PATH'],
         }
 
+    @mock.patch.dict(os.environ, {"PATH": "/3/4/5", "PATH1": '/path/1', 'PATH233': '/path/233'})
     def test_template_all_with_before_env(self):
         gt = GlobalConfigTemplate(
             identification='nobody',
             resources=dict(max_real_time='2.0s'),
             environ=dict(VAR1='2333', PATH='${RUBY_ROOT}:${PATH}'),
-            use_sys_env=['PATH'],
+            use_sys_env=['PATH*'],
         )
 
         g = gt(environ=dict(RUBY_ROOT='/root/ruby'))
@@ -133,7 +134,9 @@ class TestServiceDispatchGlobal:
         assert g.environ == {
             'VAR1': '2333',
             'RUBY_ROOT': '/root/ruby',
-            'PATH': '/root/ruby:' + os.environ['PATH'],
+            'PATH': '/root/ruby:/3/4/5',
+            "PATH1": '/path/1',
+            'PATH233': '/path/233'
         }
 
     def test_template_all_with_ext_env(self):

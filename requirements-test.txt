@@ -1,5 +1,6 @@
 pytest>=5
 coverage>=4,<5
+mock>=4.0.3
 pytest-cov>=2
 pytest-mock>=3
 pytest-timeout>=1
