@@ -1,5 +1,6 @@
 import os
 from abc import ABCMeta
+from fnmatch import filter as fnfilter
 from typing import Optional, Mapping, Union
 
 from ..base import _process_environ
@@ -55,7 +56,10 @@ def _load_local_environ(use_sys_env) -> Mapping[str, str]:
     use_sys_env = _process_use_sys_env(use_sys_env)
     _current_env = dict(os.environ)
     if isinstance(use_sys_env, set):
-        return {key: value for key, value in _current_env.items() if key in use_sys_env}
+        _keys = set()
+        for pattern in use_sys_env:
+            _keys |= set(fnfilter(list(_current_env.keys()), pattern))
+        return {key: value for key, value in _current_env.items() if key in _keys}
     else:
         return _current_env if use_sys_env else {}
 
