@@ -8,7 +8,7 @@ from pji.utils import size_to_bytes, time_to_duration, size_to_bytes_str, time_t
 class TestUtilsUnits:
     def test_size_to_bytes(self):
         assert size_to_bytes(233) == 233
-        assert size_to_bytes(20.3) == 20.3
+        assert size_to_bytes(2.3) == 2
         assert size_to_bytes('2KB') == 2000
         assert size_to_bytes('2KiB') == 2048
         assert size_to_bytes('2kb') == 2000
@@ -22,7 +22,7 @@ class TestUtilsUnits:
 
     def test_size_to_bytes_str(self):
         assert size_to_bytes_str(233) == '233.0 Byte'
-        assert size_to_bytes_str(2.3) == '2.3 Byte'
+        assert size_to_bytes_str(233.3) == '233.0 Byte'
         assert size_to_bytes_str('200000kib') == '195.3125 MiB'
 
     def test_time_to_duration(self):

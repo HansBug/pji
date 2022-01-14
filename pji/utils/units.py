@@ -6,13 +6,13 @@ from bitmath import parse_string_unsafe as parse_bytes
 from pytimeparse import parse as parse_duration
 
 
-def size_to_bytes(size) -> Union[float, int]:
+def size_to_bytes(size) -> int:
     if isinstance(size, (float, int)):
-        return size
+        return int(size)
     elif isinstance(size, str):
-        return parse_bytes(size).bytes
+        return int(parse_bytes(size).bytes)
     elif isinstance(size, Byte):
-        return size.bytes
+        return int(size.bytes)
     else:
         raise TypeError('{int}, {str} or {byte} expected but {actual} found.'.format(
             int=int.__name__,
