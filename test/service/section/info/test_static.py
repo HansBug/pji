@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.service.section.info import StaticSectionInfoTemplate
@@ -38,7 +36,3 @@ class TestServiceSectionInfoStatic:
 
         t = st(environ=dict(NO='233'))
         assert t() == (True, 2147483647)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

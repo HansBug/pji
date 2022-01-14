@@ -1,5 +1,4 @@
 import io
-import os
 from contextlib import closing
 
 import pytest
@@ -114,7 +113,3 @@ class TestControlRunTiming:
             assert not result.ok
             assert result.completed
             assert result.status == RunResultStatus.REAL_TIME_LIMIT_EXCEED
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

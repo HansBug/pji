@@ -1,5 +1,3 @@
-import os
-
 import pytest
 import where
 
@@ -113,7 +111,3 @@ class TestControlProcessOthers:
                     shell=True,
             ):
                 pytest.fail('Should not reach here.')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

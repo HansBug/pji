@@ -1,4 +1,3 @@
-import os
 from contextlib import closing
 from io import BytesIO, StringIO
 
@@ -119,7 +118,3 @@ class TestControlRunCommon:
         assert not result.ok
         assert result.completed
         assert result.status == RunResultStatus.MEMORY_LIMIT_EXCEED
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

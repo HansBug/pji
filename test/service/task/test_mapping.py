@@ -249,7 +249,3 @@ class TestServiceTaskMapping:
 
             with pytest.raises(KeyError):
                 tm('123')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

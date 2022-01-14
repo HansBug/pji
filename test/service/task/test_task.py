@@ -132,7 +132,3 @@ class TestServiceTaskTask:
                                                  'GdhbTlwYmlBS0lHaGhibVJ6SUhkcGRHZ2diR2wwZEd4bElIZG9hWFJsCklHSnZlWE1n'
                                                  'WVc1a0lI\nZG9hWFJsSUdkcGNteHpJR0Z6SUhOcGMzUmxjbk1nWVc1a0lHSnliM1JvW'
                                                  'lhKekxnPT0K\n'}
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -128,7 +128,3 @@ class TestServiceSectionSectionSection:
                 'static': 'this is v : 233', 'value': 233,
                 'local_1': '233 233\n', 'local_2': 'xxx 233\n'
             }
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

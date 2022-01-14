@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.utils import env_template, truncate
@@ -19,7 +17,3 @@ class TestUtilsString:
         assert truncate('this is the first time we do this kind of thing', width=30) == 'this is the first time we ... '
         assert truncate('this is the first time we do this kind of thing', width=40, tail_length=12,
                         show_length=True) == 'this is the ..(47 chars).. ind of thing'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.control.model import Identification, ResourceLimit
@@ -79,7 +77,3 @@ class TestServiceSectionSectionTemplate:
         assert len(c.infos.items.keys()) == 5
         with pytest.raises(TypeError):
             SectionTemplate.loads([])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

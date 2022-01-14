@@ -5,7 +5,7 @@ import tempfile
 from multiprocessing import Lock
 from typing import Mapping, Optional
 
-from pysystem import FileAuthority, SystemUser, SystemGroup, chown, chmod
+from pysyslimit import FilePermission, SystemUser, SystemGroup, chown, chmod
 
 from .path import makedirs
 
@@ -32,7 +32,7 @@ def _prepare_for_to_file(to_file: str, privilege=None, user=None, group=None):
 
 
 def auto_copy_file(from_file: str, to_file: str, privilege=None, user=None, group=None):
-    privilege = FileAuthority.loads(privilege) if privilege else None
+    privilege = FilePermission.loads(privilege) if privilege else None
     user = SystemUser.loads(user) if user else None
     group = SystemGroup.loads(group) if group else None
 

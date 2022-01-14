@@ -91,6 +91,4 @@ class TestServiceSectionInputLink:
                     open(os.path.normpath(os.path.join(_target_dir, '__init__.py')), 'rb') as tf:
                 assert of.read() == tf.read()
 
-
-if __name__ == '__main__':
     pass

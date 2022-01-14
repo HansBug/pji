@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from pysystem import FileAuthority, SystemUser, SystemGroup
+from pysyslimit import FilePermission, SystemUser, SystemGroup
 
 from pji.service.section.input import CopyFileInputTemplate
 
@@ -19,7 +19,7 @@ class TestServiceSectionInputCopy:
 
         assert cf.file == 'README.md'
         assert cf.local == './r.md'
-        assert cf.privilege == FileAuthority.loads('r--------')
+        assert cf.privilege == FilePermission.loads('r--------')
 
     def test_template_repr(self):
         cf = CopyFileInputTemplate(
@@ -41,7 +41,7 @@ class TestServiceSectionInputCopy:
 
             assert c.file == os.path.abspath('README.md')
             assert c.local == os.path.normpath(os.path.join(fd, 'r.md'))
-            assert c.privilege == FileAuthority.loads('r--------')
+            assert c.privilege == FilePermission.loads('r--------')
 
     def test_template_call_invalid(self):
         cf = CopyFileInputTemplate(
@@ -77,7 +77,7 @@ class TestServiceSectionInputCopy:
 
             _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
             assert os.path.exists(_target_file)
-            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
+            assert FilePermission.load_from_file(_target_file) == FilePermission.loads('r--------')
             with open('README.md', 'rb') as of, \
                     open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()
@@ -94,7 +94,7 @@ class TestServiceSectionInputCopy:
 
             _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
             assert os.path.exists(_target_file)
-            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('rwxrwxrwx')
+            assert FilePermission.load_from_file(_target_file) == FilePermission.loads('rwxrwxrwx')
             with open('README.md', 'rb') as of, \
                     open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()
@@ -112,7 +112,7 @@ class TestServiceSectionInputCopy:
 
             _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
             assert os.path.exists(_target_file)
-            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
+            assert FilePermission.load_from_file(_target_file) == FilePermission.loads('r--------')
             assert SystemUser.load_from_file(_target_file) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_target_file) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
@@ -145,7 +145,7 @@ class TestServiceSectionInputCopy:
 
             _target_file = os.path.normpath(os.path.join(fd, '123', 'r.md'))
             assert os.path.exists(_target_file)
-            assert FileAuthority.load_from_file(_target_file) == FileAuthority.loads('r--------')
+            assert FilePermission.load_from_file(_target_file) == FilePermission.loads('r--------')
             assert SystemUser.load_from_file(_target_file) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_target_file) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
@@ -164,12 +164,8 @@ class TestServiceSectionInputCopy:
 
             _target_dir = os.path.normpath(os.path.join(fd, 'pinit.py'))
             assert os.path.exists(_target_dir)
-            assert FileAuthority.load_from_file(os.path.join(_target_dir, '__init__.py')) == FileAuthority.loads(
+            assert FilePermission.load_from_file(os.path.join(_target_dir, '__init__.py')) == FilePermission.loads(
                 'rw-------')
             with open(os.path.normpath(os.path.join('pji', '__init__.py')), 'rb') as of, \
                     open(os.path.normpath(os.path.join(_target_dir, '__init__.py')), 'rb') as tf:
                 assert of.read() == tf.read()
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

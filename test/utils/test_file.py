@@ -3,7 +3,7 @@ import tempfile
 import warnings
 
 import pytest
-from pysystem import chmod, SystemUser, FileAuthority, SystemGroup
+from pysyslimit import chmod, SystemUser, FilePermission, SystemGroup
 
 from pji.utils.file import FilePool
 
@@ -172,7 +172,7 @@ class TestUtilsFile:
                         open('README.md', 'rb') as of:
                     assert ef.read() == of.read()
 
-                assert FileAuthority.load_from_file(f.name) == FileAuthority.loads('-wxr-xrw-')
+                assert FilePermission.load_from_file(f.name) == FilePermission.loads('-wxr-xrw-')
                 assert SystemUser.load_from_file(f.name) == SystemUser.loads('nobody')
                 assert SystemGroup.load_from_file(f.name) == SystemGroup.loads("nogroup")
 
@@ -253,7 +253,3 @@ class TestUtilsFile:
             pool.close()
 
         assert not os.path.exists(_root_dir)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

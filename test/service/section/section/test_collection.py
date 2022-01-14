@@ -351,7 +351,3 @@ class TestServiceSectionSectionCollection:
                          'bGUgdG8gam9pbiAKIGhhbmRzIHdpdGggbGl0dGxlIHdoaXRl\nIGJveXMgYW5kIHdoaX'
                          'RlIGdpcmxzIGFzIHNpc3RlcnMgYW5kIGJyb3RoZXJzLg==\n',
             }
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

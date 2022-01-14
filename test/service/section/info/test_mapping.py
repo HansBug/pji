@@ -91,7 +91,3 @@ class TestServiceSectionInfoMapping:
 
         with pytest.raises(TypeError):
             SectionInfoMappingTemplate.loads(123)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

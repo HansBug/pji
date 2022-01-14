@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.utils import eclosing
@@ -59,7 +57,3 @@ class TestUtilsContext:
             pytest.fail('Should not reach here.')
         else:
             pytest.fail('Should not reach here.')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

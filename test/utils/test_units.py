@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from bitmath import MiB, GB
 
@@ -45,7 +43,3 @@ class TestUtilsUnits:
         assert time_to_delta_str('2min5s') == '0:02:05'
         assert time_to_delta_str('2min170s') == '0:04:50'
         assert time_to_delta_str('1h5.5s') == '1:00:05.500000'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

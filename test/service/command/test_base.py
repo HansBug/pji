@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.service.command import CommandMode
@@ -25,7 +23,3 @@ class TestServiceCommandBase:
             CommandMode.loads(-1)
         with pytest.raises(TypeError):
             CommandMode.loads([])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

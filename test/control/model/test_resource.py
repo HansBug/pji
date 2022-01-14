@@ -1,4 +1,3 @@
-import os
 import resource
 from multiprocessing import Manager, Process
 
@@ -229,7 +228,3 @@ class TestControlModelResource:
                 max_stack=(-1, -1),
                 max_output_size=(-1, -1),
             )
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

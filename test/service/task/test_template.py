@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.control.model import Identification, ResourceLimit
@@ -57,7 +55,3 @@ class TestServiceTaskTemplate:
             TaskTemplate.loads(('name', []))
         with pytest.raises(TypeError):
             TaskTemplate.loads(233)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

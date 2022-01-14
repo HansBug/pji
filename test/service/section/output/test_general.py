@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.service.section import FileOutputType, load_output_template, TagFileOutputTemplate, CopyFileOutputTemplate
@@ -58,7 +56,3 @@ class TestServiceSectionOutputGeneral:
             load_output_template(dict(type='tag', file='/this/is/file', local='./file'))
         with pytest.raises(TypeError):
             load_output_template([])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

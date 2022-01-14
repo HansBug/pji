@@ -3,7 +3,7 @@ import json
 import tempfile
 from typing import Mapping, Callable, Tuple, List, Any, Optional
 
-from pysystem import chown, chmod
+from pysyslimit import chown, chmod
 
 from .base import _ISection
 from ..info import SectionInfoMapping

@@ -51,7 +51,3 @@ class TestServiceSectionInfoLocal:
 
             t = tl(workdir=wtd, environ=dict(DIR='1/2/3'))
             assert t() == (False, None)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -2,7 +2,7 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
-from pysystem import FileAuthority
+from pysyslimit import FilePermission
 
 from .base import FileInputTemplate, FileInput, _load_privilege, _apply_privilege_and_identification
 from ...base import _check_os_path, _check_workdir_file, _process_environ
@@ -64,7 +64,7 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
         return self.__local
 
     @property
-    def privilege(self) -> Optional[FileAuthority]:
+    def privilege(self) -> Optional[FilePermission]:
         return self.__privilege
 
     # noinspection DuplicatedCode
@@ -94,7 +94,7 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
 
 class CopyFileInput(FileInput, _ICopyFileInput):
     def __init__(self, file: str, local: str,
-                 privilege: Optional[FileAuthority],
+                 privilege: Optional[FilePermission],
                  identification: Optional[Identification]):
         """
         :param file: file path
@@ -118,7 +118,7 @@ class CopyFileInput(FileInput, _ICopyFileInput):
         return self.__local
 
     @property
-    def privilege(self) -> Optional[FileAuthority]:
+    def privilege(self) -> Optional[FilePermission]:
         return self.__privilege
 
     def __call__(self, input_start: Optional[Callable[['CopyFileInput'], None]] = None,

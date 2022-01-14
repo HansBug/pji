@@ -2,6 +2,7 @@ import os
 
 import mock
 import pytest
+
 from pji.control.model import Identification, ResourceLimit
 from pji.service.dispatch.global_ import GlobalConfigTemplate
 
@@ -193,7 +194,3 @@ class TestServiceDispatchGlobal:
                 'PATH': '/root/ruby:' + os.environ['PATH'],
             },
         )
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -1,6 +1,5 @@
 import codecs
 import io
-import os
 import tempfile
 
 import pytest
@@ -185,7 +184,3 @@ class TestServiceCommandCommand:
         assert repr(c) == "<Command args: 'echo 233 echo ..(902 chars).. o 233 echo 233 ', shell: False, " \
                           "mode: TIMING, workdir: '123/123', identification: <Identification user: nobody, " \
                           "group: nogroup>, resources: <ResourceLimit cpu time: 1.000s, real time: 1.000s>>"
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

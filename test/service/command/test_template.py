@@ -121,7 +121,3 @@ class TestServiceCommandTemplate:
                 assert ff.read().rstrip() == ''
             with open(os.path.join(wtd, 'stderr_2_233.txt'), 'r') as ff:
                 assert ff.read().rstrip() == '2334'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

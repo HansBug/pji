@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from pysystem import FileAuthority, SystemUser, SystemGroup
+from pysyslimit import FilePermission, SystemUser, SystemGroup
 
 from pji.service.section.input.tag import TagFileInputTemplate
 from pji.utils import FilePool
@@ -19,7 +19,7 @@ class TestServiceSectionInputTag:
 
         assert tt.tag == 'tag_x'
         assert tt.local == './r.md'
-        assert tt.privilege == FileAuthority.loads('400')
+        assert tt.privilege == FilePermission.loads('400')
 
     def test_repr(self):
         tt = TagFileInputTemplate(
@@ -43,7 +43,7 @@ class TestServiceSectionInputTag:
 
             assert fi.tag == 'tag_x'
             assert fi.local == os.path.normpath(os.path.join(td, 'r.md'))
-            assert fi.privilege == FileAuthority.loads('400')
+            assert fi.privilege == FilePermission.loads('400')
 
     def test_call_with_env(self):
         tt = TagFileInputTemplate(
@@ -58,7 +58,7 @@ class TestServiceSectionInputTag:
 
             assert fi.tag == 'tag_233_x'
             assert fi.local == os.path.normpath(os.path.join(td, 'r.md'))
-            assert fi.privilege == FileAuthority.loads('400')
+            assert fi.privilege == FilePermission.loads('400')
 
     def test_call_invalid(self):
         tt = TagFileInputTemplate(
@@ -88,7 +88,7 @@ class TestServiceSectionInputTag:
 
             _target_path = os.path.normpath(os.path.join(td, 'r.md'))
             assert os.path.exists(_target_path)
-            assert FileAuthority.load_from_file(_target_path) == FileAuthority.loads('400')
+            assert FilePermission.load_from_file(_target_path) == FilePermission.loads('400')
             with open('README.md', 'rb') as of, \
                     open(_target_path, 'rb') as tf:
                 assert of.read() == tf.read()
@@ -108,13 +108,9 @@ class TestServiceSectionInputTag:
 
             _target_path = os.path.normpath(os.path.join(td, 'r.md'))
             assert os.path.exists(_target_path)
-            assert FileAuthority.load_from_file(_target_path) == FileAuthority.loads('400')
+            assert FilePermission.load_from_file(_target_path) == FilePermission.loads('400')
             assert SystemUser.load_from_file(_target_path) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_target_path) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
                     open(_target_path, 'rb') as tf:
                 assert of.read() == tf.read()
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

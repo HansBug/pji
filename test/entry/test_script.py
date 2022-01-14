@@ -66,7 +66,3 @@ class TestEntryScript:
             assert _success
             with codecs.open(os.path.join(workdir, 'test_result.txt'), 'r') as rf:
                 assert rf.read().rstrip() == '28'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -3,7 +3,7 @@ import shutil
 import tempfile
 
 import pytest
-from pysystem import FileAuthority, SystemUser, SystemGroup
+from pysyslimit import FilePermission, SystemUser, SystemGroup
 
 from pji.utils import is_absolute_path, is_relative_path, is_inner_relative_path, makedirs
 
@@ -47,13 +47,13 @@ class TestUtilsPath:
             _target_dir = os.path.normpath(_target_dir)
             assert os.path.exists(_target_dir)
             assert os.path.isdir(_target_dir)
-            assert FileAuthority.load_from_file(_target_dir) == FileAuthority.loads('-wxr-xrw-')
+            assert FilePermission.load_from_file(_target_dir) == FilePermission.loads('-wxr-xrw-')
             assert SystemUser.load_from_file(_target_dir) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_target_dir) == SystemGroup.loads('nogroup')
-            assert FileAuthority.load_from_file(os.path.join(_target_dir, '..')) == FileAuthority.loads('-wxr-xrw-')
+            assert FilePermission.load_from_file(os.path.join(_target_dir, '..')) == FilePermission.loads('-wxr-xrw-')
             assert SystemUser.load_from_file(os.path.join(_target_dir, '..')) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(os.path.join(_target_dir, '..')) == SystemGroup.loads('nogroup')
-            assert FileAuthority.load_from_file(os.path.join(_target_dir, '../..')) == FileAuthority.loads('-wxr-xrw-')
+            assert FilePermission.load_from_file(os.path.join(_target_dir, '../..')) == FilePermission.loads('-wxr-xrw-')
             assert SystemUser.load_from_file(os.path.join(_target_dir, '../..')) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(os.path.join(_target_dir, '../..')) == SystemGroup.loads('nogroup')
 
@@ -62,7 +62,3 @@ class TestUtilsPath:
             shutil.copyfile('README.md', os.path.join(td, 'r'))
             with pytest.raises(NotADirectoryError):
                 makedirs(os.path.join(td, 'r', '1', '2'), '356', 'nobody', 'nogroup')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

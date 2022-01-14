@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.utils import get_repr_info
@@ -85,7 +83,3 @@ class TestUtilsRepr:
 
         with pytest.raises(TypeError):
             repr(Sumx(1, 2))
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

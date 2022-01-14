@@ -1,4 +1,3 @@
-import os
 import time
 
 import pytest
@@ -178,7 +177,3 @@ class TestControlProcessCommon:
 
             with pytest.raises(RuntimeError):
                 cp.communicate(b'')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

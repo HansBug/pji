@@ -24,7 +24,7 @@ pip uninstall pji
 
 开始使用前请务必注意：
 
-* pji依赖于pysystem包（指的是OO课程组内的那个，不是pypi上的`pySystem`），如果没有pypi平台支持的话，需要先手动安装版本合适的pysystem
+* pji依赖于pysyslimit包（指的是OO课程组内的那个，不是pypi上的`pySystem`），如果没有pypi平台支持的话，需要先手动安装版本合适的pysyslimit
 * pji的一系列功能，包括降权、限制资源、系统交互等，都是**需要root权限**的，请在使用时务必注意
 * pji由于功能限制，故**只支持linux系统环境下使用**，且目前只在ubuntu上做过测试，请在使用时务必注意
 

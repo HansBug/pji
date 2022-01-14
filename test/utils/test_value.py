@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.utils import ValueProxy
@@ -21,7 +19,3 @@ class TestUtilsValue:
 
         value.value = -27
         assert value.value == -27
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

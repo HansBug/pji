@@ -1,8 +1,6 @@
-import os
-
 import pytest
 import where
-from pysystem import SystemUser, SystemGroup
+from pysyslimit import SystemUser, SystemGroup
 
 from pji.control import Identification
 
@@ -90,7 +88,3 @@ class TestControlModelIdentification:
         assert repr(Identification('nobody')) == '<Identification user: nobody>'
         assert repr(Identification(None, 'nogroup')) == '<Identification group: nogroup>'
         assert repr(Identification()) == '<Identification>'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

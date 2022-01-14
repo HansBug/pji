@@ -127,7 +127,3 @@ class TestServiceCommandCollection:
         ).commands) == 1
         with pytest.raises(TypeError):
             CommandCollectionTemplate.loads(123)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

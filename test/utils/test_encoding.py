@@ -1,4 +1,3 @@
-import os
 from typing import List, Union
 
 import pytest
@@ -55,7 +54,3 @@ class TestUtilsEncoding:
 
         with pytest.raises(TypeError):
             _func_3([115, 100, 115, 102, 108, 107, 115, 102, 100])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

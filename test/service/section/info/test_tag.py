@@ -105,7 +105,3 @@ class TestServiceSectionInfoTag:
         with FilePool({'tag_233_x': os.curdir}) as pool:
             t = tt(pool=pool, environ=dict(NOX='233', NOD='EADME'))
             assert t() == (False, None)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

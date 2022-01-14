@@ -86,7 +86,3 @@ class TestServiceSectionOutputTag:
             with open(os.path.join('test', '__init__.py'), 'rb') as of, \
                     open(os.path.join(_target_dir, '__init__.py'), 'rb') as tf:
                 assert of.read() == tf.read()
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

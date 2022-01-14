@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.utils import allow_none
@@ -12,7 +10,3 @@ class TestUtilsDecorator:
         assert _demo_func(1) == '1'
         assert _demo_func('sdfkljksdko') == 'sdfkljksdko'
         assert _demo_func(None) is None
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from pysystem import FileAuthority, SystemUser, SystemGroup
+from pysyslimit import FilePermission, SystemUser, SystemGroup
 
 from pji.service.section.input import FileInputCollectionTemplate, CopyFileInputTemplate, TagFileInputTemplate, \
     LinkFileInputTemplate, CopyFileInput, TagFileInput, LinkFileInput
@@ -70,7 +70,7 @@ class TestServiceSectionInputCollection:
             _copy_target_file = os.path.join(wtd, '123', 'rc.md')
             assert os.path.exists(_copy_target_file)
             assert os.path.isfile(_copy_target_file)
-            assert FileAuthority.load_from_file(_copy_target_file) == FileAuthority.loads('r--------')
+            assert FilePermission.load_from_file(_copy_target_file) == FilePermission.loads('r--------')
             assert SystemUser.load_from_file(_copy_target_file) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_copy_target_file) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
@@ -80,7 +80,7 @@ class TestServiceSectionInputCollection:
             _tag_target_file = os.path.join(wtd, '123', 'rt.md')
             assert os.path.exists(_tag_target_file)
             assert os.path.isfile(_tag_target_file)
-            assert FileAuthority.load_from_file(_tag_target_file) == FileAuthority.loads('rw-------')
+            assert FilePermission.load_from_file(_tag_target_file) == FilePermission.loads('rw-------')
             assert SystemUser.load_from_file(_tag_target_file) == SystemUser.loads('nobody')
             assert SystemGroup.load_from_file(_tag_target_file) == SystemGroup.loads('nogroup')
             with open('README.md', 'rb') as of, \
@@ -121,7 +121,3 @@ class TestServiceSectionInputCollection:
         ).items) == 1
         with pytest.raises(TypeError):
             FileInputCollectionTemplate.loads(123)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

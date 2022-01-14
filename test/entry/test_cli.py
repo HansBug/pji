@@ -1,11 +1,10 @@
 import codecs
 import json
-import os
 
 import pytest
 from click.testing import CliRunner
-from pji.entry.cli import cli
 
+from pji.entry.cli import cli
 from .scripts import DEMO_B64_SCRIPT, DEMO_B64_TEST_SCRIPT_PY, DEMO_B64_FAIL_SCRIPT, DEMO_B64_BEFORE_SCRIPT, \
     DEMO_B64_LINK_SCRIPT
 
@@ -173,7 +172,3 @@ class TestEntryCli:
             assert "Section 'get_test_info' execute completed!" in result.output
             assert "Section 'generate_base64' execute completed!" in result.output
             assert "Section 'run_result' execute failed!" in result.output
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

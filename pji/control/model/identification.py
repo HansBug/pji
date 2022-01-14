@@ -1,7 +1,7 @@
 from functools import reduce
 from typing import Mapping, Union, Optional
 
-from pysystem import SystemUser, SystemGroup
+from pysyslimit import SystemUser, SystemGroup
 
 from ...utils import get_repr_info
 

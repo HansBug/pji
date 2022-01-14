@@ -1,4 +1,3 @@
-import os
 import resource
 import signal
 import time
@@ -102,7 +101,3 @@ class TestControlModelProcessKilled:
 
         assert repr(pr) == '<ProcessResult exitcode: 0, signal: SIGKILL, real time: 1.000s, ' \
                            'cpu time: 2.000s, max memory: 128.0 MiB>'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

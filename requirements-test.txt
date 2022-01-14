@@ -1,7 +1,10 @@
-pytest>=5
-coverage>=4,<5
+coverage>=5
 mock>=4.0.3
-pytest-cov>=2
-pytest-mock>=3
-pytest-timeout>=1
-pytest-rerunfailures>=9
+flake8~=3.5
+pytest~=6.2.5
+pytest-cov~=3.0.0
+pytest-mock~=3.6.1
+pytest-xdist>=1.34.0
+pytest-rerunfailures~=10.2
+pytest-timeout~=2.0.2
+where>=1.0.2

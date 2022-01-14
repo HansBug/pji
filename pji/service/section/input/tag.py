@@ -2,7 +2,7 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
-from pysystem import FileAuthority
+from pysyslimit import FilePermission
 
 from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
@@ -64,7 +64,7 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         return self.__local
 
     @property
-    def privilege(self) -> Optional[FileAuthority]:
+    def privilege(self) -> Optional[FilePermission]:
         return self.__privilege
 
     def __call__(self, workdir: str, pool: FilePool, identification=None,
@@ -91,7 +91,7 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
 
 class TagFileInput(FileInput, _ITagFileInput):
     def __init__(self, pool: FilePool, tag: str, local: str,
-                 privilege: Optional[FileAuthority],
+                 privilege: Optional[FilePermission],
                  identification: Optional[Identification]):
         """
         :param pool: file pool
@@ -117,7 +117,7 @@ class TagFileInput(FileInput, _ITagFileInput):
         return self.__local
 
     @property
-    def privilege(self) -> Optional[FileAuthority]:
+    def privilege(self) -> Optional[FilePermission]:
         return self.__privilege
 
     def __call__(self, input_start: Optional[Callable[['TagFileInput'], None]] = None,

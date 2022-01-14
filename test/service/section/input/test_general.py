@@ -1,7 +1,5 @@
-import os
-
 import pytest
-from pysystem import FileAuthority
+from pysyslimit import FilePermission
 
 from pji.service.section import FileInputType, load_input_template, CopyFileInputTemplate, LinkFileInputTemplate, \
     TagFileInputTemplate
@@ -33,13 +31,13 @@ class TestServiceSectionInputGeneral:
         assert isinstance(ct, CopyFileInputTemplate)
         assert ct.file == '/this/is/file'
         assert ct.local == './file'
-        assert ct.privilege == FileAuthority.loads('rw-------')
+        assert ct.privilege == FilePermission.loads('rw-------')
 
         ct = load_input_template('copy:/this/is/file:./file:rw-')
         assert isinstance(ct, CopyFileInputTemplate)
         assert ct.file == '/this/is/file'
         assert ct.local == './file'
-        assert ct.privilege == FileAuthority.loads('rw-------')
+        assert ct.privilege == FilePermission.loads('rw-------')
 
     def test_load_template_link(self):
         lnt = load_input_template(dict(type='link', file='/this/is/file', local='./file'))
@@ -57,13 +55,13 @@ class TestServiceSectionInputGeneral:
         assert isinstance(tt, TagFileInputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'
-        assert tt.privilege == FileAuthority.loads('rwxrwxrwx')
+        assert tt.privilege == FilePermission.loads('rwxrwxrwx')
 
         tt = load_input_template('tag:djgfld:./file:777')
         assert isinstance(tt, TagFileInputTemplate)
         assert tt.tag == 'djgfld'
         assert tt.local == './file'
-        assert tt.privilege == FileAuthority.loads('rwxrwxrwx')
+        assert tt.privilege == FilePermission.loads('rwxrwxrwx')
 
     def test_load_template_self(self):
         tt = load_input_template(dict(type='tag', tag='djgfld', local='./file', privilege='777'))
@@ -78,7 +76,3 @@ class TestServiceSectionInputGeneral:
             load_input_template(dict(type='link', file='/this/is/file', local='./file', privilege='777'))
         with pytest.raises(TypeError):
             load_input_template([])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

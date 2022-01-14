@@ -1,5 +1,4 @@
 import io
-import os
 
 import pytest
 
@@ -339,7 +338,3 @@ class TestControlModelTiming:
             (3.0, b'this is last line'),
         ])) == '<TimingContent lines: 4, start_time: 0.000s, end_time: 3.000s>'
         assert repr(TimingContent()) == '<TimingContent lines: 0>'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

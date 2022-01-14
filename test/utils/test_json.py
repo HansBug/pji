@@ -1,6 +1,5 @@
 import io
 import json
-import os
 import tempfile
 
 import pytest
@@ -39,7 +38,3 @@ class TestUtilsJson:
             tmpfile.flush()
             with open(tmpfile.name, 'rb') as file:
                 assert auto_load_json(file) == {'a': 233, 'b': -1}
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

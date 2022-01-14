@@ -1,4 +1,3 @@
-import os
 from threading import Thread
 
 import pytest
@@ -40,7 +39,3 @@ class TestUtilsIter:
             t.join()
 
         assert sorted(_list) == sorted(list(_original))
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

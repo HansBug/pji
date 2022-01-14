@@ -35,7 +35,7 @@ class TestServiceSectionOutputCollection:
 
         with tempfile.TemporaryDirectory() as wtd, \
                 tempfile.TemporaryDirectory() as ttd, \
-                FilePool()as pool:
+                FilePool() as pool:
             fc = fct(scriptdir=ttd, workdir=wtd, pool=pool, environ=dict(V='233', DIR='123'))
 
             assert len(fc.items) == 2
@@ -56,7 +56,7 @@ class TestServiceSectionOutputCollection:
 
         with tempfile.TemporaryDirectory() as wtd, \
                 tempfile.TemporaryDirectory() as ttd, \
-                FilePool()as pool:
+                FilePool() as pool:
             os.makedirs(os.path.join(wtd, '123'), exist_ok=True)
             shutil.copyfile('README.md', os.path.join(wtd, '123', 'r.md'))
 
@@ -100,7 +100,3 @@ class TestServiceSectionOutputCollection:
         ).items) == 1
         with pytest.raises(TypeError):
             FileOutputCollectionTemplate.loads(123)
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

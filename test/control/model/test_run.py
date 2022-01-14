@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from pji.control.model import ProcessResult, RunResult, ResourceLimit, RunResultStatus
@@ -166,7 +164,3 @@ class TestControlModelRun:
         assert not rr.ok
         assert rr.status == RunResultStatus.SYSTEM_ERROR
         assert repr(rr) == '<RunResult status: SYSTEM_ERROR, signal: SIGKILL>'
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

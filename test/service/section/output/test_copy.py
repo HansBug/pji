@@ -88,7 +88,3 @@ class TestServiceSectionOutputCopy:
             with open(os.path.join('test', '__init__.py'), 'rb') as of, \
                     open(os.path.join(ttd, '1/2/3', 'test', '__init__.py'), 'rb') as tf:
                 assert of.read() == tf.read()
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -1,6 +1,6 @@
 import os
 
-from pysystem import FileAuthority, SystemUser, SystemGroup, chmod, chown
+from pysyslimit import FilePermission, SystemUser, SystemGroup, chmod, chown
 
 
 def is_absolute_path(path: str) -> bool:
@@ -47,7 +47,7 @@ def makedirs(path: str, privilege=None, user=None, group=None):
     :param group: group, not set when none
     """
     path = os.path.normpath(path)
-    privilege = FileAuthority.loads(privilege) if privilege else None
+    privilege = FilePermission.loads(privilege) if privilege else None
     user = SystemUser.loads(user) if user else None
     group = SystemGroup.loads(group) if group else None
 

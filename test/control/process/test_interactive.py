@@ -1,4 +1,3 @@
-import os
 import time
 from threading import Thread
 
@@ -256,7 +255,3 @@ class TestControlProcessInteractive:
                     args="what_the_fuck -c 'echo 233 && sleep 2 && echo 2334'",
             ):
                 pytest.fail('Should not reach here')
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

@@ -1,5 +1,4 @@
 import io
-import os
 import sys
 from contextlib import closing
 
@@ -163,7 +162,3 @@ class TestControlRunMutual:
             assert result.ok
             assert result.completed
             assert result.status == RunResultStatus.SUCCESS
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])

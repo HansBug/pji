@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
-from pysystem import chown, chmod
-from pysystem.models.authority.full import FileUserAuthority, FileAuthority, FileGroupAuthority, FileOtherAuthority
+from pysyslimit import chown, chmod
+from pysyslimit.models.permission.full import FileUserPermission, FilePermission, FileGroupPermission, FileOtherPermission
 
 from ....control.model import Identification
 
 
-def _load_privilege(privilege=None) -> Optional[FileAuthority]:
+def _load_privilege(privilege=None) -> Optional[FilePermission]:
     """
     load privilege information from data
     :param privilege: raw privilege data
@@ -15,12 +15,12 @@ def _load_privilege(privilege=None) -> Optional[FileAuthority]:
     """
     if privilege is not None:
         try:
-            _privilege = FileAuthority.loads(privilege)
+            _privilege = FilePermission.loads(privilege)
         except (TypeError, ValueError):
-            _privilege = FileAuthority(
-                FileUserAuthority.loads(privilege),
-                FileGroupAuthority.loads('---'),
-                FileOtherAuthority.loads('---'),
+            _privilege = FilePermission(
+                FileUserPermission.loads(privilege),
+                FileGroupPermission.loads('---'),
+                FileOtherPermission.loads('---'),
             )
     else:
         _privilege = None

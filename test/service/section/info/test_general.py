@@ -1,5 +1,8 @@
-import os
+import pytest
 
+from pji.service.section.info import SectionInfoType, load_info_template, LocalSectionInfoTemplate, \
+    TagSectionInfoTemplate, \
+    StaticSectionInfoTemplate
 import pytest
 
 from pji.service.section.info import SectionInfoType, load_info_template, LocalSectionInfoTemplate, \
@@ -70,7 +73,3 @@ class TestServiceSectionInfoGeneral:
             load_info_template(dict(type='local', tag='233'))
         with pytest.raises(TypeError):
             load_info_template([])
-
-
-if __name__ == "__main__":
-    pytest.main([os.path.abspath(__file__)])
