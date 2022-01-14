@@ -1,5 +1,25 @@
 # pji
 
+[![PyPI](https://img.shields.io/pypi/v/pji)](https://pypi.org/project/pji/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pji)](https://pypi.org/project/pji/)
+![Loc](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/HansBug/fe11c430393128dda3a998423a95ed57/raw/loc.json)
+![Comments](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/HansBug/fe11c430393128dda3a998423a95ed57/raw/comments.json)
+
+[![Docs Deploy](https://github.com/HansBug/pji/workflows/Docs%20Deploy/badge.svg)](https://github.com/HansBug/pji/actions?query=workflow%3A%22Docs+Deploy%22)
+[![Code Test](https://github.com/HansBug/pji/workflows/Code%20Test/badge.svg)](https://github.com/HansBug/pji/actions?query=workflow%3A%22Code+Test%22)
+[![Badge Creation](https://github.com/HansBug/pji/workflows/Badge%20Creation/badge.svg)](https://github.com/HansBug/pji/actions?query=workflow%3A%22Badge+Creation%22)
+[![Package Release](https://github.com/HansBug/pji/workflows/Package%20Release/badge.svg)](https://github.com/HansBug/pji/actions?query=workflow%3A%22Package+Release%22)
+[![codecov](https://codecov.io/gh/HansBug/pji/branch/main/graph/badge.svg?token=XJVDP4EFAT)](https://codecov.io/gh/HansBug/pji)
+
+[![GitHub stars](https://img.shields.io/github/stars/HansBug/pji)](https://github.com/HansBug/pji/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/HansBug/pji)](https://github.com/HansBug/pji/network)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/HansBug/pji)
+[![GitHub issues](https://img.shields.io/github/issues/HansBug/pji)](https://github.com/HansBug/pji/issues)
+[![GitHub pulls](https://img.shields.io/github/issues-pr/HansBug/pji)](https://github.com/HansBug/pji/pulls)
+[![Contributors](https://img.shields.io/github/contributors/HansBug/pji)](https://github.com/HansBug/pji/graphs/contributors)
+[![GitHub license](https://img.shields.io/github/license/HansBug/pji)](https://github.com/HansBug/pji/blob/master/LICENSE)
+
+
 An easy-to-use python interaction for judgement.
 
 一款新型的评测机内核，支持了一些新功能和特性，在第一版本（`pyjudge`）基础上进行了较大的扩展。
@@ -24,7 +44,7 @@ pip uninstall pji
 
 开始使用前请务必注意：
 
-* pji依赖于pysyslimit包（指的是OO课程组内的那个，不是pypi上的`pySystem`），如果没有pypi平台支持的话，需要先手动安装版本合适的pysyslimit
+* pji依赖于pji包（指的是OO课程组内的那个，不是pypi上的`pySystem`），如果没有pypi平台支持的话，需要先手动安装版本合适的pji
 * pji的一系列功能，包括降权、限制资源、系统交互等，都是**需要root权限**的，请在使用时务必注意
 * pji由于功能限制，故**只支持linux系统环境下使用**，且目前只在ubuntu上做过测试，请在使用时务必注意
 
