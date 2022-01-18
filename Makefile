@@ -18,8 +18,7 @@ unittest:
 		-sv -m unittest \
 		$(shell for type in ${COV_TYPES}; do echo "--cov-report=$$type"; done) \
 		--cov="${RANGE_SRC_DIR}" \
-		$(if ${MIN_COVERAGE},--cov-fail-under=${MIN_COVERAGE},) \
-		$(if ${WORKERS},-n ${WORKERS},)
+		$(if ${MIN_COVERAGE},--cov-fail-under=${MIN_COVERAGE},)
 
 run_dev:
 	docker run -it \
