@@ -1,11 +1,12 @@
 import os
 from typing import Union, List, Optional
 
+from hbutils.string import env_template
+
 from .base import _ICommandBase, CommandMode
 from .command import Command
 from ..base import _check_workdir_position, _process_environ
 from ...control.model import ResourceLimit, Identification
-from ...utils import env_template
 
 
 class CommandTemplate(_ICommandBase):

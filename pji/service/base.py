@@ -1,7 +1,9 @@
 import os
 from typing import Mapping, Optional, Any
 
-from ..utils import is_inner_relative_path, FilePool, env_template
+from hbutils.string import env_template
+
+from ..utils import is_inner_relative_path, FilePool
 
 
 def _check_os_path(path: str) -> str:

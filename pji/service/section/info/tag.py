@@ -4,9 +4,11 @@ import warnings
 from abc import ABCMeta
 from typing import Optional, Mapping, Tuple
 
+from hbutils.string import env_template
+
 from .base import SectionInfoTemplate, SectionInfo
 from ...base import _check_pool_tag, _check_workdir_file, _process_environ
-from ....utils import get_repr_info, FilePool, env_template
+from ....utils import get_repr_info, FilePool
 
 
 class _ITagSectionInfo(metaclass=ABCMeta):

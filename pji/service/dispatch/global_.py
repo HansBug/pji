@@ -3,9 +3,11 @@ from abc import ABCMeta
 from fnmatch import filter as fnfilter
 from typing import Optional, Mapping, Union
 
+from hbutils.string import truncate
+
 from ..base import _process_environ
 from ...control.model import Identification, ResourceLimit
-from ...utils import get_repr_info, truncate
+from ...utils import get_repr_info
 
 
 class _IGlobalConfig(metaclass=ABCMeta):

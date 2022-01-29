@@ -1,12 +1,13 @@
 import warnings
 from typing import Mapping
 
+from hbutils.string import env_template
+
 from .base import _ITask, _check_task_name, ENV_PJI_TASK_NAME
 from .task import Task
 from ..base import _process_environ
 from ..section import SectionCollectionTemplate
 from ...control.model import Identification, ResourceLimit
-from ...utils import env_template
 
 
 class TaskTemplate(_ITask):

@@ -2,6 +2,8 @@ import os
 from functools import partial
 from typing import Mapping, Optional
 
+from hbutils.string import env_template
+
 from .base import _ISection, _check_section_name, ENV_PJI_SECTION_NAME
 from .section import Section
 from ..info import SectionInfoMappingTemplate
@@ -10,7 +12,7 @@ from ..output import FileOutputCollectionTemplate
 from ...base import _process_environ, _check_os_path
 from ...command import CommandCollectionTemplate
 from ....control.model import Identification, ResourceLimit
-from ....utils import env_template, FilePool
+from ....utils import FilePool
 
 
 class SectionTemplate(_ISection):

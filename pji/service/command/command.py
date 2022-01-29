@@ -1,9 +1,11 @@
 from typing import Union, List, Optional, Mapping, Callable
 
+from hbutils.string import env_template
+
 from .base import _ICommandBase, CommandMode
 from ...control.model import ResourceLimit, Identification, RunResult
 from ...control.run import common_run, timing_run, mutual_run
-from ...utils import env_template, eclosing, wrap_empty
+from ...utils import eclosing, wrap_empty
 
 
 class Command(_ICommandBase):

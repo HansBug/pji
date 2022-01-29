@@ -9,5 +9,4 @@ from .iter import gen_lock
 from .json import auto_load_json, JsonLoadError
 from .path import is_absolute_path, is_relative_path, is_inner_relative_path, makedirs
 from .repr import get_repr_info
-from .string import env_template, truncate
 from .value import ValueProxy
