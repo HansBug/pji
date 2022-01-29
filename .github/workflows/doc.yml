@@ -11,11 +11,18 @@ on:
 
 jobs:
   doc:
-    runs-on: ubuntu-latest
+    name: Documentation Generation
+    runs-on: 'ubuntu-18.04'
     if: "!contains(github.event.head_commit.message, 'ci skip')"
+    container:
+      image: python:${{ matrix.python-version }}-${{ matrix.os }}
+      options: --user root
     strategy:
       matrix:
-        python-version: [ 3.7 ]
+        os:
+          - 'buster'
+        python-version:
+          - '3.7'
 
     services:
       plantuml:
@@ -24,22 +31,45 @@ jobs:
           - 18080:8080
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          fetch-depth: 20
+      - name: Set up system dependences on linux
+        if: ${{ matrix.os != 'alpine' }}
+        run: |
+          apt-get update
+          apt-get install -y tree cloc wget curl make graphviz rsync
+          apt-get install -y libxml2-dev libxslt-dev python-dev  # need by pypy3
+          dot -V
+          python -V
+      - name: Set up system dependences on alpine
+        if: ${{ matrix.os == 'alpine' }}
+        run: |
+          apk update
+          apk add tree cloc wget curl make graphviz rsync
+          apk add libxml2-dev libxslt-dev
+          dot -V
+          python -V
       - name: Install dependencies
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y make wget curl cloc graphviz
-          dot -V
-          python -m pip install -r requirements.txt
-          python -m pip install -r requirements-doc.txt
+          python -m pip install --upgrade pip
+          pip install --upgrade flake8 setuptools wheel twine
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+          pip install -r requirements-doc.txt
+      - name: Test the basic environment
+        run: |
+          python -V
+          pip --version
+          pip list
+          tree .
+          cloc pji
+          cloc test
       - name: Generate
         env:
           ENV_PROD: 'true'
-          PLANTUML_HOST: http://localhost:18080
+          PLANTUML_HOST: http://plantuml:8080
         run: |
           git fetch --all --tags
           git branch -av
