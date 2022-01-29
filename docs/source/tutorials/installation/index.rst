@@ -29,5 +29,18 @@ is successful.
     :language: text
     :linenos:
 
+In addition, you can also use the pji command line tool directly \
+to test and view the version.
+
+.. literalinclude:: pji_cli.demo.sh
+    :language: shell
+    :linenos:
+
+The output should be
+
+.. literalinclude:: pji_cli.demo.sh.txt
+    :language: text
+    :linenos:
+
 pji is still under development, you can also check out the \
 documents in stable version through `https://hansbug.github.io/pji/ <https://hansbug.github.io/pji/>`_.

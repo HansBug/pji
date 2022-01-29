@@ -1,3 +1,0 @@
-pji 0.1.4
-Developed and maintained by HansBug
-Python library which can do complex test in educational area.
