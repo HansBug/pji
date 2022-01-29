@@ -19,44 +19,41 @@
 [![Contributors](https://img.shields.io/github/contributors/HansBug/pji)](https://github.com/HansBug/pji/graphs/contributors)
 [![GitHub license](https://img.shields.io/github/license/HansBug/pji)](https://github.com/HansBug/pji/blob/master/LICENSE)
 
+An new easy-to-use python interaction for judgement written by Python.
 
-An easy-to-use python interaction for judgement.
+Some more features are supported, such as interaction test.
 
-一款新型的评测机内核，支持了一些新功能和特性，在第一版本（`pyjudge`）基础上进行了较大的扩展。
+## Installation
 
-## 安装
+You can simply install it with `pip` command line from the official PyPI site.
 
-源代码安装
-
-```shell
-git clone git@gitlab.buaaoo.top:oo_system/judge/pji.git
-cd pji
-pip install .
+```
+pip install pji
 ```
 
-卸载
+For more information about installation, you can refer to the [installation guide](https://hansbug.github.io/pji/main/tutorials/installation/index.html).
 
-```shell
-pip uninstall pji
-```
+## Documentation
 
-## 开始使用
+The detailed documentation are hosted on [https://hansbug.github.io/pji](https://hansbug.github.io/pji).
 
-开始使用前请务必注意：
+Only english version is provided now, the chinese documentation is still under development.
 
-* pji依赖于pji包（指的是OO课程组内的那个，不是pypi上的`pySystem`），如果没有pypi平台支持的话，需要先手动安装版本合适的pji
-* pji的一系列功能，包括降权、限制资源、系统交互等，都是**需要root权限**的，请在使用时务必注意
-* pji由于功能限制，故**只支持linux系统环境下使用**，且目前只在ubuntu上做过测试，请在使用时务必注意
+## Quick Start
 
-### 命令行使用
+`pji` uses fork to create child processes, pipe for inter-process communication, and the linux permission system to ensure evaluation security. 
 
-pji采用基于配置文件的使用方式，命令行帮助信息如下
+As a result, **`pji` only works on Linux systems, and you must have root permissions to use it**.
+
+### Use With Command-Line
+
+`pji` is used based on configuration files, and the command line help information is as follows
 
 ```shell
 pji -h
 ```
 
-内容如下
+Output as follows
 
 ```
 Usage: pji [OPTIONS]
@@ -75,7 +72,11 @@ Options:
 
 ```
 
-一个简单的使用示例，设有配置文件`test_dispatch.yml`
+### A Simple Example
+
+Here's an simple example. In this case, the test data is generated automatically, and then the running test of the script to be tested is performed with restricted permissions, and the results are sent back and logs are logged.
+
+Here is the configuration file `test_dispatch.yml`.
 
 ```yml
 global:
@@ -128,7 +129,7 @@ tasks:
           - 'true'
 ```
 
-脚本文件`test_script.py`
+Script file going to be tested`test_script.py`
 
 ```python
 import base64
@@ -139,13 +140,13 @@ if __name__ == '__main__':
 
 ```
 
-这两者均位于目录`/root/123`下，故可以运行
+Place the abovementioned files to directory`/root/123`, and then run the following `pji` command.
 
 ```shell
 pji -s /root/123/test_dispatch.yml -t run_python
 ```
 
-则有输出
+The output should be
 
 ```
 Section 'get_test_info' start ...
@@ -178,31 +179,35 @@ Task success.
 
 ```
 
-以及回传的文件`/root/123/result.txt`
+The file passed back`/root/123/result.txt`
 
 ```
 5
 ```
 
-此外，当执行命令行
+
+
+Furthermore, when this command line, which is slightly different from the one above, is executed
 
 ```shell
 pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7"
 ```
 
-则有`/root/123/result.txt`
+The content of `/root/123/result.txt` should be
 
 ```
 28
 ```
 
-以及如果需要导出完整的运行信息，可以执行命令行
+
+
+And, if you need the full running information, just use the following command with `-i` option
 
 ```shell
 pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i test_info.json
 ```
 
-则会额外有文件`test_info.json`
+An extra log file `test_info.json` will be exported
 
 ```json
 {
@@ -342,11 +347,11 @@ pji -s /root/123/test_dispatch.yml -t run_python -E "INPUT=1 2 3 4 5 6 7" -i tes
 
 
 
-### 脚本使用
+### Use In Script
 
-实际上pji也支持用程序的方式进行如上的调用。
+`pji` can be used like the above method with native python.
 
-例如对于上述两个文件，我们可以编写这样的程序
+For example, we can build the following script to run the test mentioned above
 
 ```python
 import codecs
@@ -365,7 +370,7 @@ if __name__ == '__main__':
 
 ```
 
-输出结果为
+The output should be
 
 ```
 True
@@ -373,7 +378,9 @@ True
 5
 ```
 
-此外也有
+
+
+Another case for extra environment variable attached
 
 ```python
 import codecs
@@ -392,7 +399,7 @@ if __name__ == '__main__':
 
 ```
 
-输出的结果为
+The output should be
 
 ```
 True
@@ -400,6 +407,6 @@ True
 28
 ```
 
-## 更多细节
+## License
 
-（暂时先不想写了，后续再填坑吧）
+`pji` released under the Apache 2.0 license.
