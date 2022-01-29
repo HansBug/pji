@@ -35,6 +35,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 20
+      - name: Show Python Version
+        run: |
+          python -V
       - name: Set up system dependences on linux
         if: ${{ matrix.os != 'alpine' }}
         run: |
@@ -42,7 +45,6 @@ jobs:
           apt-get install -y tree cloc wget curl make graphviz rsync
           apt-get install -y libxml2-dev libxslt-dev python-dev  # need by pypy3
           dot -V
-          python -V
       - name: Set up system dependences on alpine
         if: ${{ matrix.os == 'alpine' }}
         run: |
@@ -50,7 +52,6 @@ jobs:
           apk add tree cloc wget curl make graphviz rsync
           apk add libxml2-dev libxslt-dev
           dot -V
-          python -V
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
