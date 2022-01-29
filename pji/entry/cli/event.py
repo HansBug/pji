@@ -2,13 +2,14 @@ import os
 from typing import Callable, Mapping, Any
 
 import click
+from hbutils.scale import size_to_bytes_str
 
 from ..event import _load_dispatch_getter as _load_abstract_dispatch_getter
 from ..runner import DispatchRunner
 from ...control import RunResult, RunResultStatus
 from ...service import Dispatch, Command, FileInput, CopyFileInput, TagFileInput, LinkFileInput, \
     Section, SectionInfoMapping, FileOutput, CopyFileOutput, TagFileOutput
-from ...utils import truncate, size_to_bytes_str
+from ...utils import truncate
 
 
 class DispatchEventRunner(DispatchRunner):

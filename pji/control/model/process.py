@@ -3,7 +3,9 @@ import signal
 from resource import struct_rusage
 from typing import Optional
 
-from ...utils import size_to_bytes_str, get_repr_info
+from hbutils.scale import size_to_bytes_str
+
+from ...utils import get_repr_info
 
 
 class _IStatus:
