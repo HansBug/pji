@@ -407,6 +407,21 @@ True
 28
 ```
 
+
+## Run Unittest / Building
+
+```bash
+# create dev container
+make run_dev IMAGE_DEV=python:3.6
+
+# after enter the docker container
+./install.sh   # install requirements with chinese mirror
+source env.sh  # add pji cli's environment
+make unittest  # run unittest
+make build     # build a standalone cli, placed at 'dist/pji'
+```
+
+
 ## License
 
 `pji` released under the Apache 2.0 license.

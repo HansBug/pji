@@ -1,4 +1,4 @@
-.PHONY: docs test unittest
+.PHONY: test unittest docs pdocs run_dev build clean
 
 DOC_DIR  := ./docs
 TEST_DIR := ./test
@@ -31,3 +31,8 @@ docs:
 	$(MAKE) -C "${DOC_DIR}" build
 pdocs:
 	$(MAKE) -C "${DOC_DIR}" prod
+
+build:
+	pyinstaller -D -F -n pji -c pji_cli.py
+clean:
+	rm -rf build dist pji.spec
