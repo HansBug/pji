@@ -98,7 +98,7 @@ jobs:
           make build
           mkdir -p dist/${{ env.CLI_NAME }}
           cp dist/pji dist/${{ env.CLI_NAME }}/pji
-          zip dist/${{ env.CLI_NAME }}.zip dist/${{ env.CLI_NAME }}
+          zip -r dist/${{ env.CLI_NAME }}.zip dist/${{ env.CLI_NAME }}
           ls -al dist
           dist/pji -v
           dist/pji -h
