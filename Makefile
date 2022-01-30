@@ -8,8 +8,9 @@ RANGE_DIR      ?= .
 RANGE_TEST_DIR := ${TEST_DIR}/${RANGE_DIR}
 RANGE_SRC_DIR  := ${SRC_DIR}/${RANGE_DIR}
 
-IMAGE_DEV ?= python:3.6
-COV_TYPES ?= xml term-missing
+IMAGE_DEV   ?= python:3.6
+IMAGE_SHELL ?= /bin/bash
+COV_TYPES   ?= xml term-missing
 
 test: unittest
 
@@ -25,7 +26,7 @@ run_dev:
 		-v $$PWD:$$PWD:rw -w $$PWD \
 		--net=host \
 		${IMAGE_DEV} \
-		/bin/bash
+		${IMAGE_SHELL}
 
 docs:
 	$(MAKE) -C "${DOC_DIR}" build

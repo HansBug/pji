@@ -80,48 +80,28 @@ jobs:
     runs-on: 'ubuntu-18.04'
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     container:
-      image: python:${{ matrix.python-version }}-${{ matrix.os }}
+      image: python:${{ matrix.python-version }}
       options: --user root
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - 'buster'
         python-version:
-          - '3.6'
-          - '3.7'
-          - '3.8'
-          - '3.9'
-          - '3.10'
+          - '3.6.0'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 20
-      - name: Show Python Version
-        run: |
-          python -V
       - name: Set up system dependences on linux
-        if: ${{ matrix.os != 'alpine' }}
         run: |
           apt-get update
-          apt-get install -y tree cloc wget curl make graphviz
+          apt-get install -y tree cloc wget curl make
           apt-get install -y libxml2-dev libxslt-dev python-dev  # need by pypy3
-          dot -V
-      - name: Set up system dependences on alpine
-        if: ${{ matrix.os == 'alpine' }}
-        run: |
-          apk update
-          apk add tree cloc wget curl make graphviz
-          apk add libxml2-dev libxslt-dev
-          dot -V
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade flake8 setuptools wheel twine
           pip install -r requirements.txt
-          pip install -r requirements-test.txt
           pip install -r requirements-build.txt
       - name: Test the basic environment
         run: |
@@ -144,8 +124,9 @@ jobs:
           python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)'
           echo "PACKAGE_VERSION=$(python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)')" >> $GITHUB_ENV
           echo "GIT_COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$(python -V | xargs -n 1 | tail -1)" >> $GITHUB_ENV
           echo "CPU_ARCH=$(uname -m)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v2
         with:
-          name: pji-v${{ env.PACKAGE_VERSION }}-${{ env.CPU_ARCH }}-cp${{ matrix.python-version }}-${{ env.GIT_COMMIT_ID }}
+          name: pji-v${{ env.PACKAGE_VERSION }}-${{ env.CPU_ARCH }}-cp${{ env.PYTHON_VERSION }}-${{ env.GIT_COMMIT_ID }}
           path: dist
