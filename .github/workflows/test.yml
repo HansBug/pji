@@ -108,17 +108,20 @@ jobs:
           echo "OS_NAME=$(uname)" >> $GITHUB_ENV
       - name: Get CLI name
         run: |
-          echo "CLI_NAME=pji-v${{ env.PACKAGE_VERSION }}-${{ env.OS_NAME }}-${{ env.CPU_ARCH }}-${{ env.GIT_COMMIT_ID }}-standalone" >> $GITHUB_ENV
+          echo "ZIP_NAME=pji-v${{ env.PACKAGE_VERSION }}-${{ env.OS_NAME }}-${{ env.CPU_ARCH }}-${{ env.GIT_COMMIT_ID }}-standalone" >> $GITHUB_ENV
+          echo "CLI_NAME=pji-v${{ env.PACKAGE_VERSION }}-${{ env.OS_NAME }}-${{ env.CPU_ARCH }}" >> $GITHUB_ENV
       - name: Build standalone cli
         run: |
           make build
           mkdir -p dist/${{ env.CLI_NAME }}
           cp dist/pji dist/${{ env.CLI_NAME }}/pji
-          zip -r dist/${{ env.CLI_NAME }}.zip dist/${{ env.CLI_NAME }}
+          cd dist
+          zip -r ${{ env.ZIP_NAME }}.zip ${{ env.CLI_NAME }}
+          cd ..
           ls -al dist
           dist/pji -v
           dist/pji -h
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.CLI_NAME }}.zip
-          path: dist/${{ env.CLI_NAME }}.zip
+          name: pji-v${{ env.PACKAGE_VERSION }}-${{ env.OS_NAME }}-${{ env.CPU_ARCH }}-${{ env.GIT_COMMIT_ID }}
+          path: dist
