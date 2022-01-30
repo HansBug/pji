@@ -129,7 +129,7 @@ jobs:
           pip --version
           pip list
           tree .
-      - name: Run unittest
+      - name: Build CLI
         env:
           CI: 'true'
           LINETRACE: 1
@@ -147,5 +147,5 @@ jobs:
           echo "CPU_ARCH=$(uname -m)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v2
         with:
-          name: pji-v${{ env.PACKAGE_VERSION }}-${{ env.CPU_ARCH }}-${{ matrix.python-version }}-${{ env.GIT_COMMIT_ID }}
+          name: pji-v${{ env.PACKAGE_VERSION }}-${{ env.CPU_ARCH }}-cp${{ matrix.python-version }}-${{ env.GIT_COMMIT_ID }}
           path: dist
