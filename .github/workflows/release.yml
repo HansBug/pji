@@ -53,44 +53,28 @@ jobs:
     runs-on: 'ubuntu-18.04'
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     container:
-      image: python:${{ matrix.python-version }}-${{ matrix.os }}
+      image: python:${{ matrix.python-version }}
       options: --user root
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - 'buster'
         python-version:
-          - '3.8'
+          - '3.6.1'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 20
-      - name: Show Python Version
-        run: |
-          python -V
       - name: Set up system dependences on linux
-        if: ${{ matrix.os != 'alpine' }}
         run: |
           apt-get update
-          apt-get install -y tree cloc wget curl make graphviz
+          apt-get install -y tree cloc wget curl make zip
           apt-get install -y libxml2-dev libxslt-dev python-dev  # need by pypy3
-          dot -V
-      - name: Set up system dependences on alpine
-        if: ${{ matrix.os == 'alpine' }}
-        run: |
-          apk update
-          apk add tree cloc wget curl make graphviz
-          apk add libxml2-dev libxslt-dev
-          dot -V
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade flake8 setuptools wheel twine
           pip install -r requirements.txt
-          pip install -r requirements-test.txt
           pip install -r requirements-build.txt
       - name: Test the basic environment
         run: |
@@ -98,27 +82,31 @@ jobs:
           pip --version
           pip list
           tree .
-      - name: Run unittest
-        env:
-          CI: 'true'
-          LINETRACE: 1
+      - name: Get package version
+        run: |
+          python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)'
+          echo "PACKAGE_VERSION=$(python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)')" >> $GITHUB_ENV
+          echo "GIT_COMMIT_ID=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$(python -V | xargs -n 1 | tail -1)" >> $GITHUB_ENV
+          echo "CPU_ARCH=$(uname -m)" >> $GITHUB_ENV
+          echo "OS_NAME=$(uname)" >> $GITHUB_ENV
+      - name: Get CLI name
+        run: |
+          echo "CLI_NAME=pji-v${{ env.PACKAGE_VERSION }}-${{ env.OS_NAME }}-${{ env.CPU_ARCH }}-${{ env.GIT_COMMIT_ID }}-standalone" >> $GITHUB_ENV
+      - name: Build standalone cli
         run: |
           make build
+          mkdir -p dist/${{ env.CLI_NAME }}
+          cp dist/pji dist/${{ env.CLI_NAME }}/pji
+          zip dist/${{ env.CLI_NAME }}.zip dist/${{ env.CLI_NAME }}
           ls -al dist
           dist/pji -v
           dist/pji -h
-      - name: Get package version
-        run: |
-          make build
-          python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)'
-          echo "PACKAGE_VERSION=$(python -c 'from pji.config.meta import __VERSION__;print(__VERSION__)')" >> $GITHUB_ENV
-          echo "GIT_COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "CPU_ARCH=$(uname -m)" >> $GITHUB_ENV
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/pji
-          asset_name: pji-v${{ env.PACKAGE_VERSION }}-linux-${{ env.CPU_ARCH }}-standalone
+          file: dist/${{ env.CLI_NAME }}.zip
+          asset_name: ${{ env.CLI_NAME }}.zip
           tag: ${{ github.ref }}
           overwrite: true
