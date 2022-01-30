@@ -8,7 +8,7 @@ RANGE_DIR      ?= .
 RANGE_TEST_DIR := ${TEST_DIR}/${RANGE_DIR}
 RANGE_SRC_DIR  := ${SRC_DIR}/${RANGE_DIR}
 
-IMAGE_DEV   ?= python:3.6
+IMAGE_DEV   ?= python:3.6.3
 IMAGE_SHELL ?= /bin/bash
 COV_TYPES   ?= xml term-missing
 
