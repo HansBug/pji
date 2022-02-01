@@ -7,7 +7,7 @@ Overview:
 __TITLE__ = "pji"
 
 #: Version of this project.
-__VERSION__ = "0.1.8"
+__VERSION__ = "0.1.9"
 
 #: Short description of the project, will be included in ``setup.py``.
 __DESCRIPTION__ = 'Python library which can do complex test in educational area.'
