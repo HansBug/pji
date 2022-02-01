@@ -1,12 +1,14 @@
 from abc import ABCMeta
 from typing import List, Tuple, Optional, Callable
 
+from hbutils.model import get_repr_info
+
 from .base import ENV_PJI_COMMAND_INDEX
 from .command import Command
 from .template import CommandTemplate
 from ..base import _process_environ
 from ...control.model import RunResult
-from ...utils import get_repr_info, wrap_empty
+from ...utils import wrap_empty
 
 
 class _ICommandCollection(metaclass=ABCMeta):

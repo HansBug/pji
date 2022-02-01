@@ -2,9 +2,10 @@ from enum import unique, IntEnum
 from multiprocessing import Lock
 from typing import Optional
 
+from hbutils.model import get_repr_info
+
 from .process import ProcessResult
 from .resource import ResourceLimit
-from ...utils import get_repr_info
 
 
 @unique

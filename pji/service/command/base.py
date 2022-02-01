@@ -2,10 +2,10 @@ import os
 from enum import unique, IntEnum
 from typing import Union, List, Optional
 
+from hbutils.model import get_repr_info
 from hbutils.string import truncate
 
 from ...control.model import ResourceLimit, Identification
-from ...utils import get_repr_info
 
 
 @unique

@@ -3,7 +3,8 @@ from typing import Mapping, Any, Optional, Callable
 
 from .base import SectionInfoTemplate, SectionInfo
 from .general import load_info_template
-from ....utils import get_repr_info, wrap_empty
+from ....utils import  wrap_empty
+from hbutils.model import get_repr_info
 
 
 class _ISectionInfoMapping(metaclass=ABCMeta):

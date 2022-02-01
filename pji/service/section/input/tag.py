@@ -2,13 +2,14 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
+from hbutils.model import get_repr_info
 from hbutils.string import env_template, truncate
 from pysyslimit import FilePermission
 
 from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
 from ....control.model import Identification
-from ....utils import get_repr_info, FilePool, wrap_empty
+from ....utils import FilePool, wrap_empty
 
 
 class _ITagFileInput(metaclass=ABCMeta):

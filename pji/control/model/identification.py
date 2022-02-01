@@ -1,9 +1,8 @@
 from functools import reduce
 from typing import Mapping, Union, Optional
 
+from hbutils.model import get_repr_info
 from pysyslimit import SystemUser, SystemGroup
-
-from ...utils import get_repr_info
 
 
 class Identification:

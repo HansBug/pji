@@ -2,9 +2,11 @@ from abc import ABCMeta
 from functools import partial
 from typing import Tuple, List, Callable, Optional
 
+from hbutils.model import get_repr_info
+
 from .section import Section, _SECTION_RESULT
 from .template import SectionTemplate
-from ....utils import get_repr_info, FilePool, duplicates, wrap_empty
+from ....utils import FilePool, duplicates, wrap_empty
 
 
 class _ISectionCollection(metaclass=ABCMeta):

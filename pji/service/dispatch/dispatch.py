@@ -2,11 +2,11 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping
 
+from hbutils.model import get_repr_info
 from hbutils.string import truncate
 
 from .global_ import GlobalConfigTemplate, GlobalConfig
 from ..task import TaskMappingTemplate, TaskMapping
-from ...utils import get_repr_info
 
 
 class _IDispatch(metaclass=ABCMeta):

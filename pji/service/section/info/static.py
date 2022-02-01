@@ -1,10 +1,10 @@
 from typing import Optional, Mapping, Tuple, Any
 
+from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
 from .base import SectionInfoTemplate, SectionInfo
 from ...base import _process_environ
-from ....utils import get_repr_info
 
 
 class _IStaticSectionInfo:

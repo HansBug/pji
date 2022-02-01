@@ -1,8 +1,10 @@
 from typing import List, Optional, Callable
 
+from hbutils.model import get_repr_info
+
 from .base import FileOutputTemplate, FileOutput
 from .general import load_output_template
-from ....utils import get_repr_info, wrap_empty
+from ....utils import wrap_empty
 
 
 class _IFileOutputCollection:

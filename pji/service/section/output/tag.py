@@ -2,11 +2,12 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
+from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
 from .base import FileOutputTemplate, FileOutput
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
-from ....utils import get_repr_info, FilePool, wrap_empty
+from ....utils import FilePool, wrap_empty
 
 
 class _ITagFileOutput(metaclass=ABCMeta):

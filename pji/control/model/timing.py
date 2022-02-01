@@ -6,7 +6,9 @@ import re
 from abc import ABCMeta
 from typing import List, Tuple, Optional, Union, TypeVar, Type
 
-from ...utils import auto_encode_support, auto_decode_support, auto_load_json, JsonLoadError, get_repr_info
+from hbutils.model import get_repr_info
+
+from ...utils import auto_encode_support, auto_decode_support, auto_load_json, JsonLoadError
 
 _auto_encode = auto_encode_support(lambda x: x)
 _auto_decode = auto_decode_support(lambda x: x)

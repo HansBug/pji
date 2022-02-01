@@ -1,10 +1,10 @@
 import re
 from abc import ABCMeta
 
+from hbutils.model import get_repr_info
 from hbutils.string import truncate
 
 from ....control.model import Identification, ResourceLimit
-from ....utils import get_repr_info
 
 _SECTION_NAME_PATTERN = re.compile('[a-zA-Z_][0-9a-zA-Z_]*')
 

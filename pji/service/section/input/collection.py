@@ -1,9 +1,11 @@
 from abc import ABCMeta
 from typing import List, Optional, Callable
 
+from hbutils.model import get_repr_info
+
 from .base import FileInputTemplate, FileInput
 from .general import load_input_template
-from ....utils import get_repr_info, wrap_empty
+from ....utils import wrap_empty
 
 
 class _IFileInputCollection(metaclass=ABCMeta):

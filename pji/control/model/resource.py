@@ -2,9 +2,10 @@ import resource
 from typing import Optional, Union
 
 from bitmath import MiB
+from hbutils.model import get_repr_info
 from hbutils.scale import size_to_bytes, time_to_duration, size_to_bytes_str
 
-from ...utils import allow_none, get_repr_info
+from ...utils import allow_none
 
 _UNLIMITED = -1
 

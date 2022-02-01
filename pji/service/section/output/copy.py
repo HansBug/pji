@@ -2,11 +2,12 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
+from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
 from .base import FileOutputTemplate, FileOutput
 from ...base import _check_workdir_file, _process_environ
-from ....utils import get_repr_info, auto_copy_file, wrap_empty
+from ....utils import auto_copy_file, wrap_empty
 
 
 def _check_os_path(path: str) -> str:

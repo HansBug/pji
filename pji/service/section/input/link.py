@@ -2,11 +2,12 @@ import os
 from abc import ABCMeta
 from typing import Optional, Mapping, Callable
 
+from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
 from .base import FileInput, FileInputTemplate
 from ...base import _check_workdir_file, _check_os_path, _process_environ
-from ....utils import get_repr_info, makedirs, wrap_empty
+from ....utils import makedirs, wrap_empty
 
 
 class _ILinkFileInput(metaclass=ABCMeta):

@@ -1,9 +1,11 @@
 from abc import ABCMeta
 from typing import Mapping
 
+from hbutils.model import get_repr_info
+
 from .task import Task
 from .template import TaskTemplate
-from ...utils import get_repr_info, duplicates
+from ...utils import duplicates
 
 
 class _ITaskMapping(metaclass=ABCMeta):
