@@ -129,7 +129,7 @@ class CommandTemplate(_ICommandBase):
             identification=_identification, resources=_resources,
             mode=self.__mode, stdin=_stdin, stdout=_stdout, stderr=_stderr,
             **{
-                key: env_template(value, environ)
+                key: env_template(value, environ) if isinstance(value, str) else value
                 for key, value in self.__kwargs.items()
             }
         )
