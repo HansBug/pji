@@ -12,7 +12,7 @@ class Command(_ICommandBase):
     def __init__(self, args: Union[str, List[str]], shell: bool,
                  workdir: Optional[str], environ: Mapping[str, str],
                  identification: Identification, resources: ResourceLimit,
-                 mode, stdin, stdout, stderr):
+                 mode, stdin, stdout, stderr, **kwargs):
         """
         :param args: arguments
         :param shell: use shell mode
@@ -39,8 +39,9 @@ class Command(_ICommandBase):
         self.__stdout = env_template(stdout, self.__environ) if isinstance(stdout, str) else stdout
         self.__stderr = env_template(stderr, self.__environ) if isinstance(stderr, str) else stderr
 
+        self.__kwargs = kwargs
         _ICommandBase.__init__(self, self.__args, self.__shell, self.__workdir,
-                               self.__identification, self.__resources, self.__mode)
+                               self.__identification, self.__resources, self.__mode, **kwargs)
 
     @property
     def args(self) -> Union[str, List[str]]:
@@ -81,6 +82,10 @@ class Command(_ICommandBase):
     @property
     def stderr(self):
         return self.__stderr
+
+    @property
+    def kwargs(self):
+        return self.__kwargs
 
     __RUN_FUNCTION = {
         CommandMode.COMMON: common_run,
@@ -124,6 +129,7 @@ class Command(_ICommandBase):
                 stdin=fstdin, stdout=fstdout, stderr=fstderr,
                 environ=self.__environ, cwd=self.__workdir,
                 resources=self.__resources, identification=self.__identification,
+                **self.__kwargs,
             )
 
         wrap_empty(command_complete)(self, _result)
