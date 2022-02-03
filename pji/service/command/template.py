@@ -15,7 +15,7 @@ class CommandTemplate(_ICommandBase):
 
     def __init__(self, args: Union[str, List[str]], shell: bool = True,
                  workdir: Optional[str] = None, resources=None,
-                 mode=None, stdin=None, stdout=None, stderr=None):
+                 mode=None, stdin=None, stdout=None, stderr=None, **kwargs):
         """
         :param args: arguments
         :param shell: use shell mode
@@ -42,8 +42,9 @@ class CommandTemplate(_ICommandBase):
         self.__stdout = stdout
         self.__stderr = stderr
 
+        self.__kwargs = kwargs
         _ICommandBase.__init__(self, self.__args, self.__shell, self.__workdir,
-                               None, self.__resources, self.__mode)
+                               None, self.__resources, self.__mode, **self.__kwargs)
 
     @property
     def args(self) -> Union[str, List[str]]:
@@ -127,6 +128,10 @@ class CommandTemplate(_ICommandBase):
             workdir=_workdir, environ=environ,
             identification=_identification, resources=_resources,
             mode=self.__mode, stdin=_stdin, stdout=_stdout, stderr=_stderr,
+            **{
+                key: env_template(value, environ) if isinstance(value, str) else value
+                for key, value in self.__kwargs.items()
+            }
         )
 
     @classmethod
