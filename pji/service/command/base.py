@@ -46,7 +46,7 @@ ENV_PJI_COMMAND_INDEX = 'PJI_COMMAND_INDEX'
 
 class _ICommandBase:
     def __init__(self, args: Union[str, List[str]], shell: bool = True, workdir: Optional[str] = None,
-                 identification=None, resources=None, mode=None):
+                 identification=None, resources=None, mode=None, **kwargs):
         """
         :param args: arguments
         :param shell: use shell mode
@@ -61,6 +61,7 @@ class _ICommandBase:
         self.__identification = identification
         self.__resources = resources
         self.__mode = mode
+        self.__kwargs = kwargs
 
     def __repr__(self):
         """
@@ -79,5 +80,6 @@ class _ICommandBase:
                  lambda: self.__identification and self.__identification != Identification.loads({})),
                 ('resources', lambda: truncate(repr(self.__resources), width=64, show_length=True, tail_length=16),
                  lambda: self.__resources and self.__resources != ResourceLimit.loads({})),
+                *[(key, lambda: repr(value)) for key, value in self.__kwargs.items()]
             ]
         )
