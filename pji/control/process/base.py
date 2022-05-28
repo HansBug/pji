@@ -140,7 +140,7 @@ def killer_thread(start_time_ok: Event, start_time: Value, child_pid: int,
             while time.time() < target_time and not process_complete.is_set():
                 time.sleep(min(max(target_time - time.time(), 0.0), 0.2))
             if not process_complete.is_set():
-                os.kill(child_pid, signal.SIGKILL)
+                os.killpg(os.getpgid(child_pid), signal.SIGKILL)
                 process_complete.wait()
 
     return Thread(target=_thread_func), _killer_initialized
