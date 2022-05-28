@@ -1193,6 +1193,8 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 /test_*
+/*.test
+/java_build/*
 .python-version
 /docs/build
 /public

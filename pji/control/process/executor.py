@@ -39,6 +39,8 @@ def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
 
     # noinspection DuplicatedCode
     def _execute_child():
+        os.setsid()  # become the group leader
+
         os.close(stdin_write)
         sys.stdin = sys.__stdin__
         os.dup2(stdin_read, sys.stdin.fileno())
