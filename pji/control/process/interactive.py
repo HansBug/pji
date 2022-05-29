@@ -1,12 +1,12 @@
 import os
 import pickle
 from multiprocessing import Event, Value, Lock
-from multiprocessing.synchronize import Event as EventClass
+from multiprocessing.synchronize import Event as _EventType
 from queue import Queue, Empty
 from threading import Thread
 from typing import Optional, Mapping
 
-from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_bytes_stream, GeneralProcess
+from .base import BYTES_LINESEQ, measure_thread, killer_thread, load_lines_from_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from ..model import ResourceLimit
@@ -15,7 +15,7 @@ from ...utils import gen_lock
 
 class InteractiveProcess(GeneralProcess):
     def __init__(self, start_time: float, stdin_stream, output_iter,
-                 resources: ResourceLimit, process_result_func, lifetime_event: EventClass):
+                 resources: ResourceLimit, process_result_func, lifetime_event: _EventType):
         self.__lock = Lock()
         GeneralProcess.__init__(self, start_time, resources, process_result_func, lifetime_event, self.__lock)
 
@@ -78,15 +78,15 @@ class InteractiveProcess(GeneralProcess):
             self.__exit()
 
 
-def _read_pipe(pipe_entry, start_time_ok: EventClass, start_time: Value,
-               tag: str, loader_initialized: EventClass, queue: Queue):
+def _read_pipe(pipe_entry, start_time_ok: _EventType, start_time: Value,
+               tag: str, stream_ready: _EventType, process_complete: _EventType, queue: Queue):
     def _transform_func(item):
         _time, _line = item
         start_time_ok.wait()
         return _time - start_time.value, tag, _line.rstrip(b'\r\n')
 
     with os.fdopen(pipe_entry, 'rb', 0) as stream:
-        return load_lines_from_bytes_stream(stream, loader_initialized, queue, _transform_func)
+        return load_lines_from_stream(stream, stream_ready, process_complete, queue, _transform_func)
 
 
 # Attention: only real_time_limit will be processed in this function, other limits will be processed in decorator
@@ -141,14 +141,15 @@ def interactive_process(args, preexec_fn=None, resources=None,
         # lines output
         _output_queue = Queue()
         _output_start, _output_complete = Event(), Event()
-        _stdout_initialized, _stderr_initialized = Event(), Event()
+        _stdout_ready, _stderr_ready = Event(), Event()
         _stdout_thread = Thread(
             target=lambda: _read_pipe(
                 pipe_entry=stdout_read,
                 start_time_ok=_start_time_ok,
                 start_time=_start_time,
                 tag='stdout',
-                loader_initialized=_stdout_initialized,
+                stream_ready=_stdout_ready,
+                process_complete=_process_complete,
                 queue=_output_queue,
             ))
         _stderr_thread = Thread(
@@ -157,15 +158,16 @@ def interactive_process(args, preexec_fn=None, resources=None,
                 start_time_ok=_start_time_ok,
                 start_time=_start_time,
                 tag='stderr',
-                loader_initialized=_stderr_initialized,
+                stream_ready=_stderr_ready,
+                process_complete=_process_complete,
                 queue=_output_queue,
             ))
 
         def _output_queue_func():
             _stdout_thread.start()
             _stderr_thread.start()
-            _stdout_initialized.wait()
-            _stderr_initialized.wait()
+            _stdout_ready.wait()
+            _stderr_ready.wait()
             _output_start.set()
 
             _stdout_thread.join()

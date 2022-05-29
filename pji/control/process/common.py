@@ -1,11 +1,11 @@
 import os
 import pickle
 from multiprocessing import Event, Value, Lock
-from multiprocessing.synchronize import Event as EventClass
+from multiprocessing.synchronize import Event as _EventType
 from threading import Thread
 from typing import Optional, Tuple, Mapping
 
-from .base import measure_thread, killer_thread, read_all_from_bytes_stream, GeneralProcess
+from .base import measure_thread, killer_thread, read_from_stream, GeneralProcess
 from .decorator import process_setter
 from .executor import get_child_executor_func
 from ..model import ResourceLimit
@@ -14,9 +14,9 @@ from ...utils import ValueProxy
 
 class CommonProcess(GeneralProcess):
     def __init__(self, start_time: float,
-                 communicate_event: EventClass, communicate_complete: EventClass,
+                 communicate_event: _EventType, communicate_complete: _EventType,
                  communicate_stdin: ValueProxy, communicate_stdout: ValueProxy, communicate_stderr: ValueProxy,
-                 resources: ResourceLimit, process_result_func, lifetime_event: EventClass):
+                 resources: ResourceLimit, process_result_func, lifetime_event: _EventType):
         self.__lock = Lock()
         GeneralProcess.__init__(self, start_time, resources, process_result_func, lifetime_event, self.__lock)
 
@@ -137,11 +137,11 @@ def common_process(args, preexec_fn=None, resources=None,
 
                 def _read_stdout():
                     nonlocal _stdout
-                    _stdout = read_all_from_bytes_stream(fstdout)
+                    _stdout = read_from_stream(fstdout, _process_complete)
 
                 def _read_stderr():
                     nonlocal _stderr
-                    _stderr = read_all_from_bytes_stream(fstderr)
+                    _stderr = read_from_stream(fstderr, _process_complete)
 
                 def _write_stdin():
                     try:
