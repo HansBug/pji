@@ -1,12 +1,13 @@
+import io
 import os
 import signal
 import time
 from abc import ABCMeta
 from multiprocessing import Event, Value, Lock
-from multiprocessing.synchronize import Event as EventClass
+from multiprocessing.synchronize import Event as _EventType
 from queue import Empty, Queue
 from threading import Thread
-from typing import Tuple, Callable, Optional
+from typing import Tuple, Callable, Optional, BinaryIO
 
 from ..model import ProcessResult, ResourceLimit, RunResult, RunResultStatus
 from ...utils import ValueProxy
@@ -15,7 +16,7 @@ from ...utils import ValueProxy
 class GeneralProcess(metaclass=ABCMeta):
     def __init__(self, start_time: float, resources: ResourceLimit,
                  process_result_func: Callable[[], Optional[ProcessResult]],
-                 lifetime_event: EventClass, lock: Optional[Lock] = None):
+                 lifetime_event: _EventType, lock: Optional[Lock] = None):
         self.__start_time = start_time
         self.__resources = resources
         self.__process_result = None
@@ -75,30 +76,35 @@ class GeneralProcess(metaclass=ABCMeta):
 BYTES_LINESEQ = bytes(os.linesep, 'utf8')
 
 
-def read_all_from_bytes_stream(stream) -> bytes:
-    return b''.join([line for line in stream])
+def read_from_stream(stream: BinaryIO, process_complete: _EventType) -> bytes:
+    with io.BytesIO() as bio:
+        for line in stream:
+            bio.write(line)
+
+        return bio.getvalue()
 
 
-def load_lines_from_bytes_stream(stream, loader_initialized: EventClass, queue: Queue, transformer=None):
-    _middle_queue = Queue()
-    _output_load_complete = Event()
-    transformer = transformer or (lambda x: x)
+def load_lines_from_stream(stream: BinaryIO, stream_ready: _EventType, process_complete: _EventType,
+                           queue: Queue, trans=None):
+    _processing_queue = Queue()
+    _load_complete = Event()
+    trans = trans or (lambda x: x)
 
     def _output_load_func():
-        loader_initialized.set()
+        stream_ready.set()
         for line in stream:
-            _middle_queue.put((time.time(), line))
+            _processing_queue.put((time.time(), line))
 
-        _output_load_complete.set()
+        _load_complete.set()
 
     def _item_process_func():
-        while not _middle_queue.empty() or not _output_load_complete.is_set():
+        while not _processing_queue.empty() or not _load_complete.is_set():
             try:
-                item = _middle_queue.get(timeout=0.2)
+                item = _processing_queue.get(timeout=0.2)
             except Empty:
                 continue
             else:
-                queue.put(transformer(item))
+                queue.put(trans(item))
 
     _output_load_thread = Thread(target=_output_load_func)
     _item_process_func = Thread(target=_item_process_func)
@@ -111,7 +117,7 @@ def load_lines_from_bytes_stream(stream, loader_initialized: EventClass, queue: 
 
 
 def measure_thread(start_time_ok: Event, start_time: Value, child_pid: int) \
-        -> Tuple[Thread, EventClass, EventClass, EventClass, ValueProxy]:
+        -> Tuple[Thread, _EventType, _EventType, _EventType, ValueProxy]:
     _process_result = ValueProxy()
     _process_complete = Event()
     _measure_initialized = Event()
@@ -129,7 +135,7 @@ def measure_thread(start_time_ok: Event, start_time: Value, child_pid: int) \
 
 
 def killer_thread(start_time_ok: Event, start_time: Value, child_pid: int,
-                  real_time_limit: float, process_complete: Event) -> Tuple[Thread, EventClass]:
+                  real_time_limit: float, process_complete: Event) -> Tuple[Thread, _EventType]:
     _killer_initialized = Event()
 
     def _thread_func():

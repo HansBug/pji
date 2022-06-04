@@ -1,13 +1,13 @@
+import io
 import os
 from typing import Callable, Mapping, Any
 
 import click
 from hbutils.scale import size_to_bytes_str
-from hbutils.string import truncate
 
 from ..event import _load_dispatch_getter as _load_abstract_dispatch_getter
 from ..runner import DispatchRunner
-from ...control import RunResult, RunResultStatus
+from ...control import RunResult
 from ...service import Dispatch, Command, FileInput, CopyFileInput, TagFileInput, LinkFileInput, \
     Section, SectionInfoMapping, FileOutput, CopyFileOutput, TagFileOutput
 
@@ -50,20 +50,20 @@ class DispatchEventRunner(DispatchRunner):
         click.echo(click.style('COMPLETE', fg='green'))
 
     def _command_start(self, command: Command):
-        _repr = truncate(repr(command.args), width=96, tail_length=24, show_length=True)
-        click.echo(click.style("Running {repr} ... ".format(repr=_repr), bold=True), nl=False)
+        click.echo(click.style(f"Running {repr(command.args)} ... ", bold=True), nl=False)
 
     def _command_complete(self, command: Command, result: RunResult):
         _color = 'green' if result.ok else 'red'
-        if result.status != RunResultStatus.NOT_COMPLETED:
-            _title = '{status}, time: {cpu_time} / {real_time}, memory: {memory}'.format(
-                status=result.status.name,
-                cpu_time='%.3fs' % result.result.cpu_time,
-                real_time='%.3fs' % result.result.real_time,
-                memory=size_to_bytes_str(result.result.max_memory),
-            )
-        else:
-            _title = result.status.name
+        with io.StringIO() as sio:
+            print(result.status.name, file=sio, end='')
+            ret = result.result
+            if ret.exitcode or ret.signal:
+                print(f'({ret.signal or ret.exitcode})', file=sio, end='')
+
+            print(f', time: {ret.cpu_time:.3f}s / {ret.real_time:.3f}s', file=sio, end='')
+            print(f', memory: {size_to_bytes_str(ret.max_memory)}', file=sio, end='')
+            _title = sio.getvalue()
+
         click.echo(click.style(_title, fg=_color, bold=True), nl=True)
 
     def _output_start(self, output: FileOutput):

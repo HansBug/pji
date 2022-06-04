@@ -3,7 +3,7 @@ import pickle
 import sys
 import time
 from multiprocessing import Value
-from multiprocessing.synchronize import Event as EventClass
+from multiprocessing.synchronize import Event as _EventType
 from typing import Mapping
 
 import where
@@ -22,9 +22,9 @@ class ExecutorException(Exception):
 
 
 def get_child_executor_func(args, environ: Mapping[str, str], preexec_fn,
-                            executor_prepare_ok: EventClass, exception_pipes,
-                            parent_initialized: EventClass,
-                            start_time_ok: EventClass, start_time: Value,
+                            executor_prepare_ok: _EventType, exception_pipes,
+                            parent_initialized: _EventType,
+                            start_time_ok: _EventType, start_time: Value,
                             stdin_pipes, stdout_pipes, stderr_pipes):
     args = args_split(args)
     arg_file = where.first(args[0])
