@@ -1,8 +1,7 @@
 import os
-import shutil
-import tempfile
 
 import pytest
+from hbutils.testing import isolated_directory
 
 from pji.service.section.output.tag import TagFileOutputTemplate
 from pji.utils import FilePool
@@ -33,12 +32,9 @@ class TestServiceSectionOutputTag:
             tag='tag_x_${NO}',
         )
 
-        with tempfile.TemporaryDirectory() as wtd, \
-                FilePool() as pool:
-            shutil.copyfile('README.md', os.path.join(wtd, 'r.md'))
-
-            t = tt(workdir=wtd, pool=pool, environ=dict(NO="233"))
-            assert t.local == os.path.abspath(os.path.join(wtd, 'r.md'))
+        with isolated_directory({'r.md': 'README.md'}), FilePool() as pool:
+            t = tt(workdir='.', pool=pool, environ=dict(NO="233"))
+            assert t.local == os.path.abspath('r.md')
             assert t.tag == 'tag_x_233'
 
     def test_call_execute(self):
@@ -46,22 +42,18 @@ class TestServiceSectionOutputTag:
             local='./${NO}/r.md',
             tag='tag_x_${NO}',
         )
+        original_path = os.path.abspath('.')
 
-        with tempfile.TemporaryDirectory() as wtd, \
-                FilePool() as pool:
-            os.makedirs(os.path.join(wtd, '233'), exist_ok=True)
-            shutil.copyfile('README.md', os.path.join(wtd, '233', 'r.md'))
-
-            t = tt(workdir=wtd, pool=pool, environ=dict(NO="233"))
-            t()
+        with isolated_directory({'233/r.md': 'README.md'}), FilePool() as pool:
+            t = tt(workdir='.', pool=pool, environ=dict(NO="233"))
+            t(run_success=True)
             assert 'tag_x_233' in pool
 
             _target_file = pool['tag_x_233']
             assert os.path.exists(_target_file)
             assert os.path.isfile(_target_file)
 
-            with open('README.md', 'rb') as of, \
-                    open(_target_file, 'rb') as tf:
+            with open(os.path.join(original_path, 'README.md'), 'rb') as of, open(_target_file, 'rb') as tf:
                 assert of.read() == tf.read()
 
     def test_call_execute_with_dir(self):
@@ -69,20 +61,17 @@ class TestServiceSectionOutputTag:
             local='./${NO}/test',
             tag='tag_x_${NO}',
         )
+        original_path = os.path.abspath('.')
 
-        with tempfile.TemporaryDirectory() as wtd, \
-                FilePool() as pool:
-            os.makedirs(os.path.join(wtd, '233'), exist_ok=True)
-            shutil.copytree('test', os.path.join(wtd, '233', 'test'))
-
-            t = tt(workdir=wtd, pool=pool, environ=dict(NO="233"))
-            t()
+        with isolated_directory({'233/test': 'test'}), FilePool() as pool:
+            t = tt(workdir='.', pool=pool, environ=dict(NO="233"))
+            t(run_success=True)
             assert 'tag_x_233' in pool
 
             _target_dir = pool['tag_x_233']
             assert os.path.exists(_target_dir)
             assert os.path.isdir(_target_dir)
 
-            with open(os.path.join('test', '__init__.py'), 'rb') as of, \
-                    open(os.path.join(_target_dir, '__init__.py'), 'rb') as tf:
+            with open(os.path.join(original_path, 'test/utils/test_args.py'), 'rb') as of, \
+                    open(os.path.join(_target_dir, 'utils/test_args.py'), 'rb') as tf:
                 assert of.read() == tf.read()

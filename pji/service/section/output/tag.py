@@ -98,11 +98,14 @@ class TagFileOutput(FileOutput, _ITagFileOutput):
     def local(self) -> str:
         return self.__local
 
-    def __call__(self, output_start: Optional[Callable[['TagFileOutput'], None]] = None,
+    def __call__(self, *,
+                 run_success: bool,
+                 output_start: Optional[Callable[['TagFileOutput'], None]] = None,
                  output_complete: Optional[Callable[['TagFileOutput'], None]] = None, **kwargs):
         """
         execute this file output
         """
-        wrap_empty(output_start)(self)
-        self.__pool[self.__tag] = self.__local
-        wrap_empty(output_complete)(self)
+        if run_success:
+            wrap_empty(output_start)(self)
+            self.__pool[self.__tag] = self.__local
+            wrap_empty(output_complete)(self)

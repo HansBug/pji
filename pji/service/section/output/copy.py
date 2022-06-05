@@ -108,11 +108,14 @@ class CopyFileOutput(FileOutput, _ICopyFileOutput):
     def local(self) -> str:
         return self.__local
 
-    def __call__(self, output_start: Optional[Callable[['CopyFileOutput'], None]] = None,
+    def __call__(self, *,
+                 run_success: bool,
+                 output_start: Optional[Callable[['CopyFileOutput'], None]] = None,
                  output_complete: Optional[Callable[['CopyFileOutput'], None]] = None, **kwargs):
         """
         execute this file output
         """
-        wrap_empty(output_start)(self)
-        auto_copy_file(self.__local, self.__file)
-        wrap_empty(output_complete)(self)
+        if run_success:
+            wrap_empty(output_start)(self)
+            auto_copy_file(self.__local, self.__file)
+            wrap_empty(output_complete)(self)
