@@ -31,22 +31,22 @@ def _prepare_for_to_file(to_file: str, privilege=None, user=None, group=None):
     makedirs(_parent_path, privilege, user, group)
 
 
-def auto_copy_file(from_file: str, to_file: str, privilege=None, user=None, group=None):
+def auto_copy_file(srcfile: str, dstfile: str, privilege=None, user=None, group=None):
     privilege = FilePermission.loads(privilege) if privilege else None
     user = SystemUser.loads(user) if user else None
     group = SystemGroup.loads(group) if group else None
 
-    _check_from_file(from_file)
-    _prepare_for_to_file(to_file, privilege, user, group)
-    if os.path.isdir(from_file):
-        shutil.copytree(from_file, to_file)
+    _check_from_file(srcfile)
+    _prepare_for_to_file(dstfile, privilege, user, group)
+    if os.path.isdir(srcfile):
+        shutil.copytree(srcfile, dstfile)
     else:
-        shutil.copyfile(from_file, to_file, follow_symlinks=True)
+        shutil.copyfile(srcfile, dstfile, follow_symlinks=True)
 
     if privilege:
-        chmod(to_file, privilege, recursive=True)
+        chmod(dstfile, privilege, recursive=True)
     if user or group:
-        chown(to_file, user, group, recursive=True)
+        chown(dstfile, user, group, recursive=True)
 
 
 def auto_link_file(from_file: str, to_file: str):

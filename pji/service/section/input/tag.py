@@ -6,14 +6,15 @@ from hbutils.model import get_repr_info
 from hbutils.string import env_template, truncate
 from pysyslimit import FilePermission
 
-from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification
+from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification, InputCondition, \
+    _load_input_condition
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
 from ....control.model import Identification
 from ....utils import FilePool, wrap_empty
 
 
 class _ITagFileInput(metaclass=ABCMeta):
-    def __init__(self, tag: str, local: str, privilege, identification):
+    def __init__(self, tag: str, local: str, privilege, identification, condition: InputCondition):
         """
         :param tag: pool tag
         :param local: local path
@@ -24,6 +25,7 @@ class _ITagFileInput(metaclass=ABCMeta):
         self.__local = local
         self.__privilege = privilege
         self.__identification = identification
+        self.__condition = condition
 
     def __repr__(self):
         """
@@ -38,12 +40,14 @@ class _ITagFileInput(metaclass=ABCMeta):
                 ('identification',
                  lambda: truncate(repr(self.__identification), width=48, show_length=True, tail_length=16),
                  lambda: self.__identification and self.__identification != Identification.loads({})),
+                ('condition', lambda: self.__condition.name.lower()),
             ]
         )
 
 
 class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
-    def __init__(self, tag: str, local: str, privilege=None, identification=None):
+    def __init__(self, tag: str, local: str,
+                 privilege=None, identification=None, condition=None):
         """
         :param tag: pool tag
         :param local: local path
@@ -54,8 +58,12 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         self.__local = local
         self.__privilege = _load_privilege(privilege)
         self.__identification = Identification.loads(identification)
+        self.__condition = _load_input_condition(condition)
 
-        _ITagFileInput.__init__(self, self.__tag, self.__local, self.__privilege, self.__identification)
+        _ITagFileInput.__init__(
+            self, self.__tag, self.__local,
+            self.__privilege, self.__identification, self.__condition
+        )
 
     @property
     def tag(self) -> str:
@@ -88,13 +96,15 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
             pool=pool, tag=_tag, local=_local,
             privilege=self.__privilege,
             identification=_identification,
+            condition=self.__condition,
         )
 
 
 class TagFileInput(FileInput, _ITagFileInput):
     def __init__(self, pool: FilePool, tag: str, local: str,
                  privilege: Optional[FilePermission],
-                 identification: Optional[Identification]):
+                 identification: Optional[Identification],
+                 condition: InputCondition):
         """
         :param pool: file pool
         :param tag: pool tag
@@ -107,8 +117,12 @@ class TagFileInput(FileInput, _ITagFileInput):
         self.__local = local
         self.__privilege = privilege
         self.__identification = identification
+        self.__condition = condition
 
-        _ITagFileInput.__init__(self, self.__tag, self.__local, self.__privilege, self.__identification)
+        _ITagFileInput.__init__(
+            self, self.__tag, self.__local,
+            self.__privilege, self.__identification, self.__condition
+        )
 
     @property
     def tag(self) -> str:
@@ -123,12 +137,16 @@ class TagFileInput(FileInput, _ITagFileInput):
         return self.__privilege
 
     def __call__(self, input_start: Optional[Callable[['TagFileInput'], None]] = None,
-                 input_complete: Optional[Callable[['TagFileInput'], None]] = None, **kwargs):
+                 input_complete: Optional[Callable[['TagFileInput'], None]] = None,
+                 input_skip: Optional[Callable[['TagFileInput'], None]] = None, **kwargs):
         """
         execute this file input
         """
         wrap_empty(input_start)(self)
-        self.__pool.export(self.__tag, self.__local, self.__privilege, self.__identification.user,
-                           self.__identification.group)
-        _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)
-        wrap_empty(input_complete)(self)
+        if self.__condition == InputCondition.OPTIONAL and self.__tag not in self.__pool:
+            wrap_empty(input_skip)(self)
+        else:
+            self.__pool.export(self.__tag, self.__local, self.__privilege, self.__identification.user,
+                               self.__identification.group)
+            _apply_privilege_and_identification(self.__local, self.__privilege, self.__identification)
+            wrap_empty(input_complete)(self)

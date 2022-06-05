@@ -112,7 +112,7 @@ class TestServiceSectionInputCollection:
             LinkFileInputTemplate(file='README.md', local='./${DIR}/rl.md'),
         ]).items) == 3
         assert len(FileInputCollectionTemplate.loads([
-            'copy:README.md:./${DIR}/rc.md:r--',
+            'copy:README.md:./${DIR}/rc.md:r--:root:optional',
             'tag:tag_${V}_r:./${DIR}/rt.md:rw-',
             'link:README.md:./${DIR}/rl.md',
         ]).items) == 3

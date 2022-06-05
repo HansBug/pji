@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
+from enum import IntEnum, unique
 from typing import Optional
 
+from hbutils.model import int_enum_loads
 from pysyslimit import chown, chmod
 from pysyslimit.models.permission.full import FileUserPermission, FilePermission, FileGroupPermission, \
     FileOtherPermission
@@ -39,6 +41,23 @@ def _apply_privilege_and_identification(filename: str, privilege=None, identific
     if identification is not None:
         _ident = Identification.merge(Identification.load_from_file(filename), identification)
         chown(filename, _ident.user, _ident.group, recursive=True)
+
+
+@int_enum_loads(name_preprocess=str.upper)
+@unique
+class InputCondition(IntEnum):
+    OPTIONAL = 1
+    REQUIRED = 2
+
+
+_DEFAULT_INPUT_CONDITION = InputCondition.REQUIRED
+
+
+def _load_input_condition(value) -> InputCondition:
+    if not value:  # use default value
+        return _DEFAULT_INPUT_CONDITION
+    else:
+        return InputCondition.loads(value)
 
 
 class FileInputTemplate(metaclass=ABCMeta):
