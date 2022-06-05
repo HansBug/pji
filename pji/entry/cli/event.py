@@ -49,6 +49,9 @@ class DispatchEventRunner(DispatchRunner):
     def _input_complete(self, input_: FileInput):
         click.echo(click.style('COMPLETE', fg='green'))
 
+    def _input_skip(self, input_: FileInput):
+        click.echo(click.style('SKIPPED', fg='yellow'))
+
     def _command_start(self, command: Command):
         click.echo(click.style(f"Running {repr(command.args)} ... ", bold=True), nl=False)
 

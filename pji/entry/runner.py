@@ -41,6 +41,9 @@ class DispatchRunner(metaclass=ABCMeta):
     def _input_complete(self, input_: FileInput):
         pass
 
+    def _input_skip(self, input_: FileInput):
+        pass
+
     def _input_collection_start(self, collection: FileInputCollection):
         pass
 
@@ -87,6 +90,7 @@ class DispatchRunner(metaclass=ABCMeta):
             info_dump_complete=self._info_dump_complete,
             input_start=self._input_start,
             input_complete=self._input_complete,
+            input_skip=self._input_skip,
             input_collection_start=self._input_collection_start,
             input_collection_complete=self._input_collection_complete,
             output_start=self._output_start,

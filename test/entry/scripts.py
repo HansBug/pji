@@ -11,6 +11,9 @@ tasks:
       - name: get_test_info
         inputs:
           - "copy:test_script.py:test_script.py"
+          - "copy:test_script.pyxxxxxxxxxxxx:test_script.py:::optional"
+          - "link:test_script.pyxxxxxxxxxxxx:test_script.py:optional"
+          - "tag:tag_yxxxxxxxxxxxx:test_script.py:::optional"
         outputs:
           - "tag:wc_result.txt:wc"
           - "tag:input_result.txt:input"
