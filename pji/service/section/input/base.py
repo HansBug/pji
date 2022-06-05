@@ -2,7 +2,8 @@ from abc import ABCMeta, abstractmethod
 from typing import Optional
 
 from pysyslimit import chown, chmod
-from pysyslimit.models.permission.full import FileUserPermission, FilePermission, FileGroupPermission, FileOtherPermission
+from pysyslimit.models.permission.full import FileUserPermission, FilePermission, FileGroupPermission, \
+    FileOtherPermission
 
 from ....control.model import Identification
 
@@ -13,19 +14,17 @@ def _load_privilege(privilege=None) -> Optional[FilePermission]:
     :param privilege: raw privilege data
     :return: privilege object or None
     """
-    if privilege is not None:
+    if privilege:
         try:
-            _privilege = FilePermission.loads(privilege)
+            return FilePermission.loads(privilege)
         except (TypeError, ValueError):
-            _privilege = FilePermission(
+            return FilePermission(
                 FileUserPermission.loads(privilege),
                 FileGroupPermission.loads('---'),
                 FileOtherPermission.loads('---'),
             )
     else:
-        _privilege = None
-
-    return _privilege
+        return None
 
 
 def _apply_privilege_and_identification(filename: str, privilege=None, identification=None):
@@ -45,10 +44,10 @@ def _apply_privilege_and_identification(filename: str, privilege=None, identific
 class FileInputTemplate(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self, *args, **kwargs) -> 'FileInput':
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class FileInput(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self, **kwargs):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover

@@ -74,6 +74,8 @@ class TestControlModelIdentification:
         assert Identification.loads(SystemUser.loads('nobody')) == ident
         assert Identification.loads(SystemGroup.loads('nogroup')) == Identification(None, 'nogroup')
         assert Identification.loads('nobody') == ident
+        assert Identification.loads(None) == Identification()
+        assert Identification.loads('') == Identification()
         with pytest.raises(ValueError):
             Identification.loads('nogroup')
 
