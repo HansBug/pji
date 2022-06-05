@@ -24,7 +24,7 @@ class TestServiceSectionOutputCopy:
             file='${DIR}/r.md',
         )
 
-        assert repr(ct) == "<CopyFileOutputTemplate local: './r.md', file: '${DIR}/r.md'>"
+        assert repr(ct) == "<CopyFileOutputTemplate local: './r.md', file: '${DIR}/r.md', condition: required, on: success>"
 
     def test_call(self):
         ct = CopyFileOutputTemplate(

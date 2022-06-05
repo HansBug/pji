@@ -10,6 +10,18 @@ from pysyslimit.models.permission.full import FileUserPermission, FilePermission
 from ....control.model import Identification
 
 
+class FileInputTemplate(metaclass=ABCMeta):
+    @abstractmethod
+    def __call__(self, *args, **kwargs) -> 'FileInput':
+        raise NotImplementedError  # pragma: no cover
+
+
+class FileInput(metaclass=ABCMeta):
+    @abstractmethod
+    def __call__(self, **kwargs):
+        raise NotImplementedError  # pragma: no cover
+
+
 def _load_privilege(privilege=None) -> Optional[FilePermission]:
     """
     load privilege information from data
@@ -51,22 +63,3 @@ class InputCondition(IntEnum):
 
 
 _DEFAULT_INPUT_CONDITION = InputCondition.REQUIRED
-
-
-def _load_input_condition(value) -> InputCondition:
-    if not value:  # use default value
-        return _DEFAULT_INPUT_CONDITION
-    else:
-        return InputCondition.loads(value)
-
-
-class FileInputTemplate(metaclass=ABCMeta):
-    @abstractmethod
-    def __call__(self, *args, **kwargs) -> 'FileInput':
-        raise NotImplementedError  # pragma: no cover
-
-
-class FileInput(metaclass=ABCMeta):
-    @abstractmethod
-    def __call__(self, **kwargs):
-        raise NotImplementedError  # pragma: no cover

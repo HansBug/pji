@@ -25,7 +25,7 @@ class TestServiceSectionOutputTag:
             tag='tag_x',
         )
 
-        assert repr(tt) == "<TagFileOutputTemplate local: './r.md', tag: 'tag_x'>"
+        assert repr(tt) == "<TagFileOutputTemplate local: './r.md', tag: 'tag_x', condition: required, on: success>"
 
     def test_call(self):
         tt = TagFileOutputTemplate(

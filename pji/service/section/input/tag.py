@@ -7,7 +7,7 @@ from hbutils.string import env_template, truncate
 from pysyslimit import FilePermission
 
 from .base import FileInput, FileInputTemplate, _load_privilege, _apply_privilege_and_identification, InputCondition, \
-    _load_input_condition
+    _DEFAULT_INPUT_CONDITION
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
 from ....control.model import Identification
 from ....utils import FilePool, wrap_empty
@@ -58,7 +58,7 @@ class TagFileInputTemplate(FileInputTemplate, _ITagFileInput):
         self.__local = local
         self.__privilege = _load_privilege(privilege)
         self.__identification = Identification.loads(identification)
-        self.__condition = _load_input_condition(condition)
+        self.__condition = InputCondition.loads(condition or _DEFAULT_INPUT_CONDITION)
 
         _ITagFileInput.__init__(
             self, self.__tag, self.__local,

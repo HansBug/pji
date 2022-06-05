@@ -5,7 +5,8 @@ from typing import Optional, Mapping, Callable
 from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
-from .base import FileOutputTemplate, FileOutput
+from .base import FileOutputTemplate, FileOutput, OutputCondition, ResultCondition, _DEFAULT_OUTPUT_CONDITION, \
+    _DEFAULT_RESULT_CONDITION
 from ...base import _check_workdir_file, _process_environ
 from ....utils import auto_copy_file, wrap_empty
 
@@ -20,13 +21,15 @@ def _check_os_path(path: str) -> str:
 
 
 class _ICopyFileOutput(metaclass=ABCMeta):
-    def __init__(self, local: str, file: str):
+    def __init__(self, local: str, file: str, condition: OutputCondition, on_: ResultCondition):
         """
         :param local: local path
         :param file: file path
         """
         self.__local = local
         self.__file = file
+        self.__condition = condition
+        self.__on = on_
 
     def __repr__(self):
         """
@@ -38,20 +41,24 @@ class _ICopyFileOutput(metaclass=ABCMeta):
             args=[
                 ('local', lambda: repr(self.__local)),
                 ('file', lambda: repr(self.__file)),
+                ('condition', lambda: self.__condition.name.lower()),
+                ('on', lambda: self.__on.name.lower()),
             ]
         )
 
 
 class CopyFileOutputTemplate(FileOutputTemplate, _ICopyFileOutput):
-    def __init__(self, local: str, file: str):
+    def __init__(self, local: str, file: str, condition=None, on_=None):
         """
         :param local: local path
         :param file: file path
         """
         self.__local = local
         self.__file = file
+        self.__condition = OutputCondition.loads(condition or _DEFAULT_OUTPUT_CONDITION)
+        self.__on = ResultCondition.loads(on_ or _DEFAULT_RESULT_CONDITION)
 
-        _ICopyFileOutput.__init__(self, self.__local, self.__file)
+        _ICopyFileOutput.__init__(self, self.__local, self.__file, self.__condition, self.__on)
 
     @property
     def file(self) -> str:
@@ -77,19 +84,21 @@ class CopyFileOutputTemplate(FileOutputTemplate, _ICopyFileOutput):
         _file = os.path.normpath(
             os.path.abspath(os.path.join(scriptdir, _check_os_path(env_template(self.__file, environ)))))
 
-        return CopyFileOutput(file=_file, local=_local)
+        return CopyFileOutput(_local, _file, self.__condition, self.__on)
 
 
 class CopyFileOutput(FileOutput, _ICopyFileOutput):
-    def __init__(self, local: str, file: str):
+    def __init__(self, local: str, file: str, condition: OutputCondition, on_: ResultCondition):
         """
         :param local: local path
         :param file: file path
         """
         self.__local = local
         self.__file = file
+        self.__condition = condition
+        self.__on = on_
 
-        _ICopyFileOutput.__init__(self, self.__local, self.__file)
+        _ICopyFileOutput.__init__(self, self.__local, self.__file, self.__condition, self.__on)
 
     @property
     def file(self) -> str:

@@ -5,7 +5,7 @@ from typing import Optional, Mapping, Callable
 from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
-from .base import FileInput, FileInputTemplate, InputCondition, _load_input_condition
+from .base import FileInput, FileInputTemplate, InputCondition, _DEFAULT_INPUT_CONDITION
 from ...base import _check_workdir_file, _check_os_path, _process_environ
 from ....utils import makedirs, wrap_empty
 
@@ -42,7 +42,7 @@ class LinkFileInputTemplate(FileInputTemplate, _ILinkFileInput):
         """
         self.__file = file
         self.__local = local
-        self.__condition = _load_input_condition(condition)
+        self.__condition = InputCondition.loads(condition or _DEFAULT_INPUT_CONDITION)
 
         _ILinkFileInput.__init__(self, self.__file, self.__local, self.__condition)
 

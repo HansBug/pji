@@ -7,7 +7,7 @@ from hbutils.string import env_template, truncate
 from pysyslimit import FilePermission
 
 from .base import FileInputTemplate, FileInput, _load_privilege, _apply_privilege_and_identification, \
-    _load_input_condition, InputCondition
+    InputCondition, _DEFAULT_INPUT_CONDITION
 from ...base import _check_os_path, _check_workdir_file, _process_environ
 from ....control.model import Identification
 from ....utils import auto_copy_file, wrap_empty
@@ -59,7 +59,7 @@ class CopyFileInputTemplate(FileInputTemplate, _ICopyFileInput):
         self.__local = local
         self.__privilege = _load_privilege(privilege)
         self.__identification = Identification.loads(identification)
-        self.__condition = _load_input_condition(condition)
+        self.__condition = InputCondition.loads(condition or _DEFAULT_INPUT_CONDITION)
 
         _ICopyFileInput.__init__(
             self, self.__file, self.__local,

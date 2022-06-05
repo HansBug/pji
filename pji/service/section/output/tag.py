@@ -5,19 +5,22 @@ from typing import Optional, Mapping, Callable
 from hbutils.model import get_repr_info
 from hbutils.string import env_template
 
-from .base import FileOutputTemplate, FileOutput
+from .base import FileOutputTemplate, FileOutput, ResultCondition, OutputCondition, _DEFAULT_OUTPUT_CONDITION, \
+    _DEFAULT_RESULT_CONDITION
 from ...base import _check_workdir_file, _check_pool_tag, _process_environ
 from ....utils import FilePool, wrap_empty
 
 
 class _ITagFileOutput(metaclass=ABCMeta):
-    def __init__(self, local: str, tag: str):
+    def __init__(self, local: str, tag: str, condition: OutputCondition, on_: ResultCondition):
         """
         :param local: local path
         :param tag: pool tag
         """
         self.__local = local
         self.__tag = tag
+        self.__condition = condition
+        self.__on = on_
 
     def __repr__(self):
         """
@@ -28,20 +31,24 @@ class _ITagFileOutput(metaclass=ABCMeta):
             args=[
                 ('local', lambda: repr(self.__local)),
                 ('tag', lambda: repr(self.__tag)),
+                ('condition', lambda: self.__condition.name.lower()),
+                ('on', lambda: self.__on.name.lower()),
             ]
         )
 
 
 class TagFileOutputTemplate(FileOutputTemplate, _ITagFileOutput):
-    def __init__(self, local: str, tag: str):
+    def __init__(self, local: str, tag: str, condition=None, on_=None):
         """
         :param local: local path
         :param tag: pool tag
         """
         self.__local = local
         self.__tag = tag
+        self.__condition = OutputCondition.loads(condition or _DEFAULT_OUTPUT_CONDITION)
+        self.__on = ResultCondition.loads(on_ or _DEFAULT_RESULT_CONDITION)
 
-        _ITagFileOutput.__init__(self, self.__local, self.__tag)
+        _ITagFileOutput.__init__(self, self.__local, self.__tag, self.__condition, self.__on)
 
     @property
     def tag(self) -> str:
@@ -65,13 +72,11 @@ class TagFileOutputTemplate(FileOutputTemplate, _ITagFileOutput):
         _local = os.path.normpath(
             os.path.abspath(os.path.join(workdir, _check_workdir_file(env_template(self.__local, environ)))))
 
-        return TagFileOutput(
-            pool=pool, local=_local, tag=_tag,
-        )
+        return TagFileOutput(pool, _local, _tag, self.__condition, self.__on)
 
 
 class TagFileOutput(FileOutput, _ITagFileOutput):
-    def __init__(self, pool: FilePool, local: str, tag: str):
+    def __init__(self, pool: FilePool, local: str, tag: str, condition: OutputCondition, on_: ResultCondition):
         """
         :param pool: file pool
         :param local: local path
@@ -80,8 +85,10 @@ class TagFileOutput(FileOutput, _ITagFileOutput):
         self.__pool = pool
         self.__local = local
         self.__tag = tag
+        self.__condition = condition
+        self.__on = on_
 
-        _ITagFileOutput.__init__(self, self.__local, self.__tag)
+        _ITagFileOutput.__init__(self, self.__local, self.__tag, self.__condition, self.__on)
 
     @property
     def tag(self) -> str:
