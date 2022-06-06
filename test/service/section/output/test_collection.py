@@ -61,7 +61,7 @@ class TestServiceSectionOutputCollection:
             shutil.copyfile('README.md', os.path.join(wtd, '123', 'r.md'))
 
             fc = fct(scriptdir=ttd, workdir=wtd, pool=pool, environ=dict(V='233', DIR='123'))
-            fc()
+            fc(run_success=True)
 
             _copy_target_file = os.path.join(ttd, '123', 'r233.md')
             assert os.path.exists(_copy_target_file)

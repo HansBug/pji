@@ -85,12 +85,14 @@ class FileOutputCollection(_IFileOutputCollection):
     def __iter__(self):
         return self.items.__iter__()
 
-    def __call__(self, output_collection_start: Optional[Callable[['FileOutputCollection'], None]] = None,
+    def __call__(self, *,
+                 run_success: bool,
+                 output_collection_start: Optional[Callable[['FileOutputCollection'], None]] = None,
                  output_collection_complete: Optional[Callable[['FileOutputCollection'], None]] = None, **kwargs):
         """
         execute this file output setting
         """
         wrap_empty(output_collection_start)(self)
         for item in self.__items:
-            item(**kwargs)
+            item(run_success=run_success, **kwargs)
         wrap_empty(output_collection_complete)(self)

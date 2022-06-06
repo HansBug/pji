@@ -1,7 +1,7 @@
 import os
-import tempfile
 
 import pytest
+from hbutils.testing import isolated_directory
 
 from pji.service.section.input.link import LinkFileInputTemplate
 
@@ -19,60 +19,78 @@ class TestServiceSectionInputLink:
         assert lf.local == './r.md'
 
     def test_template_repr(self):
-        lf = LinkFileInputTemplate(
+        assert repr(LinkFileInputTemplate(
             file='README.md',
             local='./r.md',
-        )
+        )) == "<LinkFileInputTemplate file: 'README.md', local: './r.md', condition: required>"
 
-        assert repr(lf) == "<LinkFileInputTemplate file: 'README.md', local: './r.md'>"
+        assert repr(LinkFileInputTemplate(
+            file='README.md',
+            local='./r.md',
+            condition='optional',
+        )) == "<LinkFileInputTemplate file: 'README.md', local: './r.md', condition: optional>"
 
     def test_template_call_and_link(self):
         lf = LinkFileInputTemplate(
             file='README.md',
             local='./r.md',
         )
-        with tempfile.TemporaryDirectory() as fd:
-            ln = lf(os.curdir, fd)
+        original_path = os.path.abspath('.')
 
-            assert ln.file == os.path.abspath('README.md')
-            assert ln.local == os.path.normpath(os.path.join(fd, 'r.md'))
+        with isolated_directory():
+            ln = lf(original_path, '.')
+
+            assert ln.file == os.path.join(original_path, 'README.md')
+            assert ln.local == os.path.abspath('r.md')
 
     def test_template_call_invalid(self):
         lf = LinkFileInputTemplate(
             file='README.md',
             local='./${DIR}/r.md',
         )
-        with tempfile.TemporaryDirectory() as fd:
+        original_path = os.path.abspath('.')
+
+        with isolated_directory():
             with pytest.raises(ValueError):
-                lf(os.curdir, fd, dict(DIR='..'))
+                lf(original_path, '.', dict(DIR='..'))
             with pytest.raises(KeyError):
-                lf(os.curdir, fd, None)
+                lf(original_path, '.', None)
 
     def test_link_repr(self):
         lf = LinkFileInputTemplate(
             file='README.md',
             local='./r.md',
+            condition='optional',
         )
-        with tempfile.TemporaryDirectory() as fd:
-            ln = lf(os.curdir, fd)
+        original_path = os.path.abspath('.')
 
-            assert repr(ln) == "<LinkFileInput file: '{cur}/README.md', local: '{fd}/r.md'>".format(
-                cur=os.path.abspath('.'), fd=fd)
+        with isolated_directory():
+            ln = lf(original_path, '.')
+
+            assert repr(ln) == f"<LinkFileInput file: '{os.path.join(original_path, 'README.md')}', " \
+                               f"local: '{os.path.abspath('r.md')}', condition: optional>"
 
     def test_link_call(self):
         lf = LinkFileInputTemplate(
             file='README.md',
             local='./r.md',
         )
-        with tempfile.TemporaryDirectory() as fd:
-            ln = lf(os.curdir, fd)
-            ln()
+        original_path = os.path.abspath('.')
 
-            _target_file = os.path.normpath(os.path.join(fd, 'r.md'))
-            assert os.path.exists(_target_file)
-            assert os.path.islink(_target_file)
-            with open('README.md', 'rb') as of, \
-                    open(_target_file, 'rb') as tf:
+        with isolated_directory():
+            ln = lf(original_path, '.')
+            _is_completed = False
+
+            def _complete():
+                nonlocal _is_completed
+                _is_completed = True
+
+            ln(input_complete=_complete)
+            assert _is_completed
+
+            assert os.path.exists('r.md')
+            assert os.path.islink('r.md')
+            with open(os.path.join(original_path, 'README.md'), 'rb') as of, open('r.md', 'rb') as tf:
                 assert of.read() == tf.read()
 
     def test_link_call_dir(self):
@@ -80,15 +98,66 @@ class TestServiceSectionInputLink:
             file='pji',
             local='pinit.py',
         )
-        with tempfile.TemporaryDirectory() as fd:
-            ln = lf(os.curdir, fd)
-            ln()
+        original_path = os.path.abspath('.')
 
-            _target_dir = os.path.normpath(os.path.join(fd, 'pinit.py'))
-            assert os.path.exists(_target_dir)
-            assert os.path.islink(_target_dir)
-            with open(os.path.normpath(os.path.join('pji', '__init__.py')), 'rb') as of, \
-                    open(os.path.normpath(os.path.join(_target_dir, '__init__.py')), 'rb') as tf:
+        with isolated_directory():
+            ln = lf(original_path, '.')
+            _is_completed = False
+
+            def _complete():
+                nonlocal _is_completed
+                _is_completed = True
+
+            ln(input_complete=_complete)
+            assert _is_completed
+
+            assert os.path.exists('pinit.py')
+            assert os.path.islink('pinit.py')
+            with open(os.path.join(original_path, 'pji', '__init__.py'), 'rb') as of, \
+                    open(os.path.join('pinit.py', '__init__.py'), 'rb') as tf:
                 assert of.read() == tf.read()
 
-    pass
+    def test_link_failed(self):
+        lf = LinkFileInputTemplate(
+            file='README.mdxxxxxxxxxxxxxxx',
+            local='./r.md',
+        )
+        original_path = os.path.abspath('.')
+
+        with isolated_directory():
+            ln = lf(original_path, '.')
+            _is_completed = False
+
+            def _complete():
+                nonlocal _is_completed
+                _is_completed = True
+
+            with pytest.raises(FileNotFoundError):
+                ln(input_complete=_complete)
+            assert not _is_completed
+            assert not os.path.exists('r.md')
+
+    def test_link_skipped(self):
+        lf = LinkFileInputTemplate(
+            file='README.mdxxxxxxxxxxxxxxx',
+            local='./r.md',
+            condition='optional',
+        )
+        original_path = os.path.abspath('.')
+
+        with isolated_directory():
+            ln = lf(original_path, '.')
+            _is_completed, _is_skipped = False, False
+
+            def _complete():
+                nonlocal _is_completed
+                _is_completed = True
+
+            def _skip():
+                nonlocal _is_skipped
+                _is_skipped = True
+
+            ln(input_complete=_complete, input_skip=_skip)
+            assert not _is_completed
+            assert _is_skipped
+            assert not os.path.exists('r.md')

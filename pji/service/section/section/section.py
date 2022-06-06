@@ -108,8 +108,7 @@ class Section(_ISection):
 
             self.__inputs_getter(workdir=workdir)(**kwargs)
             _success, _results = self.__commands_getter(workdir=workdir)(**kwargs)
-            if _success:
-                self.__outputs_getter(workdir=workdir)(**kwargs)
+            self.__outputs_getter(workdir=workdir)(run_success=_success, **kwargs)
             _info = self.__infos_getter(workdir=workdir)(**kwargs)
             if self.__info_dump:
                 wrap_empty(info_dump_start)(self, _info)
