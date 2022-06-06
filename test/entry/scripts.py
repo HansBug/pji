@@ -15,8 +15,9 @@ tasks:
           - "link:test_script.pyxxxxxxxxxxxx:test_script.py:optional"
           - "tag:tag_yxxxxxxxxxxxx:test_script.py:::optional"
         outputs:
-          - "tag:wc_result.txt:wc"
+          - "tag:wc_result.txt:wc::all"
           - "tag:input_result.txt:input"
+          - "copy:no_such_file.txt:nf.txt:optional:all"
         infos:
           wc: "tag:wc"
           input: "tag:input"

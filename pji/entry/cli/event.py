@@ -86,6 +86,9 @@ class DispatchEventRunner(DispatchRunner):
     def _output_complete(self, output: FileOutput):
         click.echo(click.style('COMPLETE', fg='green'))
 
+    def _output_skip(self, output: FileOutput):
+        click.echo(click.style('SKIPPED', fg='yellow'))
+
     def _info_mapping_start(self, mapping: SectionInfoMapping):
         click.echo(click.style('Collecting result information ... ', bold=False), nl=False)
 
