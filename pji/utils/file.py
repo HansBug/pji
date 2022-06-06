@@ -17,11 +17,11 @@ def _auto_delete(filename: str):
         os.remove(filename)
 
 
-def _check_from_file(from_file: str):
-    if not os.path.exists(from_file):
-        raise FileNotFoundError('File {filename} not found.'.format(filename=repr(from_file)))
-    if not os.access(from_file, os.R_OK):
-        raise PermissionError('File {filename} unreadable.'.format(filename=repr(from_file)))
+def _check_file_accessibility(file: str):
+    if not os.path.exists(file):
+        raise FileNotFoundError('File {filename} not found.'.format(filename=repr(file)))
+    if not os.access(file, os.R_OK):
+        raise PermissionError('File {filename} unreadable.'.format(filename=repr(file)))
 
 
 def _prepare_for_to_file(to_file: str, privilege=None, user=None, group=None):
@@ -36,7 +36,7 @@ def auto_copy_file(srcfile: str, dstfile: str, privilege=None, user=None, group=
     user = SystemUser.loads(user) if user else None
     group = SystemGroup.loads(group) if group else None
 
-    _check_from_file(srcfile)
+    _check_file_accessibility(srcfile)
     _prepare_for_to_file(dstfile, privilege, user, group)
     if os.path.isdir(srcfile):
         shutil.copytree(srcfile, dstfile)
@@ -50,7 +50,7 @@ def auto_copy_file(srcfile: str, dstfile: str, privilege=None, user=None, group=
 
 
 def auto_link_file(from_file: str, to_file: str):
-    _check_from_file(from_file)
+    _check_file_accessibility(from_file)
     _prepare_for_to_file(to_file)
     os.symlink(from_file, to_file)
 
@@ -125,6 +125,7 @@ class FilePool:
 
     def __setitem__(self, tag, filename):
         with self.__lock:
+            _check_file_accessibility(filename)  # check if the file exist
             self.check_tag_name(tag)
             if tag in self.__file_dirs.keys():
                 self.__remove_tag_file(tag)

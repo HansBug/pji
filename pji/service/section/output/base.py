@@ -33,5 +33,15 @@ class ResultCondition(IntEnum):
     FAIL = 2
     ALL = 3
 
+    def need_run(self, success: bool):
+        if self == self.SUCCESS:
+            return success
+        elif self == self.FAIL:
+            return not success
+        elif self == self.ALL:
+            return True
+        else:
+            raise ValueError(f'Unknown result condition - {self}.')  # pragma: no cover
+
 
 _DEFAULT_RESULT_CONDITION = ResultCondition.SUCCESS

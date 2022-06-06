@@ -1,6 +1,6 @@
 import os
 from abc import ABCMeta
-from typing import Optional, Mapping, Callable
+from typing import Optional, Mapping, Callable, Union
 
 from hbutils.model import get_repr_info
 from hbutils.string import env_template
@@ -48,7 +48,9 @@ class _ICopyFileOutput(metaclass=ABCMeta):
 
 
 class CopyFileOutputTemplate(FileOutputTemplate, _ICopyFileOutput):
-    def __init__(self, local: str, file: str, condition=None, on_=None):
+    def __init__(self, local: str, file: str,
+                 condition: Union[OutputCondition, str, None] = None,
+                 on_: Union[ResultCondition, str, None] = None):
         """
         :param local: local path
         :param file: file path
@@ -111,11 +113,16 @@ class CopyFileOutput(FileOutput, _ICopyFileOutput):
     def __call__(self, *,
                  run_success: bool,
                  output_start: Optional[Callable[['CopyFileOutput'], None]] = None,
-                 output_complete: Optional[Callable[['CopyFileOutput'], None]] = None, **kwargs):
+                 output_complete: Optional[Callable[['CopyFileOutput'], None]] = None,
+                 output_skip: Optional[Callable[['CopyFileOutput'], None]] = None, **kwargs):
         """
         execute this file output
         """
-        if run_success:
+        if self.__on.need_run(run_success):
             wrap_empty(output_start)(self)
-            auto_copy_file(self.__local, self.__file)
-            wrap_empty(output_complete)(self)
+            if self.__condition == OutputCondition.OPTIONAL and \
+                    (not os.path.exists(self.__local) or not os.access(self.__local, os.R_OK)):
+                wrap_empty(output_skip)(self)
+            else:
+                auto_copy_file(self.__local, self.__file)
+                wrap_empty(output_complete)(self)
